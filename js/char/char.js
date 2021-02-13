@@ -6,16 +6,16 @@
      */
     const SpriteCharSetting = g.SpriteCharSetting = {
         // width: 32, height: 32,
-        width: 128, height: 128,
+        width: 96, height: 128,
         animation_asset: 'char',//ASSETS.spritesheet
         directions: ["up","right","down","left"],
         actions: ["stand","jump","walk","run","damage"],
         default_direction: 'down',
         default_action: 'walk',
-        collider_width: 64,
-        collider_height: 64,
+        collider_width: 48,
+        collider_height: 48,
         collider_offset_x: 0,
-        collider_offset_y: 32,
+        collider_offset_y: 48,
     };
 
     phina.define('SpriteCharBase', {
@@ -45,7 +45,7 @@
                 offset_x: this.collider_setting_offset_x || SpriteCharSetting.collider_offset_x || 0,
                 offset_y: this.collider_setting_offset_y || SpriteCharSetting.collider_offset_y || 0,
             };
-            this.collider.hide();//.show();
+            this.collider.show();//.hide();//
             this.collider.setSize(collider_setting.width, collider_setting.height);
             this.collider.offset(collider_setting.offset_x, collider_setting.offset_y);
 

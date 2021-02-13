@@ -1,8 +1,7 @@
 const ASSETS = {
   image: {
-    elf: "ASSETS/image/chars/Elf-female.4x.png",
-    gob: "ASSETS/image/chars/Gob-normal.4x.png",
-    org: "ASSETS/image/chars/Org-green.4x.png",
+    hero: "ASSETS/image/chars/hero.png",
+    elf: "ASSETS/image/chars/elf.png",
   },
   spritesheet: {
     char: "ASSETS/tmss/character.tmss",
@@ -20,7 +19,7 @@ phina.define('MainScene', {
     this.canvas.imageSmoothingEnabled = false;
 
     // スプライト画像作成
-    const sprite = SpriteCharBase('gob').addChildTo(this);
+    const sprite = SpriteCharBase('elf').addChildTo(this);
     sprite.x = this.gridX.center();
     sprite.y = this.gridY.center();
 
@@ -58,7 +57,7 @@ phina.define('MainScene', {
     };
 
     //当たり判定
-    const collision = SpriteCharBase('elf').addChildTo(this);
+    const collision = SpriteCharBase('hero').addChildTo(this);
     collision.onenterframe = function(e){
       const self = this;
       e.app.pointers.forEach(function(p){
