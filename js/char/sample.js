@@ -64,7 +64,7 @@ phina.define('MainScene', {
         self.x = p.x;
         self.y = p.y;
       });      
-      const hit = this.collider.hitTest(sprite.collider);
+      const hit = this.hitTestElement(sprite);
       if(hit){
         this.visible = !this.visible;
       }else{

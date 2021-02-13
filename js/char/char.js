@@ -48,7 +48,6 @@
             this.collider.show();//.hide();//
             this.collider.setSize(collider_setting.width, collider_setting.height);
             this.collider.offset(collider_setting.offset_x, collider_setting.offset_y);
-
         },
         setCharAnimation(){
             const animation = `${this.action}_${this.direction}`;
@@ -67,6 +66,13 @@
             }
             this.action = action;
             this.setCharAnimation();
+        },
+        hitTestElement: function(target){//override
+            if(target.collider){
+                return this.collider.hitTest(target.collider);
+            }else{
+                return this.superMethod('hitTestElement', target);
+            }
         },
     });
     
