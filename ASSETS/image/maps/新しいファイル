@@ -1,0 +1,38 @@
+
+convert -scale 400% bg_castle_1.png bg_castle_1_4x.png
+convert -scale 400% bg_castle_2.png bg_castle_2_4x.png
+convert -scale 400% bg_cave_1.png   bg_cave_1_4x.png
+convert -scale 400% bg_cave_2.png   bg_cave_2_4x.png
+convert -scale 400% bg_cave_2.png   bg_cave_2_4x.png
+convert -scale 400% bg_field_2.png  bg_field_2_4x.png
+convert -scale 400% bg_field_3.png  bg_field_3_4x.png
+convert -scale 400% bg_rockey_1.png bg_rockey_1_4x.png
+convert -scale 400% bg_rockey_2.png bg_rockey_2_4x.png
+
+障害物
+ 0 1 2  右に行くほど出現しにくい
+
+橋
+ 3 4 5  上端: 穴に掛ける(左右部分は通行不可)
+ 6 7 8  連続: 穴に掛ける(左右部分は通行不可)
+ 91011  下端: 穴に掛ける(左右部分は通行不可)
+
+背景1: 通常
+121314  □■┼: □未使用、■ベース、┼未使用
+151617  ┌─┐
+181920  │　│
+212223  └─┘
+
+背景2: アクセント
+242526  □■┼: この列は多分使わない
+272829  ┌─┐
+303132  │　│
+333435  └─┘
+
+背景3: 穴
+363738  □■┼: この列は多分使わない
+394041  ┌─┐
+424344  │　│
+454647  └─┘
+
+すべての背景の最低矩形サイズは2x2
