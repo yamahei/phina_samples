@@ -1,11 +1,11 @@
 const ASSETS = {
-  image: {
-    hero: "ASSETS/image/chars/hero.png",
-    elf: "ASSETS/image/chars/elf.png",
-  },
-  spritesheet: {
-    char: "ASSETS/tmss/character.tmss",
-  },
+	image: {
+		hero: "ASSETS/image/chars/hero.png",
+		elf: "ASSETS/image/chars/elf.png",
+	},
+	spritesheet: {
+		char: "ASSETS/tmss/character.tmss",
+	},
 };
 
 // phina.js をグローバル領域に展開
@@ -63,7 +63,7 @@ phina.define('MainScene', {
       e.app.pointers.forEach(function(p){
         self.x = p.x;
         self.y = p.y;
-      });      
+      });
       const hit = this.hitTestElement(sprite);
       if(hit){
         this.visible = !this.visible;

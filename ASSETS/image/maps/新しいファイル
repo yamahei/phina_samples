@@ -4,6 +4,7 @@ convert -scale 400% bg_castle_2.png bg_castle_2_4x.png
 convert -scale 400% bg_cave_1.png   bg_cave_1_4x.png
 convert -scale 400% bg_cave_2.png   bg_cave_2_4x.png
 convert -scale 400% bg_cave_2.png   bg_cave_2_4x.png
+convert -scale 400% bg_field_1.png  bg_field_1_4x.png
 convert -scale 400% bg_field_2.png  bg_field_2_4x.png
 convert -scale 400% bg_field_3.png  bg_field_3_4x.png
 convert -scale 400% bg_rockey_1.png bg_rockey_1_4x.png
@@ -18,21 +19,21 @@ convert -scale 400% bg_rockey_2.png bg_rockey_2_4x.png
  91011  下端: 穴に掛ける(左右部分は通行不可)
 
 背景1: 通常
-121314  □■┼: □未使用、■ベース、┼未使用
+121314  □■┼: □未使用、■ベース背景、┼未使用
 151617  ┌─┐
-181920  │　│
+181920  │◆│◆: 背景1の基本形
 212223  └─┘
 
 背景2: アクセント
 242526  □■┼: この列は多分使わない
 272829  ┌─┐
-303132  │　│
+303132  │◇│◇: 背景2の基本形
 333435  └─┘
 
 背景3: 穴
 363738  □■┼: この列は多分使わない
 394041  ┌─┐
-424344  │　│
+424344  │●│●: 穴の基本形
 454647  └─┘
 
 すべての背景の最低矩形サイズは2x2
