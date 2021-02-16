@@ -1,0 +1,54 @@
+{
+    "map_width": 4, "map_height": 4,
+    "chip_width": 64, "chip_height": 64,
+    "symbol_digit": 2,
+    "chips": [
+
+        { "name": "//標準の障害物(*)",
+          "index": 0, "symbol": "*0", "layer": "over", "collision": 1, "event": "wall"},
+        { "index": 1, "symbol": "*1", "layer": "over", "collision": 1, "event": "wall"},
+        { "index": 2, "symbol": "*2", "layer": "over", "collision": 1, "event": "wall"},
+
+        { "name": "//橋(#)",
+          "index":  3, "symbol": "#7", "layer": "over", "collision": 1, "event": "wall" },
+        { "index":  4, "symbol": "#8", "layer": "over" },
+        { "index":  5, "symbol": "#9", "layer": "over", "collision": 1, "event": "wall" },
+        { "index":  6, "symbol": "#4", "layer": "over", "collision": 1, "event": "wall" },
+        { "index":  7, "symbol": "#+", "layer": "over" },
+        { "index":  8, "symbol": "#6", "layer": "over", "collision": 1, "event": "wall" },
+        { "index":  9, "symbol": "#1", "layer": "over", "collision": 1, "event": "wall" },
+        { "index": 10, "symbol": "#2", "layer": "over" },
+        { "index": 11, "symbol": "#3", "layer": "over", "collision": 1, "event": "wall" },
+
+        { "name": "//ベース背景(@)",
+          "index": 13, "symbol": "@+", "layer": "over" },
+
+        { "name": "//背景1($)",
+          "index": 15, "symbol": "$7", "layer": "over" },
+        { "index": 16, "symbol": "$8", "layer": "over" },
+        { "index": 17, "symbol": "$9", "layer": "over" },
+        { "index": 18, "symbol": "$4", "layer": "over" },
+        { "index": 19, "symbol": "$+", "layer": "over" },
+        { "index": 20, "symbol": "$6", "layer": "over" },
+        { "index": 21, "symbol": "$1", "layer": "over" },
+        { "index": 22, "symbol": "$2", "layer": "over" },
+        { "index": 23, "symbol": "$3", "layer": "over" },
+
+        { "name": "//背景2(%)",
+          "index": 27, "symbol": "%7", "layer": "over", "collision": 0.25, "event": "fall" },
+        { "index": 28, "symbol": "%8", "layer": "over", "collision": 0.25, "event": "fall" },
+        { "index": 29, "symbol": "%9", "layer": "over", "collision": 0.25, "event": "fall" },
+        { "index": 30, "symbol": "%4", "layer": "over", "collision": 0.25, "event": "fall" },
+        { "index": 31, "symbol": "%+", "layer": "over", "collision": 0.25, "event": "fall" },
+        { "index": 32, "symbol": "%6", "layer": "over", "collision": 0.25, "event": "fall" },
+        { "index": 33, "symbol": "%1", "layer": "over", "collision": 0.25, "event": "fall" },
+        { "index": 34, "symbol": "%2", "layer": "over", "collision": 0.25, "event": "fall" },
+        { "index": 35, "symbol": "%3", "layer": "over", "collision": 0.25, "event": "fall" }
+    ],
+    "tiles": [
+        "$7$9@+@+",
+        "$1$3@+@+",
+        "@+@+@+@+",
+        "@+@+%7%8"
+    ]
+}
