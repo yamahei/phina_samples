@@ -19,11 +19,6 @@
         superClass: 'MapLayer',
         init: function(options) {
             this.superInit(options);
-            // this.layer_hover = MapLayer(options).addChildTo(this);
-            // this.layer_field = MapLayer(options).addChildTo(this);
-            // this.layer_over  = MapLayer(options).addChildTo(this);
-            // this.layer_under = MapLayer(options).addChildTo(this);
-
             this.addChild(this.layer_hover = MapLayer(options));
             this.addChild(this.layer_field = MapLayer(options));
             this.addChild(this.layer_over  = MapLayer(options));
@@ -51,15 +46,15 @@
         addChildToOver:  function(mapchip){ return this.layer_over.addChild(mapchip); },
         addChildToUnder: function(mapchip){ return this.layer_under.addChild(mapchip); },
 
-        clear: function(){
-            this.layers.forEach(function(layer){
-                layer.obj.children.clear();
+        clear_chips: function(){
+            this.children.forEach(function(layer){
+                layer.children.clear();
             });
             return this;
         },
         create: function(sprite_sheet, _map_data){
             const map_data = this.validate_map_data(_map_data);
-            this.clear();
+            this.clear_chips();
 
             const chip_height = map_data.chip_height;
             const chip_width = map_data.chip_width;
@@ -84,10 +79,10 @@
                         mapchip.x = x * chip_width;
                         mapchip.y = y * chip_height;
                         switch(col.layer){
-                            case LAYER_HOVER: return this.addChildToHover(mapchip);
-                            case LAYER_FIELD: return this.addChildToField(mapchip);
-                            case LAYER_OVER:  return this.addChildToOver(mapchip);
-                            case LAYER_UNDER: return this.addChildToUnder(mapchip);
+                            case LAYER_HOVER: this.addChildToHover(mapchip); break;
+                            case LAYER_FIELD: this.addChildToField(mapchip); break;
+                            case LAYER_OVER:  this.addChildToOver(mapchip);  break;
+                            case LAYER_UNDER: this.addChildToUnder(mapchip); break;
                             default: throw new Error(`layer '${col.layer}' not found.`);
                         }
                     }

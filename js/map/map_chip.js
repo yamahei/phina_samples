@@ -14,6 +14,9 @@
             if(collision){
                 this.collider.show();//.hide();//
                 this.collider.setSize(width * collision, height * collision);
+                const offset_x = (width - width * collision) / 2
+                const offset_y = (height - height * collision) / 2
+                this.collider.offset(offset_x, offset_y);
             }
         },
         hitTestElement: function(target){//override
