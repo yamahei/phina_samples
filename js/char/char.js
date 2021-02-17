@@ -71,10 +71,15 @@
             if(target.collider){
                 return this.collider.hitTest(target.collider);
             }else{
-                return this.superMethod('hitTestElement', target);
+                if(target.className == "SpriteMapChip"){
+                    //colliderのないSpriteMapChipはヒットしない
+                    return false;
+                }else{
+                    return this.superMethod('hitTestElement', target);
+                }
             }
         },
     });
-    
+
 
 })(this);

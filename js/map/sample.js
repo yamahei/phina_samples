@@ -27,7 +27,12 @@ phina.define('MainScene', {
 		const bg_images = Object.keys(AssetManager.assets.image);
 		const bg_image = bg_images[Math.floor(Math.random() * 1000) % bg_images.length];
 		const data = AssetManager.assets.json.map_sample.data;
-		const map = this.map = MapTopView().create(bg_image, data);
+		const map = this.map = window.map = MapTopView().create(bg_image, data).addChildTo(this);
+		// map.onenterframe = function(e){
+		// 	map.x = (map.x + 10) % e.app.gridX.width;
+		// 	map.y = (map.y + 10) % e.app.gridY.width;
+		// 	console.log([map.x, map.y]);
+		// };
 	},
 
 });
