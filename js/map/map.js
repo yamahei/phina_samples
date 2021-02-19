@@ -1,6 +1,7 @@
 (function(g){
 
     "use strict";
+    const LAYER_MIXED = 'MIXED';//不定（chip.layerで決定する）
     const LAYER_HOVER = 'hover';//キャラクタを覆い隠すオブジェクトの層
     const LAYER_FIELD = 'field';//一般的にキャラクタを配置する層
     const LAYER_OVER  = 'over';//地面を覆い隠すオブジェクトの層（キャラクタよりは下）
@@ -25,10 +26,10 @@
             this.addChild(this.layer_under = MapLayer(options));
 
             this.layers = [
-                {name: LAYER_HOVER, obj: this.layer_hover, sort: false},
-                {name: LAYER_FIELD, obj: this.layer_field, sort: true},
-                {name: LAYER_OVER,  obj: this.layer_over,  sort: false},
-                {name: LAYER_UNDER, obj: this.layer_under, sort: false},
+                {name: LAYER_HOVER, obj: this.layer_hover, map: [], sort: false},
+                {name: LAYER_FIELD, obj: this.layer_field, map: [], sort: true},
+                {name: LAYER_OVER,  obj: this.layer_over,  map: [], sort: false},
+                {name: LAYER_UNDER, obj: this.layer_under, map: [], sort: false},
             ];
             this.layers.forEach(function(layer){
                 //y座標の小さい順位ソート（上から順に描画）
@@ -40,29 +41,78 @@
                     };
                 }
             });
+            this.map_width = null;
+            this.map_height = null;
+            this.chip_width = null;
+            this.chip_height = null;
+            this.symbol_digit = null;
+            this.chip_of_null = null;
+            this.chips = null;
+            this.sprite_sheet = null;
         },
-        addChildToHover: function(mapchip){ return this.layer_hover.addChild(mapchip); },
-        addChildToField: function(mapchip){ return this.layer_field.addChild(mapchip); },
-        addChildToOver:  function(mapchip){ return this.layer_over.addChild(mapchip); },
-        addChildToUnder: function(mapchip){ return this.layer_under.addChild(mapchip); },
+        addChar: function(char){ return this.addChildToField(char); },
 
-        clear_chips: function(){
-            this.children.forEach(function(layer){
-                layer.children.clear();
+        create: function(sprite_sheet, _map_data){
+
+            this.sprite_sheet = sprite_sheet;
+            const map_data = this._parse_map_data(_map_data);
+
+            this._clear_chips();
+            const tiles = map_data.tiles;
+            const self = this;
+            Object.keys(tiles).forEach(function(layer){
+                self.layout_tile(layer, tiles[layer]);
             });
+
             return this;
         },
-        create: function(sprite_sheet, _map_data){
-            const map_data = this.validate_map_data(_map_data);
-            this.clear_chips();
 
-            const chip_height = map_data.chip_height;
-            const chip_width = map_data.chip_width;
-            const chips = map_data.chips;
-            const tiles = map_data.tiles;
+        /**
+         * マップの簡易表現を配列[y][x]に成形する
+         * @param {*} tile map_width * map_height * symbol_digit桁の文字列または配列[map_height] → 要素はmap_width * symbol_digit桁の文字列
+         */
+        parse_tile: function(tile){
+            const map_width = this.map_width;
+            const map_height = this.map_height;
+            const symbol_digit = this.symbol_digit;
+            const chip_of_null = this.chip_of_null;
 
-            for(let y=0; y<tiles.length; y++){
-                const row = tiles[y];
+            const is_string = (tile.constructor === String);
+            const is_array = (tile.constructor === Array);
+            if(!is_string && !is_array){
+                console.log(tile);
+                throw new Error(`map_data.tiles[n] must be String or Array.`);
+            }
+            const tile_str = is_array ? tile.flat(Infinity).join("") : tile;
+            const expect_length = map_width * map_height * symbol_digit;
+            if(tile_str.length != expect_length){
+                console.log(tile_str);
+                throw new Error(`tile expects ${expect_length} length: ${[map_width, map_height, symbol_digit]}`);
+            }
+            const reg_row = new RegExp(`(.{${symbol_digit}}){${map_width}}`, "g");
+            const reg_col = new RegExp(`.{${symbol_digit}}`, "g");
+            const tile_arr = tile_str.match(reg_row).map(function(row){
+                return row.match(reg_col).map(function(symbol){
+                    return symbol == chip_of_null ? null : symbol;
+                });
+            });
+            return tile_arr;
+        },
+
+        /**
+         * 特定のレイヤーにmapchipを配置する
+         *  * sprite_sheet, map_dataが配置（create実行）済みであること
+         * @param {*} _layer レイヤー名 MIXEDの時chips.layerを見て自動配置する
+         * @param {*} tile parse_tileされたmap_width x map_heightの配列（[y][x]）要素はsymbol_digit桁のマップチップを表すシンボル
+         */
+        layout_tile: function(_layer, tile){
+            const sprite_sheet = this.sprite_sheet;
+            const chip_width = this.chip_width;
+            const chip_height = this.chip_height;
+            const chips = this.chips;
+
+            for(let y=0; y<tile.length; y++){
+                const row = tile[y];
                 for(let x=0; x<row.length; x++){
                     const symbol = row[x];
                     const col = chips.find(function(chip){
@@ -72,37 +122,61 @@
                         throw new Error(`symbol '${symbol}' not found in chips.`);
                     }else{
                         const mapchip = SpriteMapChip(
-                            sprite_sheet,
+                            sprite_sheet, symbol,
                             chip_width, chip_height,
                             col.index, col.collision, col.event
                         );
                         mapchip.x = x * chip_width;
                         mapchip.y = y * chip_height;
-                        switch(col.layer){
-                            case LAYER_HOVER: this.addChildToHover(mapchip); break;
-                            case LAYER_FIELD: this.addChildToField(mapchip); break;
-                            case LAYER_OVER:  this.addChildToOver(mapchip);  break;
-                            case LAYER_UNDER: this.addChildToUnder(mapchip); break;
-                            default: throw new Error(`layer '${col.layer}' not found.`);
+                        const layer_name = (_layer == LAYER_MIXED) ? col.layer : _layer;
+                        const target_layer = this.layers.find(function(layer){
+                            return layer.name == layer_name;
+                        });
+                        if(!target_layer){
+                            throw new Error(`layer '${col.layer}' not found.`);
+                        }else{
+                            target_layer.obj.addChild(mapchip);
+                            target_layer.map[y][x] = mapchip;
                         }
                     }
                 }
             }
+        },
+
+        _clear_chips: function(){
+            const map_width = this.map_width;
+            const map_height = this.map_height;
+
+            this.layers.forEach(function(layer){
+                layer.obj.children.clear();
+                layer.map = (new Array(map_height)).fill(null).map(function(row){
+                    return (new Array(map_width)).fill(null);
+                });
+            });
             return this;
         },
-        validate_map_data: function(_map_data){
+
+        _parse_map_data: function(_map_data){
             const map_data = {
                 map_width: _map_data.map_width || 32,
                 map_height: _map_data.map_height || 64,
                 chip_width: _map_data.chip_width || 32,
                 chip_height: _map_data.chip_height || 32,
                 symbol_digit: _map_data.symbol_digit || 2,
+                chip_of_null: _map_data.chip_of_null || "  ",
             };
-            map_data.chips = this.convert_chips(_map_data.chips);
-            map_data.tiles = this.convert_tiles(_map_data.tiles, map_data.map_width, map_data.map_height, map_data.symbol_digit);
+            this.map_width = map_data.map_width;
+            this.map_height = map_data.map_height;
+            this.chip_width = map_data.chip_width;
+            this.chip_height = map_data.chip_height;
+            this.symbol_digit = map_data.symbol_digit;
+            this.chip_of_null = map_data.chip_of_null;
+            this.chips = map_data.chips = this._convert_chips(_map_data.chips);
+            this.tiles = map_data.tiles = this._convert_tiles(_map_data.tiles);
             return map_data;
         },
-        convert_chips: function(chips){
+
+        _convert_chips: function(chips){
             return chips.map(function(chip){
                 if(chip.index !== 0 && !chip.index){
                     throw new Error(`chip.index is required: ${chip.index}`);
@@ -120,27 +194,15 @@
                 };
             });
         },
-        convert_tiles: function(tiles, width, height, digit){
-            const is_string = (tiles.constructor === String);
-            const is_array = (tiles.constructor === Array);
-            if(!is_string && !is_array){
-                console.log(tiles);
-                throw new Error(`map_data.tiles must be String or Array: ${tiles}`);
-            }
-            const tile_str = is_array ? tiles.flat(Infinity).join("") : tiles;
-            const expect_length = width * height * digit;
-            if(tile_str.length != expect_length){
-                console.log(tile_str);
-                throw new Error(`tiles expects ${expect_length} length: ${[width, height, digit]}`);
-            }
-            const reg_row = new RegExp(`(.{${digit}}){${width}}`, "g");
-            const reg_col = new RegExp(`.{${digit}}`, "g");
-            const tile_arr = tile_str.match(reg_row).map(function(row){
-                return row.match(reg_col);
-            });
-            return tile_arr;
-        },
 
+        _convert_tiles: function(_tiles){
+            const self = this;
+            const tiles = {};
+            Object.keys(_tiles).forEach(function(layer_name){
+                tiles[layer_name] = self.parse_tile(_tiles[layer_name]);
+            });
+            return tiles;
+        },
     });
 
 })(this);

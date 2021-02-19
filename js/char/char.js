@@ -26,6 +26,7 @@
                 SpriteCharSetting.width,
                 SpriteCharSetting.height
             );
+            this.sprite_type = "char";
             /**
              * animation setting
              */
