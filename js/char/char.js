@@ -6,16 +6,16 @@
      */
     const SpriteCharSetting = g.SpriteCharSetting = {
         // width: 32, height: 32,
-        width: 96, height: 128,
+        width: 48, height: 64,
         animation_asset: 'char',//ASSETS.spritesheet
         directions: ["up","right","down","left"],
         actions: ["stand","jump","walk","run","damage"],
         default_direction: 'down',
         default_action: 'walk',
-        collider_width: 48,
-        collider_height: 48,
+        collider_width: 24,
+        collider_height: 24,
         collider_offset_x: 0,
-        collider_offset_y: 48,
+        collider_offset_y: 24,
     };
 
     phina.define('SpriteCharBase', {

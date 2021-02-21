@@ -1,6 +1,6 @@
 {
     "map_width": 5, "map_height": 5,
-    "chip_width": 64, "chip_height": 64,
+    "chip_width": 32, "chip_height": 32,
     "symbol_digit": 2,
     "chip_of_null": "  ",
     "chips": [
