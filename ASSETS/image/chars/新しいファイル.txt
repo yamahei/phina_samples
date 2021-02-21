@@ -1,0 +1,14 @@
+
+convert -scale 200% doors.png doors_2x.png
+convert -scale 200% items.png items_2x.png
+convert -scale 200% statuses.png statuses_2x.png
+convert -scale 200% switches.png switches_2x.png
+convert -scale 200% treasure_chest.png treasure_chest_2x.png
+
+convert -scale 400% doors.png doors_4x.png
+convert -scale 400% items.png items_4x.png
+convert -scale 400% statuses.png statuses_4x.png
+convert -scale 400% switches.png switches_4x.png
+convert -scale 400% treasure_chest.png treasure_chest_4x.png
+
+
