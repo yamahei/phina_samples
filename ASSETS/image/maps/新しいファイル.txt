@@ -10,6 +10,18 @@ convert -scale 400% bg_field_3.png  bg_field_3_4x.png
 convert -scale 400% bg_rockey_1.png bg_rockey_1_4x.png
 convert -scale 400% bg_rockey_2.png bg_rockey_2_4x.png
 
+convert -scale 200% bg_castle_1.png bg_castle_1_2x.png
+convert -scale 200% bg_castle_2.png bg_castle_2_2x.png
+convert -scale 200% bg_cave_1.png   bg_cave_1_2x.png
+convert -scale 200% bg_cave_2.png   bg_cave_2_2x.png
+convert -scale 200% bg_cave_2.png   bg_cave_2_2x.png
+convert -scale 200% bg_field_1.png  bg_field_1_2x.png
+convert -scale 200% bg_field_2.png  bg_field_2_2x.png
+convert -scale 200% bg_field_3.png  bg_field_3_2x.png
+convert -scale 200% bg_rockey_1.png bg_rockey_1_2x.png
+convert -scale 200% bg_rockey_2.png bg_rockey_2_2x.png
+
+
 障害物
  0 1 2  右に行くほど出現しにくい
 
