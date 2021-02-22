@@ -9,9 +9,14 @@ const ASSETS = {
 		map_field_3: "ASSETS/image/maps/bg_field_3_2x.png",
 		map_rockey_1: "ASSETS/image/maps/bg_rockey_1_2x.png",
 		map_rockey_2: "ASSETS/image/maps/bg_rockey_2_2x.png",
+
+		hero: "ASSETS/image/chars/hero.2x.png",
 	},
 	json: {
 		map_sample: "ASSETS/json/map/map_sample.json"
+	},
+	spritesheet: {
+		char: "ASSETS/tmss/character.tmss",
 	},
 };
 
@@ -30,6 +35,22 @@ phina.define('MainScene', {
 		const world = this.world = window.world = MapTopView();
 		world.create(bg_image, data);
 		this.addChild(world);
+		//当たり判定
+		const collision = SpriteCharBase('hero');
+		world.addChar(collision);
+		collision.onenterframe = function(e){
+			const self = this;
+			e.app.pointers.forEach(function(p){
+				self.x = p.x;
+				self.y = p.y;
+			});
+			const hit = world.hitTestElement(self);
+			if(hit){
+				this.visible = !this.visible;
+			}else{
+				this.visible = true;
+			}
+		};
 	},
 
 });

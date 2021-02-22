@@ -13,6 +13,7 @@
             this.symbol = symbol;
             this.event_name = event;
             this.sprite_type = "map";
+            this.need_hittest = !!collision;
             if(collision){
                 this.collider.show();//.hide();//
                 const size_w = width * collision;
@@ -25,7 +26,7 @@
         },
         hitTestElement: function(target){//override
             //colliderのないSpriteMapChipはヒットしない
-            if(!this.collider){ return false; }
+            if(!this.need_hittest){ return false; }
             if(target.collider){
                 return this.collider.hitTest(target.collider);
             }else{

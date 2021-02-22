@@ -1,7 +1,7 @@
 const ASSETS = {
 	image: {
-		hero: "ASSETS/image/chars/hero.png",
-		elf: "ASSETS/image/chars/elf.png",
+		hero: "ASSETS/image/chars/hero.2x.png",
+		elf: "ASSETS/image/chars/elf.2x.png",
 	},
 	spritesheet: {
 		char: "ASSETS/tmss/character.tmss",

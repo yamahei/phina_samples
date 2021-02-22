@@ -20,11 +20,12 @@
         superClass: 'MapLayer',
         init: function(options) {
             this.superInit(options);
-            this.addChild(this.layer_hover = MapLayer(options));
-            this.addChild(this.layer_field = MapLayer(options));
-            this.addChild(this.layer_over  = MapLayer(options));
+            //下から追加
             this.addChild(this.layer_under = MapLayer(options));
-
+            this.addChild(this.layer_over  = MapLayer(options));
+            this.addChild(this.layer_field = MapLayer(options));
+            this.addChild(this.layer_hover = MapLayer(options));
+            //管理は上から
             this.layers = [
                 {name: LAYER_HOVER, obj: this.layer_hover, map: [], sort: false},
                 {name: LAYER_FIELD, obj: this.layer_field, map: [], sort: true},
@@ -50,7 +51,7 @@
             this.chips = null;
             this.sprite_sheet = null;
         },
-        addChar: function(char){ return this.addChildToField(char); },
+        addChar: function(char){ return this.layer_field.addChild(char); },
 
         create: function(sprite_sheet, _map_data){
 
@@ -118,9 +119,7 @@
                     const col = chips.find(function(chip){
                         return chip.symbol == symbol;
                     });
-                    if(!col){
-                        throw new Error(`symbol '${symbol}' not found in chips.`);
-                    }else{
+                    if(col){
                         const mapchip = SpriteMapChip(
                             sprite_sheet, symbol,
                             chip_width, chip_height,
@@ -188,7 +187,7 @@
                     name: chip.name || null,
                     index: chip.index,
                     symbol: chip.symbol,
-                    layer: chip.layer || LAYER_OVER,
+                    layer: chip.layer || LAYER_UNDER,
                     collision: chip.collision || 0,
                     event: chip.event || null,
                 };
@@ -202,6 +201,65 @@
                 tiles[layer_name] = self.parse_tile(_tiles[layer_name]);
             });
             return tiles;
+        },
+
+        hitTestElement: function(sprite){
+            const leftX = Math.floor(sprite.left / this.chip_width);
+            const rightX = Math.ceil(sprite.right / this.chip_width);
+            const topY = Math.floor(sprite.top / this.chip_height);
+            const bottomY = Math.ceil(sprite.bottom / this.chip_height);
+            // console.log(`x: ${leftX}-${rightX}, y: ${topY}-${bottomY}`);
+            const DEBUG_RECT1 = this.append_rect(leftX*this.chip_width, rightX*this.chip_width, topY*this.chip_height, bottomY*this.chip_height, "red");
+            const layer = this.layers.find(function(_layer){
+                return _layer.name = LAYER_FIELD;
+            });
+            const layer_index = this.layers.indexOf(layer);
+            for(let y=topY; y<bottomY; y++){
+                if(y < 0 || this.map_height <= y){ continue; }
+                for(let x=leftX; x<rightX; x++){
+                    if(x < 0 || this.map_width <= x){ continue; }
+                    const DEBUG_RECT2 = this.append_rect(x*this.chip_width, (x+1)*this.chip_width, y*this.chip_height, (y+1)*this.chip_height, "blue");
+                    let index = layer_index;
+                    while(true){
+                        let current_layer = this.layers[index];
+                        if(!current_layer){ break; }
+
+                        const map = current_layer.map;
+                        let mapchip = (map[y] && map[y][x]) ? map[y][x] : null;
+                        if(mapchip && mapchip.hitTestElement(sprite)){
+                            console.log(`HIT: ${x}, ${y} (${mapchip.symbol})`);
+                            console.log(mapchip);
+                            this.remove_rect(DEBUG_RECT1);
+                            this.remove_rect(DEBUG_RECT2);
+                            return mapchip.event_name || true;
+                        }else{
+                            index += 1;
+                        }
+                    }
+                }
+            }
+            return false;
+        },
+
+        append_rect: function(x1, x2, y1, y2, color){
+            const rect = RectangleShape({
+                width: Math.abs(x1 - x2),
+                height: Math.abs(y1 - y2),
+                backgroundColor: "transparent",
+                fill: "transparent",
+                stroke: color,
+                strokeWidth:2,
+            });
+            rect.x = (x1 + x2) / 2;
+            rect.y = (y1 + y2) / 2;
+            this.addChild(rect);
+            this.remove_rect(rect);
+            return rect;
+        },
+        remove_rect: function(rect){
+            setTimeout(function(){
+                rect.remove();
+            }, 20);
         },
     });
 
