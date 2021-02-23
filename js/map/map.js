@@ -1,6 +1,7 @@
 (function(g){
 
     "use strict";
+    const MAP_DEBUG = true;
     const LAYER_MIXED = 'MIXED';//不定（chip.layerで決定する）
     const LAYER_HOVER = 'hover';//キャラクタを覆い隠すオブジェクトの層
     const LAYER_FIELD = 'field';//一般的にキャラクタを配置する層
@@ -208,8 +209,9 @@
             const rightX = Math.ceil(sprite.right / this.chip_width);
             const topY = Math.floor(sprite.top / this.chip_height);
             const bottomY = Math.ceil(sprite.bottom / this.chip_height);
-            // console.log(`x: ${leftX}-${rightX}, y: ${topY}-${bottomY}`);
-            const DEBUG_RECT1 = this.append_rect(leftX*this.chip_width, rightX*this.chip_width, topY*this.chip_height, bottomY*this.chip_height, "red");
+            if(MAP_DEBUG){
+                this.append_rect(leftX*this.chip_width, rightX*this.chip_width, topY*this.chip_height, bottomY*this.chip_height, "red");
+            }
             const layer = this.layers.find(function(_layer){
                 return _layer.name = LAYER_FIELD;
             });
@@ -218,7 +220,9 @@
                 if(y < 0 || this.map_height <= y){ continue; }
                 for(let x=leftX; x<rightX; x++){
                     if(x < 0 || this.map_width <= x){ continue; }
-                    const DEBUG_RECT2 = this.append_rect(x*this.chip_width, (x+1)*this.chip_width, y*this.chip_height, (y+1)*this.chip_height, "blue");
+                    if(MAP_DEBUG){
+                        this.append_rect(x*this.chip_width, (x+1)*this.chip_width, y*this.chip_height, (y+1)*this.chip_height, "blue");
+                    }
                     let index = layer_index;
                     while(true){
                         let current_layer = this.layers[index];
@@ -227,10 +231,6 @@
                         const map = current_layer.map;
                         let mapchip = (map[y] && map[y][x]) ? map[y][x] : null;
                         if(mapchip && mapchip.hitTestElement(sprite)){
-                            console.log(`HIT: ${x}, ${y} (${mapchip.symbol})`);
-                            console.log(mapchip);
-                            this.remove_rect(DEBUG_RECT1);
-                            this.remove_rect(DEBUG_RECT2);
                             return mapchip.event_name || true;
                         }else{
                             index += 1;
@@ -254,7 +254,6 @@
             rect.y = (y1 + y2) / 2;
             this.addChild(rect);
             this.remove_rect(rect);
-            return rect;
         },
         remove_rect: function(rect){
             setTimeout(function(){

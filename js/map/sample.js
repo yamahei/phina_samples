@@ -32,7 +32,7 @@ phina.define('MainScene', {
 		const bg_images = Object.keys(AssetManager.assets.image);
 		const bg_image = bg_images[Math.floor(Math.random() * 1000) % bg_images.length];
 		const data = AssetManager.assets.json.map_sample.data;
-		const world = this.world = window.world = MapTopView();
+		const world = MapTopView();
 		world.create(bg_image, data);
 		this.addChild(world);
 		//当たり判定
@@ -44,6 +44,13 @@ phina.define('MainScene', {
 				self.x = p.x;
 				self.y = p.y;
 			});
+			/**
+			 * 【注意】
+			 * MapTopViewの当たり判定は
+			 * MapTopView.hitTestElementに
+			 * SpriteCharBaseを与える
+			 * →逆だと機能しない
+			 */
 			const hit = world.hitTestElement(self);
 			if(hit){
 				this.visible = !this.visible;
