@@ -3,7 +3,12 @@ phina_samples
 
 [phina.js](https://phinajs.com/) を勉強しつつライブラリを充実させるて、最後にはゲームを作る予定
 
-動かし方
+GithubPages
+--------
+
+* [https://yamahei.github.io/phina_samples/](https://yamahei.github.io/phina_samples/)
+
+ローカルでの動かし方
 --------
 
 ASSET読み込みの都合があり、Webサーバを起動します
@@ -16,9 +21,19 @@ ruby -rsinatra -e 'set :public_folder, "./", get("/"){"Hello world"}'
 各ページの説明
 --------------
 
-### [スプライト制御のサンプル](http://localhost:4567/char_sample.html)
+### [スプライト制御のサンプル](char_sample.html)
 
 スプライトシートとアニメーション、当たり判定の制御のサンプルです。
 
-* 既定クラス: SpriteCharBase
+* 基底クラス: SpriteCharBase
 * 基本設定: SpriteCharSetting
+
+### [マップ当たり判定のサンプル](map_sample.html)
+
+* トップビューのマップ管理クラス: MapTopView
+* マップチップ管理クラス: SpriteMapChip
+
+#### マップの構成要素
+
+* スプライトシート
+* マップ定義定義(map_sample.json)
