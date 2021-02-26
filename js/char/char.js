@@ -5,17 +5,16 @@
      * ATTENTION: must include collider.js
      */
     const SpriteCharSetting = g.SpriteCharSetting = {
-        // width: 32, height: 32,
-        width: 48, height: 64,
+        width: 24, height: 32,
         animation_asset: 'char',//ASSETS.spritesheet
         directions: ["up","right","down","left"],
         actions: ["stand","jump","walk","run","damage"],
         default_direction: 'down',
         default_action: 'walk',
-        collider_width: 24,
-        collider_height: 24,
+        collider_width: 12,
+        collider_height: 12,
         collider_offset_x: 0,
-        collider_offset_y: 24,
+        collider_offset_y: 12,
     };
 
     phina.define('SpriteCharBase', {

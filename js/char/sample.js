@@ -1,13 +1,14 @@
 const ASSETS = {
 	image: {
-		hero: "ASSETS/image/chars/hero.2x.png",
-		elf: "ASSETS/image/chars/elf.2x.png",
+		hero: "ASSETS/image/chars/hero.png",
+		elf: "ASSETS/image/chars/elf.png",
 	},
 	spritesheet: {
 		char: "ASSETS/tmss/character.tmss",
 	},
 };
 
+const size = GameSize.byWidth(512);
 // phina.js をグローバル領域に展開
 phina.globalize();
 
@@ -15,7 +16,7 @@ phina.globalize();
 phina.define('MainScene', {
   superClass: 'DisplayScene',
   init: function() {
-    this.superInit();
+    this.superInit(size);
     this.canvas.imageSmoothingEnabled = false;
 
     // スプライト画像作成
@@ -77,10 +78,11 @@ phina.define('MainScene', {
 // メイン処理
 phina.main(function() {
   // アプリケーション生成
-  var app = GameApp({
+	const app = GameApp({
     startLabel: 'main', // メインシーンから開始する
     assets: ASSETS,
-  });
+    ...size,
+	});
   // アプリケーション実行
   app.run();
 });
