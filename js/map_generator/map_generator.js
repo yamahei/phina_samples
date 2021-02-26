@@ -7,7 +7,7 @@
      * ATTENTION: must include map.js
      */
     const MapGeneratorSetting = g.MapGeneratorSetting = {
-        "map_width": 32,
+        "map_width": 24,
         "map_height": 48,
         "map_min_height": 64,
         "map_max_height": 128,
@@ -40,7 +40,7 @@
             map_data.map_width = MapGeneratorSetting.map_width || map_data.map_width;
             map_data.tiles = { over: [], under: [] };
             // this.tiles = map_data.tiles;
-            // this.map_width = map_data.map_width;
+            this.map_width = map_data.map_width;
             // this.map_height = 0;//未確定
 
             const appear_criff = this.is_appear_criff();
@@ -56,9 +56,9 @@
             this.draw_map(map_data, map_scenes);
             //フチの処理
             //map_data.tiles形式に変換
-            //描画
-            // const sprite_sheet = this.get_sprite_sheet(stage_scene);
-            // return this.map.create(sprite_sheet, map_data);
+            //生成
+            const sprite_sheet = this.get_sprite_sheet(stage_scene);
+            return this.map.create(sprite_sheet, map_data);
         },
 
         get_sprite_sheet: function(stage_type){
@@ -69,7 +69,7 @@
                 ["map_castle_1", "map_castle_2"],
             ];
             const sheets = sheets_set[stage_type % sheets_set.length];
-            const random = this.random.randint(0, 1000);
+            const random = this.random.randint(0, 999);
             return sheets[random % sheets.length];
         },
         is_appear_criff: function(){
@@ -94,29 +94,29 @@
             }
         },
         draw_map__wall: function(map_data){
-            const wall_tiles = this.get_maplines(map_data, 12, MAPSYM_WALL, MAPSYM_EMPTY);
+            const wall_tiles = this.get_maplines(8, MAPSYM_WALL, MAPSYM_EMPTY);
             this.push_tiles(map_data, wall_tiles);
 
-            const ground_tiles = this.get_maplines(map_data, 16, MAPSYM_BASE, MAPSYM_EMPTY);
+            const ground_tiles = this.get_maplines(12, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
-            const p1 = {x: rnd.randint(0, 4), y: rnd.randint(0, 4)};
-            const p2 = {x: map_data.map_width - rnd.randint(0, 4), y: 16 - rnd.randint(0, 4)};
+            const p1 = {x: rnd.randint(1, 4), y: rnd.randint(1, 4)};
+            const p2 = {x: this.map_width - rnd.randint(1, 4), y: 12 - rnd.randint(1, 4)};
             ground_tiles.under = this.fill_rect(ground_tiles.under, p1, p2, MAPSYM_FLOOR2);
             this.push_tiles(map_data, ground_tiles);
         },
         draw_map__rough: function(map_data){
-            const rough_tiles = this.get_maplines(map_data, 32, MAPSYM_BASE, MAPSYM_EMPTY);
+            const rough_tiles = this.get_maplines(32, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
-
-            //rough
-            const rough_times = rnd.randint(2, 8);
-            const rough_maxarea = 12;
-            rough_tiles.under = this.spread_rects(rough_tiles.under, map_data.map_width, rough_times, rough_maxarea, 2, MAPSYM_FLOOR1, MAPSYM_BASE);
 
             //hole
             const hole_times = Math.min(Math.floor(this.level / 8) + 1, 4);
-            const hole_maxarea = 12;
-            rough_tiles.under = this.spread_rects(rough_tiles.under, map_data.map_width, hole_times, hole_maxarea, 3, MAPSYM_HOLE, MAPSYM_BASE);
+            const hole_maxarea = 16;
+            rough_tiles.under = this.spread_rects(rough_tiles.under, hole_times, hole_maxarea, 3, MAPSYM_HOLE, MAPSYM_BASE);
+
+            //rough
+            const rough_times = rnd.randint(2, 8);
+            const rough_maxarea = 16;
+            rough_tiles.under = this.spread_rects(rough_tiles.under, rough_times, rough_maxarea, 2, MAPSYM_FLOOR1, MAPSYM_BASE);
 
             //TODO: block
 
@@ -135,9 +135,10 @@
                 }
                 layer.push(..._layers[layer_name]);
             });
+            map_data.map_height = map_data.tiles.under.length;
         },
-        get_maplines: function(map_data, times, under_sym, over_sym){
-            const width = map_data.map_width;
+        get_maplines: function(times, under_sym, over_sym){
+            const width = this.map_width;
             const unders = (new Array(times)).fill(null).map(function(_){
                 return (new Array(width)).fill(under_sym);
             });
@@ -155,14 +156,14 @@
             }
             return layer;
         },
-        spread_rects: function(_layer, map_width, times, maxarea, minsize, fill_symbol, lay_symbol){
+        spread_rects: function(_layer, times, maxarea, minsize, fill_symbol, lay_symbol){
             const self = this;
             const rnd = this.random;
             let layer = JSON.parse(JSON.stringify(_layer));
             (new Array(times)).fill(null).map(function(_){
                 let counter = 0;
                 while(true){
-                    let [x1, x2] = [rnd.randint(0, map_width), rnd.randint(0, map_width)].sort();
+                    let [x1, x2] = [rnd.randint(0, self.map_width), rnd.randint(0, self.map_width)].sort();
                     let [y1, y2] = [rnd.randint(0, layer.length), rnd.randint(0, layer.length)].sort();
                     if(x2 - x1 < minsize || y2 - y1 < minsize){ continue; }
                     if((x2 - x1) * (y2 - y1) > maxarea){ continue; }
@@ -171,7 +172,7 @@
                     if(self.is_all(layer, p1, p2, lay_symbol)){
                         layer = self.fill_rect(layer, p1, p2, fill_symbol);
                         break;
-                    }else if(counter++ > 10){
+                    }else if(counter++ > 16){
                         break;//無限ループ防止
                     }
                 }

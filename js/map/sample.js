@@ -20,7 +20,7 @@ const ASSETS = {
 	},
 };
 
-const size = GameSize.byWidth(512);
+const size = GameSize.byWidth(384);
 // phina.js をグローバル領域に展開
 phina.globalize();
 
@@ -66,7 +66,6 @@ phina.define('MainScene', {
 // メイン処理
 phina.main(function() {
 	// アプリケーション生成
-	const size = GameSize.byWidth(512);
 	const app = GameApp({
 		startLabel: 'main', // メインシーンから開始する
 		assets: ASSETS,

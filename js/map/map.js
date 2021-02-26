@@ -158,10 +158,10 @@
 
         _parse_map_data: function(_map_data){
             const map_data = {
-                map_width: _map_data.map_width || 32,
+                map_width: _map_data.map_width || 24,
                 map_height: _map_data.map_height || 64,
-                chip_width: _map_data.chip_width || 32,
-                chip_height: _map_data.chip_height || 32,
+                chip_width: _map_data.chip_width || 16,
+                chip_height: _map_data.chip_height || 16,
                 symbol_digit: _map_data.symbol_digit || 2,
                 chip_of_null: _map_data.chip_of_null || "  ",
             };
