@@ -51,8 +51,37 @@
             this.chip_of_null = null;
             this.chips = null;
             this.sprite_sheet = null;
+            this.total_width = null;//
+            this.total_height = null;//
+            this.tracker = null;//追尾スクロール用
         },
         addChar: function(char){ return this.layer_field.addChild(char); },
+        setScrollTracker: function(char){
+            this.tracker = char;
+            if(char){
+                const self = this;
+                this.onenterframe = function(e){
+                    const game_width = e.app.gridX.width;
+                    const game_height = e.app.gridY.width;
+                    const center_x = game_width / 2;
+                    const center_y = game_height / 2;
+                    const gap_x = center_x - char.x;
+                    const gap_y = center_y - char.y;
+                    const scrollable_width = self.total_width - game_width;
+                    const scrollable_height = self.total_height - game_height;
+                    let offset_x = gap_x;
+                    let offset_y = gap_y;
+                    if(offset_x < -scrollable_width){ offset_x = -scrollable_width; }
+                    if(offset_x > 0){ offset_x = 0; }
+                    if(offset_y < -scrollable_height){ offset_y = -scrollable_height; }
+                    if(offset_y > 0){ offset_y = 0; }
+                    self.x = offset_x;
+                    self.y = offset_y;
+                };
+            }else{
+                this.onenterframe = null;//これでイベント消える？
+            }
+        },
 
         create: function(sprite_sheet, _map_data){
 
@@ -169,6 +198,8 @@
             this.map_height = map_data.map_height;
             this.chip_width = map_data.chip_width;
             this.chip_height = map_data.chip_height;
+            this.total_width = this.map_width * this.chip_width;
+            this.total_height = this.map_height * this.chip_height;
             this.symbol_digit = map_data.symbol_digit;
             this.chip_of_null = map_data.chip_of_null;
             this.chips = map_data.chips = this._convert_chips(_map_data.chips);

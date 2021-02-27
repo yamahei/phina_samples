@@ -9,9 +9,13 @@ const ASSETS = {
 		map_field_3: "ASSETS/image/maps/bg_field_3.png",
 		map_rockey_1: "ASSETS/image/maps/bg_rockey_1.png",
 		map_rockey_2: "ASSETS/image/maps/bg_rockey_2.png",
+		hero: "ASSETS/image/chars/hero.png",
 	},
 	json: {
 		map_sample: "ASSETS/json/map/map_sample.json"
+	},
+	spritesheet: {
+		char: "ASSETS/tmss/character.tmss",
 	},
 };
 
@@ -31,6 +35,54 @@ phina.define('MainScene', {
 		const level = 1;
 		const world = generator.create(level);
 		this.addChild(world);
+
+		//当たり判定と追尾スクロール
+		const collision = SpriteCharBase('hero');
+		world.addChar(collision);
+		world.setScrollTracker(collision);
+		let collision_v = 1;
+		let collision_w = 1;
+		const collision_speed = 4;
+		collision.onenterframe = function(e){
+			const self = this;
+			// e.app.pointers.forEach(function(p){
+			// 	self.x = p.x;
+			// 	self.y = p.y;
+			// });
+
+			collision.x += collision_v * collision_speed;
+			if(collision.x > world.total_width){
+				collision.x = world.total_width;
+				collision_v *= -1;
+			}
+			if(collision.x < 0){
+				collision.x = 0;
+				collision_v *= -1;
+			}
+			collision.y += collision_w * collision_speed;
+			if(collision.y > world.total_height){
+				collision.y = world.total_height;
+				collision_w *= -1;
+			}
+			if(collision.y < 0){
+				collision.y = 0;
+				collision_w *= -1;
+			}
+			/**
+			 * 【注意】
+			 * MapTopViewの当たり判定は
+			 * MapTopView.hitTestElementに
+			 * SpriteCharBaseを与える
+			 * →逆だと機能しない
+			 */
+			const hit = world.hitTestElement(self);
+			if(hit){
+				this.visible = !this.visible;
+			}else{
+				this.visible = true;
+			}
+		};
+
 	},
 
 });
@@ -44,5 +96,6 @@ phina.main(function() {
 		...size,
 	});
 	// アプリケーション実行
+	app.enableStats();
 	app.run();
 });
