@@ -7,7 +7,7 @@
      * ATTENTION: must include map.js
      */
     const MapGeneratorSetting = g.MapGeneratorSetting = {
-        "map_width": 24,
+        "map_width": 16,
         "map_height": 48,
         "map_min_height": 64,
         "map_max_height": 128,
@@ -56,7 +56,8 @@
 
             this.draw_map(map_data, map_scenes);
             //フチの処理
-            //map_data.tiles形式に変換
+            map_data.tiles.over = this.draw_border(map_data.tiles.over, [MAPSYM_BRIDGE]);
+            map_data.tiles.under = this.draw_border(map_data.tiles.under, [MAPSYM_FLOOR1, MAPSYM_FLOOR2, MAPSYM_HOLE]);
             //生成
             const sprite_sheet = this.get_sprite_sheet(stage_scene);
             return this.map.create(sprite_sheet, map_data);
@@ -72,7 +73,8 @@
             // const sheets = sheets_set[stage_type % sheets_set.length];
             // const random = this.random.randint(0, 999);
             // return sheets[random % sheets.length];
-            return (sheets_set.flat(Infinity))[(Math.floor(Math.random()*999))%sheets_set.length];
+            const _sheets_set = sheets_set.flat(Infinity);
+            return _sheets_set[Math.floor(Math.random() * _sheets_set.length)];
         },
         is_appear_criff: function(){
             return true; //!!(this.stage_scene == 2 || this.stage_scene == 3);
@@ -177,8 +179,7 @@
                 for(let i=0; i<=length; i++){
                     const x = Math.floor(p1.x + (w * i));
                     const y = Math.floor(p1.y + (h * i));
-                    crack_tiles.under = this.fill_rect(crack_tiles.under, {x: x-1, y: y}, {x: x+1, y: y}, MAPSYM_HOLE);
-                    crack_tiles.under = this.fill_rect(crack_tiles.under, {x: x, y: y-1}, {x: x, y: y+1}, MAPSYM_HOLE);
+                    crack_tiles.under = this.fill_rect(crack_tiles.under, {x: x, y: y}, {x: x+1, y: y+2}, MAPSYM_HOLE);
                 }
                 [p1, p2] = [p2, crack_points.shift()];
                 if(!p2){
@@ -311,6 +312,59 @@
             }
             return true;
         },
+
+        draw_border: function(_layer, _symbols){
+            const layer = JSON.parse(JSON.stringify(_layer));
+            const symbol_heads = _symbols.map(function(s){ return s[0]; });
+            const self = this;
+            const EQ = "EQ";//同じ柄
+            const NE = "NE";//違う柄
+            const border_patterns = [
+                {num: 7, top: NE, right: EQ, bottom: EQ, left: NE},
+                {num: 8, top: NE, right: EQ, bottom: EQ, left: EQ},
+                {num: 9, top: NE, right: NE, bottom: EQ, left: EQ},
+                {num: 4, top: EQ, right: EQ, bottom: EQ, left: NE},
+                // {num: 5, top: EQ, right: EQ, bottom: EQ, left: EQ},
+                {num: 6, top: EQ, right: NE, bottom: EQ, left: EQ},
+                {num: 1, top: EQ, right: EQ, bottom: NE, left: NE},
+                {num: 2, top: EQ, right: EQ, bottom: NE, left: EQ},
+                {num: 3, top: EQ, right: NE, bottom: NE, left: EQ},
+            ];
+            const get_symbol_at = function(x, y, symbol){
+                const not_equal = MAPSYM_EMPTY;
+                if(y < 0 || layer.length <= y ){ return not_equal; }
+                const row = layer[y];
+                if(x < 0 || row.length <= x ){ return symbol; }
+                return row[x];
+            };
+            symbol_heads.forEach(function(head){
+                for(let y=0; y<layer.length; y++){
+                    const row = layer[y];
+                    for(let x=0; x<row.length; x++){
+                        const symbol = row[x];
+                        const symbol_head = symbol[0];
+                        if(symbol_head != head){ continue; }
+
+                        const top_is    = (head == get_symbol_at(x, y-1, symbol)[0]) ? EQ : NE;
+                        const right_is  = (head == get_symbol_at(x+1, y, symbol)[0]) ? EQ : NE;
+                        const bottom_is = (head == get_symbol_at(x, y+1, symbol)[0]) ? EQ : NE;
+                        const left_is   = (head == get_symbol_at(x-1, y, symbol)[0]) ? EQ : NE;
+                        const border_pattern = border_patterns.find(function(pattern){
+                            return (
+                                pattern.top == top_is &&
+                                pattern.right == right_is &&
+                                pattern.bottom == bottom_is &&
+                                pattern.left == left_is
+                            );
+                        });
+                        const new_symbol = border_pattern ? `${head}${border_pattern.num}` : symbol;
+                        layer[y][x] = new_symbol;
+                    }
+                }
+            });
+            return layer;
+        },
+
     });
 
 
