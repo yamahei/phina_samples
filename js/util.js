@@ -21,7 +21,6 @@
                 width: width_px,
                 height: width_px * height_ratio,
             };
-            console.log(size);
             return size;
         },
     };

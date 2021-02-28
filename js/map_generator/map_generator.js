@@ -31,7 +31,8 @@
         },
         create: function(level){//0スタート
             this.level = level;
-            const random = this.random = Random(level);
+            // const random = this.random = Random(level);
+            const random = this.random = Random(Math.floor(Math.random()*999));//debug
             const level_interval = this.level_interval = MapGeneratorSetting.level_interval || 4;
             const stage_scene = this.stage_scene = level % level_interval;
             const stage_switch = this.stage_switch = !!(Math.floor(level / level_interval) % 2);
@@ -68,15 +69,16 @@
                 ["map_cave_1", "map_cave_2"],
                 ["map_castle_1", "map_castle_2"],
             ];
-            const sheets = sheets_set[stage_type % sheets_set.length];
-            const random = this.random.randint(0, 999);
-            return sheets[random % sheets.length];
+            // const sheets = sheets_set[stage_type % sheets_set.length];
+            // const random = this.random.randint(0, 999);
+            // return sheets[random % sheets.length];
+            return (sheets_set.flat(Infinity))[(Math.floor(Math.random()*999))%sheets_set.length];
         },
         is_appear_criff: function(){
-            return !!(this.stage_scene == 2 || this.stage_scene == 3);
+            return true; //!!(this.stage_scene == 2 || this.stage_scene == 3);
         },
         is_appear_crack: function(){
-            return !!(this.stage_scene == 1 || this.stage_scene == 3);
+            return true; //!!(this.stage_scene == 1 || this.stage_scene == 3);
         },
 
         draw_map: function(map_data, map_scenes){
@@ -94,36 +96,97 @@
             }
         },
         draw_map__wall: function(map_data){
-            const wall_tiles = this.get_maplines(8, MAPSYM_WALL, MAPSYM_EMPTY);
+            const wall_height = 8;
+            const wall_tiles = this.get_maplines(wall_height, MAPSYM_WALL, MAPSYM_EMPTY);
             this.push_tiles(map_data, wall_tiles);
 
-            const ground_tiles = this.get_maplines(12, MAPSYM_BASE, MAPSYM_EMPTY);
+            const ground_height = 8;
+            const ground_tiles = this.get_maplines(ground_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
-            const p1 = {x: rnd.randint(1, 4), y: rnd.randint(1, 4)};
-            const p2 = {x: this.map_width - rnd.randint(1, 4), y: 12 - rnd.randint(1, 4)};
+            const p1 = {x: rnd.randint(1, 4), y: rnd.randint(1, 2)};
+            const p2 = {x: this.map_width - rnd.randint(1, 4), y: ground_height - rnd.randint(1, 2)};
             ground_tiles.under = this.fill_rect(ground_tiles.under, p1, p2, MAPSYM_FLOOR2);
             this.push_tiles(map_data, ground_tiles);
+
+            const enter_height = 4;
+            const enter_tiles = this.get_maplines(enter_height, MAPSYM_BASE, MAPSYM_EMPTY);
+            this.push_tiles(map_data, enter_tiles);
         },
         draw_map__rough: function(map_data){
-            const rough_tiles = this.get_maplines(32, MAPSYM_BASE, MAPSYM_EMPTY);
+            const rough_height = 16;
+            const rough_tiles = this.get_maplines(rough_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
-
             //hole
-            const hole_times = Math.min(Math.floor(this.level / 8) + 1, 4);
-            const hole_maxarea = 16;
-            rough_tiles.under = this.spread_rects(rough_tiles.under, hole_times, hole_maxarea, 3, MAPSYM_HOLE, MAPSYM_BASE);
-
+            rough_tiles.under = this.spread_rects({
+                layer: rough_tiles.under,
+                times: Math.min(Math.floor(this.level / 8) + 1, 6),
+                minarea: 25, maxarea: 39, minsize: 5, offset: 1,
+                fill: MAPSYM_HOLE, lay: null, exclude: MAPSYM_HOLE,
+            });
             //rough
-            const rough_times = rnd.randint(2, 8);
-            const rough_maxarea = 16;
-            rough_tiles.under = this.spread_rects(rough_tiles.under, rough_times, rough_maxarea, 2, MAPSYM_FLOOR1, MAPSYM_BASE);
-
-            //TODO: block
+            rough_tiles.under = this.spread_rects({
+                layer: rough_tiles.under,
+                times: rnd.randint(2, 8),
+                minarea: 12, maxarea: 32, minsize: 2,
+                fill: MAPSYM_FLOOR1, lay: null, exclude: MAPSYM_HOLE,
+            });
+            //block
+            this.put_blocks({
+                under: rough_tiles.under,
+                over: rough_tiles.over,
+                lays: [MAPSYM_BASE, MAPSYM_FLOOR1],
+                times: Math.min(Math.floor(this.level / 4) + 4, 12),
+            });
 
             this.push_tiles(map_data, rough_tiles);
         },
-        draw_map__criff: function(map_data){},
-        draw_map__crack: function(map_data){},
+        draw_map__criff: function(map_data){
+            const rnd = this.random;
+            const criff_height = Math.floor(Math.log2(this.level || 1) * 2) + 12;
+            const criff_tiles_upper = this.get_maplines(2, MAPSYM_BASE, MAPSYM_EMPTY);
+            const criff_tiles_under = this.get_maplines(2, MAPSYM_BASE, MAPSYM_EMPTY);
+            const criff_tiles_main = this.get_maplines(criff_height, MAPSYM_HOLE, MAPSYM_EMPTY);
+
+            const w = rnd.randint(2, 6);
+            const x = rnd.randint(4, this.map_width - 4 - w);
+            criff_tiles_main.under = this.fill_rect(criff_tiles_main.under, {x: x, y: 0}, {x: x+w, y: criff_height}, MAPSYM_BASE);
+
+            this.push_tiles(map_data, criff_tiles_upper);
+            this.push_tiles(map_data, criff_tiles_main);
+            this.push_tiles(map_data, criff_tiles_under);
+        },
+        draw_map__crack: function(map_data){
+            const rnd = this.random;
+            const crack_height = Math.floor(Math.log2(this.level || 1) * 2) + 12;
+            const crack_tiles = this.get_maplines(crack_height, MAPSYM_BASE, MAPSYM_EMPTY);
+            const crack_x_list = [
+                0, this.map_width,
+                rnd.randint(4, this.map_width - 4),
+                rnd.randint(4, this.map_width - 4)
+            ];
+            crack_x_list.sort(function(a, b){ return (a * 1) - (b * 1); });
+            const crack_points = crack_x_list.map(function(x){
+                return {x: x, y: rnd.randint(2, crack_height - 2)};
+            });
+            let p1 = crack_points.shift();
+            let p2 = crack_points.shift();
+            while(true){
+                const length = Math.ceil(Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)));
+                const w = (p2.x - p1.x) / length;
+                const h = (p2.y - p1.y) / length;
+                for(let i=0; i<=length; i++){
+                    const x = Math.floor(p1.x + (w * i));
+                    const y = Math.floor(p1.y + (h * i));
+                    crack_tiles.under = this.fill_rect(crack_tiles.under, {x: x-1, y: y}, {x: x+1, y: y}, MAPSYM_HOLE);
+                    crack_tiles.under = this.fill_rect(crack_tiles.under, {x: x, y: y-1}, {x: x, y: y+1}, MAPSYM_HOLE);
+                }
+                [p1, p2] = [p2, crack_points.shift()];
+                if(!p2){
+                    break;
+                }
+            }
+            this.push_tiles(map_data, crack_tiles);
+        },
         draw_map__field: function(map_data){},
         draw_map__start: function(map_data){},
 
@@ -147,42 +210,103 @@
             });
             return { under: unders, over: overs };
         },
-        fill_rect: function(_layer, p1, p2, symbol){
-            const layer = JSON.parse(JSON.stringify(_layer));
-            for(let y=p1.y; y<p2.y; y++){
-                for(let x=p1.x; x<p2.x; x++){
-                    layer[y][x] = symbol;
-                }
-            }
-            return layer;
-        },
-        spread_rects: function(_layer, times, maxarea, minsize, fill_symbol, lay_symbol){
+        spread_rects: function(param){
+            let layer = JSON.parse(JSON.stringify(param.layer));
+            const conf = {
+                fill: param.fill,//描画するシンボル
+                lay: param.lay,//描画領域の下地を強制する場合（falsyのとき強制しない
+                exclude: param.exclude,//描画領域の下地に禁止する場合（falsyのとき禁止しない
+                times: param.times || 4,//描画する矩形の個数
+                maxarea: param.maxarea || null,//矩形の最大面積
+                minarea: param.minarea || null,//矩形の最小面積
+                maxsize: param.maxsize || null,//矩形の最大幅・高さ
+                minsize: param.minsize || null,//矩形の最小幅・高さ
+                offset: param.offset || 0,//描画矩形の縮小幅（説明難しい
+            };
             const self = this;
             const rnd = this.random;
-            let layer = JSON.parse(JSON.stringify(_layer));
-            (new Array(times)).fill(null).map(function(_){
+            (new Array(conf.times)).fill(null).map(function(_){
                 let counter = 0;
                 while(true){
-                    let [x1, x2] = [rnd.randint(0, self.map_width), rnd.randint(0, self.map_width)].sort();
-                    let [y1, y2] = [rnd.randint(0, layer.length), rnd.randint(0, layer.length)].sort();
-                    if(x2 - x1 < minsize || y2 - y1 < minsize){ continue; }
-                    if((x2 - x1) * (y2 - y1) > maxarea){ continue; }
+                    if(counter++ > 99){ break; }//無限ループ防止
+                    const rect_width = rnd.randint(conf.minsize || 0, conf.maxsize || self.map_width);
+                    const rect_height = rnd.randint(conf.minsize || 0, conf.maxsize || layer.length);
+                    if(conf.maxarea !== null && (rect_width * rect_height > conf.maxarea)){ continue; }
+                    if(conf.minarea !== null && (rect_width * rect_height < conf.minarea)){ continue; }
+                    const x1 = rnd.randint(0, self.map_width - rect_width);
+                    const x2 = x1 + rect_width;
+                    const y1 = rnd.randint(0, layer.length - rect_height);
+                    const y2 = y1 + rect_height;
                     const p1 = {x: x1, y: y1};
                     const p2 = {x: x2, y: y2};
-                    if(self.is_all(layer, p1, p2, lay_symbol)){
-                        layer = self.fill_rect(layer, p1, p2, fill_symbol);
-                        break;
-                    }else if(counter++ > 16){
-                        break;//無限ループ防止
-                    }
+                    const o1 = {x: x1 + conf.offset, y: y1 + conf.offset};
+                    const o2 = {x: x2 - conf.offset, y: y2 - conf.offset};
+                    const lay_ok = conf.lay ? self.is_all(layer, p1, p2, conf.lay) : true;
+                    const exclude_ok = conf.exclude ? self.is_in(layer, p1, p2, conf.exclude) : true;
+                    if(!lay_ok || !exclude_ok){ continue; }
+                    layer = self.fill_rect(layer, o1, o2, conf.fill);
+                    break;
                 }
             });
             return layer;
         },
+        put_blocks: function(param){
+            const conf = {
+                under: param.under,
+                over: param.over,
+                lays: param.lays || [],//ブロックを置いてよいシンボル
+                times: param.times,
+            };
+            const self = this;
+            const rnd = this.random;
+            (new Array(conf.times)).fill(null).map(function(_){
+                let counter = 0;
+                while(true){
+                    if(counter++ > 99){ break; }//無限ループ防止
+                    const x = rnd.randint(0, self.map_width);
+                    const y = rnd.randint(0, conf.under.length);
+                    if(conf.under[y] && conf.under[y][x]){
+                        const symbol = conf.under[y][x];
+                        if(conf.lays.indexOf(symbol) < 0){ continue; }
+                        const block = (rnd.randint(0, 10) < 3) ? MAPSYM_BLOCK2 : MAPSYM_BLOCK1;
+                        if(conf.over[y] && conf.over[y][x]){
+                            if(conf.over[y][x] == MAPSYM_EMPTY){
+                                conf.over[y][x] = block;
+                                break;
+                            }
+                            else{ continue; }
+                        }
+                    }
+                }
+            });
+        },
+        fill_rect: function(_layer, p1, p2, symbol){
+            const layer = JSON.parse(JSON.stringify(_layer));
+            for(let y=p1.y; y<=p2.y; y++){
+                for(let x=p1.x; x<=p2.x; x++){
+                    if(layer[y] && layer[y][x]){
+                        layer[y][x] = symbol;
+                    }
+                }
+            }
+            return layer;
+        },
         is_all: function(layer, p1, p2, symbol){
+            for(let y=p1.y; y<=p2.y; y++){
+                for(let x=p1.x; x<=p2.x; x++){
+                    if(layer[y] && layer[y][x]){
+                        if(layer[y][x] != symbol){ return false; }
+                    }
+                }
+            }
+            return true;
+        },
+        is_in: function(layer, p1, p2, symbol){
             for(let y=p1.y; y<p2.y; y++){
                 for(let x=p1.x; x<p2.x; x++){
-                    if(layer[y][x] != symbol){ return false; }
+                    if(layer[y] && layer[y][x]){
+                        if(layer[y][x] == symbol){ return false; }
+                    }
                 }
             }
             return true;
