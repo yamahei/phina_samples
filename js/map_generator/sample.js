@@ -93,6 +93,7 @@ phina.main(function() {
 	// アプリケーション生成
 	const app = GameApp({
 		startLabel: 'main', // メインシーンから開始する
+		fps: 16,
 		assets: ASSETS,
 		...size,
 	});
