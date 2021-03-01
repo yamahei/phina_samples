@@ -1,7 +1,7 @@
 (function(g){
 
     "use strict";
-    const MAP_DEBUG = true;
+    const MAP_DEBUG = false;
     const LAYER_MIXED = 'MIXED';//不定（chip.layerで決定する）
     const LAYER_HOVER = 'hover';//キャラクタを覆い隠すオブジェクトの層
     const LAYER_FIELD = 'field';//一般的にキャラクタを配置する層
