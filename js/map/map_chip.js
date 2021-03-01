@@ -2,7 +2,7 @@
 
     "use strict";
     /**
-     * ATTENTION: must include collider.js
+     * ATTENTION: must include collision_rect.js
      */
     phina.define('SpriteMapChip', {
         superClass: 'phina.display.Sprite',
@@ -13,24 +13,35 @@
             this.symbol = symbol;
             this.event_name = event;
             this.sprite_type = "map";
-            this.need_hittest = !!collision;
-            if(collision){
-                this.collider.show();//.hide();//
-                const size_w = width * collision;
-                const size_h = height * collision;
-                this.collider.setSize(size_w, size_h);
-                const offset_x = width / 2;
-                const offset_y = height / 2;
-                this.collider.offset(offset_x, offset_y);
+            /**
+             * collision setting
+             */
+            const collision_setting = {
+                width: width * collision,
+                height: height * collision,
+                offset_x: width / 2,
+                offset_y: height / 2,
+            };
+            if(collision_setting.width * collision_setting.width > 0){
+                const collision = CollisionRect({
+                    width: collision_setting.width,
+                    height: collision_setting.height,
+                    fill: null,
+                    stroke: SpriteCharSetting.debug ? "yellow" : null,
+                }).addChildTo(this);
+                collision.x = collision_setting.offset_x;
+                collision.y = collision_setting.offset_y;
+                this.collision_rect = collision;
             }
+
         },
         hitTestElement: function(target){//override
-            //colliderのないSpriteMapChipはヒットしない
-            if(!this.need_hittest){ return false; }
-            if(target.collider){
-                return this.collider.hitTest(target.collider);
+            if(!this.collision_rect){
+                //collisionのないSpriteMapChipはヒットしない
+                return false;
             }else{
-                return this.superMethod('hitTestElement', target);
+                const target_collision = target.collision_rect || target;
+                return this.collision_rect.hitTestElement(target_collision);
             }
         },
 

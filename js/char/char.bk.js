@@ -2,20 +2,19 @@
 
     "use strict";
     /**
-     * ATTENTION: must include collision_rect.js
+     * ATTENTION: must include collider.js
      */
     const SpriteCharSetting = g.SpriteCharSetting = {
-        debug: true,
         width: 24, height: 32,
         animation_asset: 'char',//ASSETS.spritesheet
         directions: ["up","right","down","left"],
         actions: ["stand","jump","walk","run","damage"],
         default_direction: 'down',
         default_action: 'walk',
-        collision_width: 12,
-        collision_height: 12,
-        collision_offset_x: 0,
-        collision_offset_y: 12,
+        collider_width: 12,
+        collider_height: 12,
+        collider_offset_x: 0,
+        collider_offset_y: 12,
     };
 
     phina.define('SpriteCharBase', {
@@ -36,25 +35,19 @@
             this.setCharAnimation();
 
             /**
-             * collision setting
+             * collider setting
+             * ATTENTION: colliderがscaleに対応していないので、
+             *            ドット拡大は画像側かCSSでやること
              */
-            const collision_setting = {
-                width: this.collision_setting_width || SpriteCharSetting.collision_width || this.width,
-                height: this.collision_setting_height || SpriteCharSetting.collision_height || this.height,
-                offset_x: this.collision_setting_offset_x || SpriteCharSetting.collision_offset_x || 0,
-                offset_y: this.collision_setting_offset_y || SpriteCharSetting.collision_offset_y || 0,
+            const collider_setting = {
+                width: this.collider_setting_width || SpriteCharSetting.collider_width || this.width,
+                height: this.collider_setting_height || SpriteCharSetting.collider_height || this.height,
+                offset_x: this.collider_setting_offset_x || SpriteCharSetting.collider_offset_x || 0,
+                offset_y: this.collider_setting_offset_y || SpriteCharSetting.collider_offset_y || 0,
             };
-            if(collision_setting.width * collision_setting.width > 0){
-                const collision = CollisionRect({
-                    width: collision_setting.width,
-                    height: collision_setting.height,
-                    fill: null,
-                    stroke: SpriteCharSetting.debug ? "yellow" : null,
-                }).addChildTo(this);
-                collision.x = collision_setting.offset_x;
-                collision.y = collision_setting.offset_y;
-                this.collision_rect = collision;
-            }
+            this.collider.show();//.hide();//
+            this.collider.setSize(collider_setting.width, collider_setting.height);
+            this.collider.offset(collider_setting.offset_x, collider_setting.offset_y);
         },
         setCharAnimation(){
             const animation = `${this.action}_${this.direction}`;
@@ -75,15 +68,15 @@
             this.setCharAnimation();
         },
         hitTestElement: function(target){//override
-            if(target.className == "SpriteMapChip" && !target.collision_rect){
-                //collision_rectのないSpriteMapChipはヒットしない
-                return false;
-            }
-            const my_collision = this.collision_rect || this;
-            if(target.collision_rect){
-                return my_collision.hitTestElement(target.collision_rect);
+            if(target.collider){
+                return this.collider.hitTest(target.collider);
             }else{
-                return my_collision.hitTestElement(target);
+                if(target.className == "SpriteMapChip"){
+                    //colliderのないSpriteMapChipはヒットしない
+                    return false;
+                }else{
+                    return this.superMethod('hitTestElement', target);
+                }
             }
         },
     });

@@ -51,7 +51,7 @@
         { "index": 40, "symbol": "X8", "layer": "under" },
         { "index": 41, "symbol": "X9", "layer": "under" },
         { "index": 42, "symbol": "X4", "layer": "under" },
-        { "index": 43, "symbol": "X+", "layer": "under", "collision": 1.4, "event": "fall" },
+        { "index": 43, "symbol": "X+", "layer": "under", "collision": 1.1, "event": "fall" },
         { "index": 44, "symbol": "X6", "layer": "under" },
         { "index": 45, "symbol": "X1", "layer": "under" },
         { "index": 46, "symbol": "X2", "layer": "under" },

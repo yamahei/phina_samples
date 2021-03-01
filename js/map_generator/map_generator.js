@@ -98,7 +98,7 @@
             }
         },
         draw_map__wall: function(map_data){
-            const wall_height = 8;
+            const wall_height = 6;
             const wall_tiles = this.get_maplines(wall_height, MAPSYM_WALL, MAPSYM_EMPTY);
             this.push_tiles(map_data, wall_tiles);
 
