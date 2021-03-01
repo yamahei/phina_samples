@@ -43,7 +43,7 @@ phina.define('MainScene', {
 		world.setScrollTracker(collision);
 		let collision_v = 1;
 		let collision_w = 1;
-		const collision_speed = 4;
+		const collision_speed = 8;
 		collision.onenterframe = function(e){
 			const self = this;
 			// e.app.pointers.forEach(function(p){
@@ -93,7 +93,7 @@ phina.main(function() {
 	// アプリケーション生成
 	const app = GameApp({
 		startLabel: 'main', // メインシーンから開始する
-		fps: 16,
+		fps: 4,
 		assets: ASSETS,
 		...size,
 	});
