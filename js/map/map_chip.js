@@ -1,6 +1,9 @@
 (function(g){
 
     "use strict";
+
+    const MAP_DEBUG = false;
+
     /**
      * ATTENTION: must include collision_rect.js
      */
@@ -27,7 +30,7 @@
                     width: collision_setting.width,
                     height: collision_setting.height,
                     fill: null,
-                    stroke: SpriteCharSetting.debug ? "yellow" : null,
+                    stroke: MAP_DEBUG ? "yellow" : null,
                 }).addChildTo(this);
                 collision.x = collision_setting.offset_x;
                 collision.y = collision_setting.offset_y;

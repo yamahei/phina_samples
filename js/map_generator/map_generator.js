@@ -31,6 +31,7 @@
         },
         create: function(level){//0スタート
             this.level = level;
+            //DEBUG
             // const random = this.random = Random(level);
             const random = this.random = Random(Math.floor(Math.random()*999));//debug
             const level_interval = this.level_interval = MapGeneratorSetting.level_interval || 4;
@@ -70,6 +71,7 @@
                 ["map_cave_1", "map_cave_2"],
                 ["map_castle_1", "map_castle_2"],
             ];
+            //DEBUG
             // const sheets = sheets_set[stage_type % sheets_set.length];
             // const random = this.random.randint(0, 999);
             // return sheets[random % sheets.length];
@@ -98,24 +100,24 @@
             }
         },
         draw_map__wall: function(map_data){
-            const wall_height = 6;
+            const wall_height = 4;
             const wall_tiles = this.get_maplines(wall_height, MAPSYM_WALL, MAPSYM_EMPTY);
             this.push_tiles(map_data, wall_tiles);
 
-            const ground_height = 8;
+            const ground_height = 6;
             const ground_tiles = this.get_maplines(ground_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
-            const p1 = {x: rnd.randint(1, 4), y: rnd.randint(1, 2)};
-            const p2 = {x: this.map_width - rnd.randint(1, 4), y: ground_height - rnd.randint(1, 2)};
+            const p1 = {x: rnd.randint(1, 4), y: 1};
+            const p2 = {x: this.map_width - rnd.randint(1, 4), y: ground_height - rnd.randint(1, 3)};
             ground_tiles.under = this.fill_rect(ground_tiles.under, p1, p2, MAPSYM_FLOOR2);
             this.push_tiles(map_data, ground_tiles);
 
-            const enter_height = 4;
+            const enter_height = 2;
             const enter_tiles = this.get_maplines(enter_height, MAPSYM_BASE, MAPSYM_EMPTY);
             this.push_tiles(map_data, enter_tiles);
         },
         draw_map__rough: function(map_data){
-            const rough_height = 16;
+            const rough_height = 12;
             const rough_tiles = this.get_maplines(rough_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
             //hole
@@ -144,49 +146,74 @@
         },
         draw_map__criff: function(map_data){
             const rnd = this.random;
-            const criff_height = Math.floor(Math.log2(this.level || 1) * 2) + 12;
-            const criff_tiles_upper = this.get_maplines(2, MAPSYM_BASE, MAPSYM_EMPTY);
-            const criff_tiles_under = this.get_maplines(2, MAPSYM_BASE, MAPSYM_EMPTY);
-            const criff_tiles_main = this.get_maplines(criff_height, MAPSYM_HOLE, MAPSYM_EMPTY);
+            const ranks = [
+                { rank: 0, upper: 3, main: 8, under: 3, times: 1, roads: 6 },
+                { rank: 1, upper: 3, main: 6, under: 3, times: 1, roads: 3 },
+                { rank: 2, upper: 2, main: 4, under: 3, times: 2, roads: 4 },
+                { rank: 3, upper: 2, main: 6, under: 3, times: 2, roads: 2 },
+                { rank: 4, upper: 2, main: 5, under: 2, times: 3, roads: 3 },
+                { rank: 5, upper: 2, main: 4, under: 2, times: 3, roads: 1 },
+            ];
+            const rank = ranks[Math.floor(Math.random() * ranks.length)];
+            console.log(rank);
 
-            const w = rnd.randint(2, 6);
-            const x = rnd.randint(4, this.map_width - 4 - w);
-            criff_tiles_main.under = this.fill_rect(criff_tiles_main.under, {x: x, y: 0}, {x: x+w, y: criff_height}, MAPSYM_BASE);
-
+            const criff_tiles_upper = this.get_maplines(rank.upper, MAPSYM_BASE, MAPSYM_EMPTY);
             this.push_tiles(map_data, criff_tiles_upper);
-            this.push_tiles(map_data, criff_tiles_main);
-            this.push_tiles(map_data, criff_tiles_under);
+
+            for(let i=0; i<rank.times; i++){
+                const criff_main_tiles = this.get_maplines(rank.main, MAPSYM_HOLE, MAPSYM_EMPTY);
+                for(let j=0; j<rank.roads; j++){
+                    const road_width = 1;
+                    const road_x = Math.floor(rnd.randint(3, this.map_width - 3 - road_width) / 2) * 2;
+                    criff_main_tiles.under = this.fill_rect(
+                        criff_main_tiles.under,
+                        {x: road_x, y: 0},
+                        {x: road_x + road_width, y: rank.main},
+                        MAPSYM_BASE
+                    );
+                }
+                this.push_tiles(map_data, criff_main_tiles);
+                const criff_under_tiles = this.get_maplines(rank.under, MAPSYM_BASE, MAPSYM_EMPTY);
+                this.push_tiles(map_data, criff_under_tiles);
+            }
         },
         draw_map__crack: function(map_data){
             const rnd = this.random;
-            const crack_height = Math.floor(Math.log2(this.level || 1) * 2) + 12;
-            const crack_tiles = this.get_maplines(crack_height, MAPSYM_BASE, MAPSYM_EMPTY);
-            const crack_x_list = [
-                0, this.map_width,
-                rnd.randint(4, this.map_width - 4),
-                rnd.randint(4, this.map_width - 4)
-            ];
-            crack_x_list.sort(function(a, b){ return (a * 1) - (b * 1); });
-            const crack_points = crack_x_list.map(function(x){
-                return {x: x, y: rnd.randint(2, crack_height - 2)};
-            });
-            let p1 = crack_points.shift();
-            let p2 = crack_points.shift();
+            const crack_height = Math.floor(Math.log2(this.level || 1) * 2) + 16;
             while(true){
-                const length = Math.ceil(Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)));
-                const w = (p2.x - p1.x) / length;
-                const h = (p2.y - p1.y) / length;
-                for(let i=0; i<=length; i++){
-                    const x = Math.floor(p1.x + (w * i));
-                    const y = Math.floor(p1.y + (h * i));
-                    crack_tiles.under = this.fill_rect(crack_tiles.under, {x: x, y: y}, {x: x+1, y: y+2}, MAPSYM_HOLE);
+                const crack_tiles = this.get_maplines(crack_height, MAPSYM_BASE, MAPSYM_EMPTY);
+                const crack_x_list = [
+                    0, this.map_width,
+                    rnd.randint(4, this.map_width - 4),
+                    rnd.randint(4, this.map_width - 4)
+                ];
+                crack_x_list.sort(function(a, b){ return (a * 1) - (b * 1); });
+                const crack_points = crack_x_list.map(function(x){
+                    return {x: x, y: rnd.randint(2, crack_height - 2)};
+                });
+                const crack_y_list = crack_points.map(function(p){ return p.y; });
+                const crack_min_y = Math.min(...crack_y_list);
+                const crack_max_y = Math.max(...crack_y_list);
+                if(crack_max_y - crack_min_y < crack_height / 2){ continue; }
+
+                let p1 = crack_points.shift();
+                let p2 = crack_points.shift();
+                while(true){
+                    const length = Math.ceil(Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)));
+                    const w = (p2.x - p1.x) / length;
+                    const h = (p2.y - p1.y) / length;
+                    for(let i=0; i<=length; i++){
+                        const x = Math.floor(p1.x + (w * i));
+                        const y = Math.floor(p1.y + (h * i));
+                        crack_tiles.under = this.fill_rect(crack_tiles.under, {x: x, y: y}, {x: x+1, y: y+2}, MAPSYM_HOLE);
+                    }
+                    [p1, p2] = [p2, crack_points.shift()];
+                    if(!p2){ break; }
                 }
-                [p1, p2] = [p2, crack_points.shift()];
-                if(!p2){
-                    break;
-                }
+                this.push_tiles(map_data, crack_tiles);
+                break;
             }
-            this.push_tiles(map_data, crack_tiles);
+            //TODO: draw bridge
         },
         draw_map__field: function(map_data){},
         draw_map__start: function(map_data){},

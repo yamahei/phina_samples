@@ -27,29 +27,27 @@ phina.globalize();
 // MainScene クラスを定義
 phina.define('MainScene', {
 	superClass: 'DisplayScene',
-	init: function() {
+	init: function(options) {
 		this.superInit(size);
 		this.canvas.imageSmoothingEnabled = false;
+		const layer = this.layer = GLLayer(options);//USE GPU
+		layer.addChildTo(this);
 		const bg_images = Object.keys(AssetManager.assets.image);
 		const bg_image = bg_images[Math.floor(Math.random() * 1000) % bg_images.length];
 		const generator = MapGenerator(bg_image, "map_sample");
 		const level = 1;
 		const world = generator.create(level);
-		this.addChild(world);
+		layer.addChild(world);
 
 		//当たり判定と追尾スクロール
 		const collision = SpriteCharBase('hero');
+		collision.setAnimationAction('run');
 		world.addChar(collision);
 		world.setScrollTracker(collision);
 		let collision_v = 1;
 		let collision_w = 1;
-		const collision_speed = 8;
+		const collision_speed = 4;
 		collision.onenterframe = function(e){
-			const self = this;
-			// e.app.pointers.forEach(function(p){
-			// 	self.x = p.x;
-			// 	self.y = p.y;
-			// });
 
 			collision.x += collision_v * collision_speed;
 			if(collision.x > world.total_width){
@@ -76,7 +74,7 @@ phina.define('MainScene', {
 			 * SpriteCharBaseを与える
 			 * →逆だと機能しない
 			 */
-			const hit = world.hitTestElement(self);
+			const hit = world.hitTestElement(collision);
 			if(hit){
 				this.visible = !this.visible;
 			}else{
@@ -93,7 +91,7 @@ phina.main(function() {
 	// アプリケーション生成
 	const app = GameApp({
 		startLabel: 'main', // メインシーンから開始する
-		fps: 4,
+		// fps: 16,
 		assets: ASSETS,
 		...size,
 	});

@@ -15,7 +15,7 @@ ASSET読み込みの都合があり、Webサーバを起動します
 
 ```
 gem install sinatra
-ruby -rsinatra -e 'set :public_folder, "./", get("/"){"Hello world"}'
+ruby -rsinatra -e 'set :bind, "0.0.0.0"; set :public_folder, "./", get("/"){"Hello world"}'
 ```
 
 各ページの説明
