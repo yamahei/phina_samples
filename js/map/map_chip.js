@@ -2,7 +2,7 @@
 
     "use strict";
 
-    const MAP_DEBUG = false;
+    const MAP_DEBUG = true;
 
     /**
      * ATTENTION: must include collision_rect.js
@@ -25,7 +25,7 @@
                 offset_x: width / 2,
                 offset_y: height / 2,
             };
-            if(collision_setting.width * collision_setting.width > 0){
+            if(collision_setting.width * collision_setting.height > 0){
                 const collision = CollisionRect({
                     width: collision_setting.width,
                     height: collision_setting.height,

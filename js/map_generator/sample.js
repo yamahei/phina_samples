@@ -29,6 +29,7 @@ phina.define('MainScene', {
 	superClass: 'DisplayScene',
 	init: function(options) {
 		this.superInit(size);
+		this.backgroundColor = 'black';
 		this.canvas.imageSmoothingEnabled = false;
 		const layer = this.layer = GLLayer(options);//USE GPU
 		layer.addChildTo(this);

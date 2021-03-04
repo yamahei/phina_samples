@@ -120,19 +120,19 @@
             const rough_height = 12;
             const rough_tiles = this.get_maplines(rough_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
-            //hole
-            rough_tiles.under = this.spread_rects({
-                layer: rough_tiles.under,
-                times: Math.min(Math.floor(this.level / 8) + 1, 6),
-                minarea: 25, maxarea: 39, minsize: 5, offset: 1,
-                fill: MAPSYM_HOLE, lay: null, exclude: MAPSYM_HOLE,
-            });
             //rough
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
                 times: rnd.randint(2, 8),
                 minarea: 12, maxarea: 32, minsize: 2,
                 fill: MAPSYM_FLOOR1, lay: null, exclude: MAPSYM_HOLE,
+            });
+            //hole
+            rough_tiles.under = this.spread_rects({
+                layer: rough_tiles.under,
+                times: Math.min(Math.floor(this.level / 3) + 1, 7),
+                minarea: 25, maxarea: 45, minsize: 5, offset: 1,
+                fill: MAPSYM_HOLE, lay: null, exclude: MAPSYM_HOLE,
             });
             //block
             this.put_blocks({
@@ -155,7 +155,6 @@
                 { rank: 5, upper: 2, main: 4, under: 2, times: 3, roads: 1 },
             ];
             const rank = ranks[Math.floor(Math.random() * ranks.length)];
-            console.log(rank);
 
             const criff_tiles_upper = this.get_maplines(rank.upper, MAPSYM_BASE, MAPSYM_EMPTY);
             this.push_tiles(map_data, criff_tiles_upper);
@@ -164,7 +163,8 @@
                 const criff_main_tiles = this.get_maplines(rank.main, MAPSYM_HOLE, MAPSYM_EMPTY);
                 for(let j=0; j<rank.roads; j++){
                     const road_width = 1;
-                    const road_x = Math.floor(rnd.randint(3, this.map_width - 3 - road_width) / 2) * 2;
+                    const criff_padding = 3;
+                    const road_x = Math.floor(rnd.randint(criff_padding, this.map_width - criff_padding - road_width) / 2) * 2;
                     criff_main_tiles.under = this.fill_rect(
                         criff_main_tiles.under,
                         {x: road_x, y: 0},
@@ -196,6 +196,23 @@
                 const crack_max_y = Math.max(...crack_y_list);
                 if(crack_max_y - crack_min_y < crack_height / 2){ continue; }
 
+                const crack_widthes = [];
+                for(let i=1; i<crack_points.length; i++){
+                    const p1 = crack_points[i-1];
+                    const p2 = crack_points[i];
+                    const width = Math.abs(p2.x-p1.x);
+                    const tilt = Math.abs((p2.y-p1.y)/width);
+                    crack_widthes.push({
+                        p1: p1, p2: p2,
+                        width: width,
+                        tilt: tilt,
+                    });
+                }
+                crack_widthes.sort(function(a, b){
+                    return a.tilt - b.tilt;
+                });
+
+                //亀裂描画
                 let p1 = crack_points.shift();
                 let p2 = crack_points.shift();
                 while(true){
@@ -210,6 +227,42 @@
                     [p1, p2] = [p2, crack_points.shift()];
                     if(!p2){ break; }
                 }
+                //橋検索・描画
+                const bridge_crack = crack_widthes.find(function(crack_width){
+                    return crack_width.width > 3;
+                });
+                const bridge_x1 = Math.min(...[
+                    bridge_crack.p1.x + Math.floor((bridge_crack.p2.x - bridge_crack.p1.x) / 2),
+                    this.map_width - 3,
+                ]);
+                const bridge_cy = Math.floor((bridge_crack.p1.y + bridge_crack.p2.y) / 2);
+                const bridge_y_list = [{y: bridge_cy, direction: -1}, {y: bridge_cy, direction: 1}].map(function(param){
+                    let y = param.y;
+                    while(true){
+                        y += param.direction;
+                        const f1 = (crack_tiles.under[y][bridge_x1 + 0] != MAPSYM_HOLE);
+                        const f2 = (crack_tiles.under[y][bridge_x1 + 1] != MAPSYM_HOLE);
+                        const f3 = (crack_tiles.under[y][bridge_x1 + 2] != MAPSYM_HOLE);
+                        if((f1 && f2 && f3) || y <= 0 || crack_tiles.under.length - 1 <= y){ break; }
+                    }
+                    return y;
+                });
+                let [bridge_y1, bridge_y2] = bridge_y_list;
+                crack_tiles.over = this.fill_rect(
+                    crack_tiles.over,
+                    {x: bridge_x1, y: bridge_y1},
+                    {x: bridge_x1 + 2, y: bridge_y2},
+                    MAPSYM_BRIDGE
+                );
+
+                //背景描画
+                crack_tiles.under = this.spread_rects({
+                    layer: crack_tiles.under,
+                    times: rnd.randint(6, 12),
+                    minarea: 12, maxarea: 64, minsize: 4, maxsize: 8, offset: 1,
+                    fill: MAPSYM_FLOOR1, lay: MAPSYM_BASE, exclude: MAPSYM_HOLE,
+                });
+
                 this.push_tiles(map_data, crack_tiles);
                 break;
             }
@@ -261,9 +314,9 @@
                     const rect_height = rnd.randint(conf.minsize || 0, conf.maxsize || layer.length);
                     if(conf.maxarea !== null && (rect_width * rect_height > conf.maxarea)){ continue; }
                     if(conf.minarea !== null && (rect_width * rect_height < conf.minarea)){ continue; }
-                    const x1 = rnd.randint(0, self.map_width - rect_width);
+                    const x1 = rnd.randint(0, self.map_width - rect_width - 1);
                     const x2 = x1 + rect_width;
-                    const y1 = rnd.randint(0, layer.length - rect_height);
+                    const y1 = rnd.randint(0, layer.length - rect_height - 1);
                     const y2 = y1 + rect_height;
                     const p1 = {x: x1, y: y1};
                     const p2 = {x: x2, y: y2};

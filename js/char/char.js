@@ -44,7 +44,7 @@
                 offset_x: this.collision_setting_offset_x || SpriteCharSetting.collision_offset_x || 0,
                 offset_y: this.collision_setting_offset_y || SpriteCharSetting.collision_offset_y || 0,
             };
-            if(collision_setting.width * collision_setting.width > 0){
+            if(collision_setting.width * collision_setting.height > 0){
                 const collision = CollisionRect({
                     width: collision_setting.width,
                     height: collision_setting.height,
