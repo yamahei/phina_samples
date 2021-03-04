@@ -164,7 +164,8 @@
                 for(let j=0; j<rank.roads; j++){
                     const road_width = 1;
                     const criff_padding = 3;
-                    const road_x = Math.floor(rnd.randint(criff_padding, this.map_width - criff_padding - road_width) / 2) * 2;
+                    const _road_x = rnd.randint(criff_padding, this.map_width - criff_padding - road_width);
+                    const road_x = Math.floor(_road_x / 2) * 2;
                     criff_main_tiles.under = this.fill_rect(
                         criff_main_tiles.under,
                         {x: road_x, y: 0},

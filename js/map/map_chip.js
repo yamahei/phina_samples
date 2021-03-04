@@ -36,7 +36,6 @@
                 collision.y = collision_setting.offset_y;
                 this.collision_rect = collision;
             }
-
         },
         hitTestElement: function(target){//override
             if(!this.collision_rect){

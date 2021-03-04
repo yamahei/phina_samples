@@ -19,6 +19,7 @@ const ASSETS = {
 	},
 };
 
+const USE_WebGL = true;//WebGLだと当たり判定枠が表示できない
 const size = GameSize.byWidth(256);
 // const size = GameSize.byWidth(384);
 // phina.js をグローバル領域に展開
@@ -31,14 +32,18 @@ phina.define('MainScene', {
 		this.superInit(size);
 		this.backgroundColor = 'black';
 		this.canvas.imageSmoothingEnabled = false;
-		const layer = this.layer = GLLayer(options);//USE GPU
-		layer.addChildTo(this);
 		const bg_images = Object.keys(AssetManager.assets.image);
 		const bg_image = bg_images[Math.floor(Math.random() * 1000) % bg_images.length];
 		const generator = MapGenerator(bg_image, "map_sample");
 		const level = 1;
 		const world = generator.create(level);
-		layer.addChild(world);
+		if(USE_WebGL){
+			const layer = this.layer = GLLayer(options);//USE GPU
+			layer.addChildTo(this);
+			layer.addChild(world);
+		}else{
+			this.addChild(world);
+		}
 
 		//当たり判定と追尾スクロール
 		const collision = SpriteCharBase('hero');
