@@ -24,21 +24,20 @@
     const MAPSYM_HOLE = "X+";
 
     phina.define('MapGenerator', {
-        init: function(sprite_sheet_name, map_asset_name) {
-            this.sprite_sheet_name = sprite_sheet_name;
-            this.map_data_org = AssetManager.assets.json[map_asset_name].data;
+        init: function(mad_data) {
+            this.map_data_org = mad_data;
             this.map = MapTopView();
         },
         create: function(level){//0スタート
             this.level = level;
+            const map_data = JSON.parse(JSON.stringify(this.map_data_org));
             //DEBUG
-            // const random = this.random = Random(level);
-            const random = this.random = Random(Math.floor(Math.random()*999));//debug
+            // const rand = this.random = Random(level);
+            const rand = this.random = Random(Math.floor(Math.random()*999));//debug
             const level_interval = this.level_interval = MapGeneratorSetting.level_interval || 4;
             const stage_scene = this.stage_scene = level % level_interval;
             const stage_switch = this.stage_switch = !!(Math.floor(level / level_interval) % 2);
 
-            const map_data = JSON.parse(JSON.stringify(this.map_data_org));
             map_data.map_width = MapGeneratorSetting.map_width || map_data.map_width;
             map_data.tiles = { over: [], under: [] };
             // this.tiles = map_data.tiles;
@@ -60,24 +59,13 @@
             map_data.tiles.over = this.draw_border(map_data.tiles.over, [MAPSYM_BRIDGE]);
             map_data.tiles.under = this.draw_border(map_data.tiles.under, [MAPSYM_FLOOR1, MAPSYM_FLOOR2, MAPSYM_HOLE]);
             //生成
-            const sprite_sheet = this.get_sprite_sheet(stage_scene);
+            const map_image = map_data.images[stage_scene];
+            const sprite_sheet = map_image.sheets[rand.randint(0, map_image.sheets.length-1)];
+            console.log(map_image);
+            console.log(sprite_sheet);
             return this.map.create(sprite_sheet, map_data);
         },
 
-        get_sprite_sheet: function(stage_type){
-            const sheets_set = [
-                ["map_field_1", "map_field_2", "map_field_3"],
-                ["map_rockey_1", "map_rockey_2"],
-                ["map_cave_1", "map_cave_2"],
-                ["map_castle_1", "map_castle_2"],
-            ];
-            //DEBUG
-            // const sheets = sheets_set[stage_type % sheets_set.length];
-            // const random = this.random.randint(0, 999);
-            // return sheets[random % sheets.length];
-            const _sheets_set = sheets_set.flat(Infinity);
-            return _sheets_set[Math.floor(Math.random() * _sheets_set.length)];
-        },
         is_appear_criff: function(){
             return true; //!!(this.stage_scene == 2 || this.stage_scene == 3);
         },

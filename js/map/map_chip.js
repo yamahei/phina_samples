@@ -9,7 +9,7 @@
      */
     phina.define('SpriteMapChip', {
         superClass: 'phina.display.Sprite',
-        init: function(image, symbol, width, height, frame_index, collision, event) {
+        init: function(image, symbol, width, height, frame_index, collision, _propotion, event) {
             this.superInit(image, width, height);
             this.setOrigin(0, 0);
             this.frameIndex = frame_index;
@@ -19,9 +19,11 @@
             /**
              * collision setting
              */
+            const propotion_w = _propotion < 0 ? 1 + _propotion : 1;
+            const propotion_h = _propotion > 0 ? 1 - _propotion : 1;
             const collision_setting = {
-                width: width * collision,
-                height: height * collision,
+                width: width * collision * propotion_w,
+                height: height * collision * propotion_h,
                 offset_x: width / 2,
                 offset_y: height / 2,
             };

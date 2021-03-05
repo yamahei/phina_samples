@@ -25,5 +25,13 @@
         },
     };
 
+    const Queries = g.Queries = {
+        get: function(){
+            const searches = location.search.replace(/^\?/, "");
+            const entries = searches.split(/&/g).map(function(e){ return e.split(/=/); });
+            return Object.fromEntries(entries);
+        },
+    };
+
 
 })(this);

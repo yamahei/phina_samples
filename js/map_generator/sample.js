@@ -21,6 +21,8 @@ const ASSETS = {
 
 const USE_WebGL = true;//WebGLだと当たり判定枠が表示できない
 const size = GameSize.byWidth(256);
+const GAME_LEVEL = (Queries.get().level || 0) * 1;
+
 // const size = GameSize.byWidth(384);
 // phina.js をグローバル領域に展開
 phina.globalize();
@@ -32,10 +34,9 @@ phina.define('MainScene', {
 		this.superInit(size);
 		this.backgroundColor = 'black';
 		this.canvas.imageSmoothingEnabled = false;
-		const bg_images = Object.keys(AssetManager.assets.image);
-		const bg_image = bg_images[Math.floor(Math.random() * 1000) % bg_images.length];
-		const generator = MapGenerator(bg_image, "map_sample");
-		const level = 1;
+		const mad_data = AssetManager.assets.json.map_sample.data;
+		const generator = MapGenerator(mad_data);
+		const level = GAME_LEVEL;
 		const world = generator.create(level);
 		if(USE_WebGL){
 			const layer = this.layer = GLLayer(options);//USE GPU

@@ -153,7 +153,8 @@
                         const mapchip = SpriteMapChip(
                             sprite_sheet, symbol,
                             chip_width, chip_height,
-                            col.index, col.collision, col.event
+                            col.index, col.collision,
+                            col.proportion, col.event
                         );
                         mapchip.x = x * chip_width;
                         mapchip.y = y * chip_height;
@@ -221,6 +222,7 @@
                     symbol: chip.symbol,
                     layer: chip.layer || LAYER_UNDER,
                     collision: chip.collision || 0,
+                    proportion: chip.proportion || 0,
                     event: chip.event || null,
                 };
             });
