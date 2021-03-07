@@ -47,15 +47,15 @@
         { "index": 35, "symbol": "%3", "layer": "under" },
 
         { "name": "//穴(X)",
-          "index": 39, "symbol": "X7", "layer": "under" },
-        { "index": 40, "symbol": "X8", "layer": "under", "collision": 1, "proportion": 0.9, "event": "fall" },
-        { "index": 41, "symbol": "X9", "layer": "under" },
-        { "index": 42, "symbol": "X4", "layer": "under", "collision": 1, "proportion": -0.9, "event": "fall" },
-        { "index": 43, "symbol": "X+", "layer": "under", "collision": 0.8, "event": "fall" },
-        { "index": 44, "symbol": "X6", "layer": "under", "collision": 1, "proportion": -0.9, "event": "fall" },
-        { "index": 45, "symbol": "X1", "layer": "under" },
-        { "index": 46, "symbol": "X2", "layer": "under", "collision": 1, "proportion": 0.9, "event": "fall" },
-        { "index": 47, "symbol": "X3", "layer": "under" }
+          "index": 39, "symbol": "X7", "layer": "under", "collision": 0.1, "event": "fall" },
+        { "index": 40, "symbol": "X8", "layer": "under", "collision": 1.2, "proportion": 0.9, "event": "fall" },
+        { "index": 41, "symbol": "X9", "layer": "under", "collision": 0.1, "event": "fall" },
+        { "index": 42, "symbol": "X4", "layer": "under", "collision": 1.2, "proportion": -0.9, "event": "fall" },
+        { "index": 43, "symbol": "X+", "layer": "under", "collision": 0.7, "event": "fall" },
+        { "index": 44, "symbol": "X6", "layer": "under", "collision": 1.2, "proportion": -0.9, "event": "fall" },
+        { "index": 45, "symbol": "X1", "layer": "under", "collision": 0.1, "event": "fall" },
+        { "index": 46, "symbol": "X2", "layer": "under", "collision": 1.2, "proportion": 0.9, "event": "fall" },
+        { "index": 47, "symbol": "X3", "layer": "under", "collision": 0.1, "event": "fall" }
 
 	],
 	"tiles": {

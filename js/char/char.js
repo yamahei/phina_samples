@@ -88,5 +88,17 @@
         },
     });
 
+    phina.define('CharHero', {
+        superClass: 'SpriteCharBase',
+        init: function() {
+            const image = "hero";
+            this.collision_setting_width = 4;
+            this.collision_setting_height = 4;
+            this.collision_setting_offset_x = null;
+            this.collision_setting_offset_y = null;
+            this.superInit(image);
+        },
+    });
+
 
 })(this);

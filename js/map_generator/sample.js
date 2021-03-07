@@ -32,7 +32,7 @@ phina.define('MainScene', {
 	superClass: 'DisplayScene',
 	init: function(options) {
 		this.superInit(size);
-		this.backgroundColor = 'black';
+		this.backgroundColor = '#212';
 		this.canvas.imageSmoothingEnabled = false;
 		const mad_data = AssetManager.assets.json.map_sample.data;
 		const generator = MapGenerator(mad_data);
@@ -47,7 +47,7 @@ phina.define('MainScene', {
 		}
 
 		//当たり判定と追尾スクロール
-		const collision = SpriteCharBase('hero');
+		const collision = CharHero();//SpriteCharBase('hero');
 		collision.setAnimationAction('run');
 		world.addChar(collision);
 		world.setScrollTracker(collision);
@@ -83,7 +83,7 @@ phina.define('MainScene', {
 			 */
 			const hit = world.hitTestElement(collision);
 			if(hit){
-				this.visible = !this.visible;
+				this.visible = false;//!this.visible;
 			}else{
 				this.visible = true;
 			}
