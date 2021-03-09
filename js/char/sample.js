@@ -2,9 +2,11 @@ const ASSETS = {
 	image: {
 		hero: "ASSETS/image/chars/hero.png",
 		elf: "ASSETS/image/chars/elf.png",
+		door: "ASSETS/image/chars/doors.png",
 	},
 	spritesheet: {
 		char: "ASSETS/tmss/character.tmss",
+		door: "ASSETS/tmss/door.tmss",
 	},
 };
 
@@ -55,6 +57,19 @@ phina.define('MainScene', {
       const direction = directions[index];
       sprite.setAnimationDirection(direction);
       changeLabel();
+    };
+
+    //ドア
+    const door = EventDoor().addChildTo(this);
+    door.x = this.gridX.center(+2);
+    door.y = this.gridY.center();
+    const door_actions = ["do_open", "do_close"];
+    const doorButton = this.doorButton = Button({ text: 'door'}).addChildTo(this);
+    doorButton.x = this.gridX.center();
+    doorButton.y = this.gridY.center(+2);
+    doorButton.onclick = function(){
+      door[door_actions[0]]();
+      door_actions.push(door_actions.shift());
     };
 
     //当たり判定

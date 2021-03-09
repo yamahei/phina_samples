@@ -29,8 +29,10 @@
             this.map = MapTopView();
         },
         create: function(level){//0スタート
+            const chars = {hero: null, events: [], enemies: []};
             const map_data = JSON.parse(JSON.stringify(this.map_data_org));
             const rand = this.random = Random(level || 99);
+            rand.random();//init?
 
             map_data.map_width = MapGeneratorSetting.map_width || map_data.map_width;
             map_data.tiles = { over: [], under: [] };
@@ -41,43 +43,51 @@
 
             const stage_interval = MapGeneratorSetting.level_interval || 4;
             const stage_flag = !!(Math.floor(level / stage_interval) % 2);
+            const stage_lap = Math.floor(level / stage_interval);
             const stage_scene = level % stage_interval;
-            map_data.tiles = this.draw_map(level, stage_scene, stage_interval, stage_flag, map_data);
+            map_data.tiles = this.draw_map(level, stage_scene, stage_interval, stage_lap, stage_flag, map_data, chars);
             //フチの処理
             map_data.tiles.over = this.draw_border(map_data.tiles.over, [MAPSYM_BRIDGE]);
             map_data.tiles.under = this.draw_border(map_data.tiles.under, [MAPSYM_FLOOR1, MAPSYM_FLOOR2, MAPSYM_HOLE]);
             //生成
             const map_image = map_data.images[stage_scene];
             const sprite_sheet = map_image.sheets[rand.randint(0, map_image.sheets.length-1)];
-            return this.map.create(sprite_sheet, map_data);
+            const map = this.map.create(sprite_sheet, map_data);
+            if(chars.hero){ map.addChar(chars.hero); }
+            chars.events.forEach(function(event){ map.addChar(event); });
+            chars.enemies.forEach(function(enemie){ map.addChar(enemie); });
+            return map;
         },
 
-        draw_map: function(level, scene, interval, flag, map_data){
+        draw_map: function(level, scene, interval, lap, flag, map_data, chars){
 
             const map_scene_list = [
-                {interval: 0, name: "平原", scenes: ["start", "field", "rough", "field", "wall"]},
-                {interval: 1, name: "岩場", scenes: ["start", "rough", "crack", "rough", "wall"]},
-                {interval: 2, name: "洞窟", scenes: ["start", "crack", "rough", "crack", "wall"]},
-                {interval: 3, name: "城",   scenes: ["start", "criff", "field", "criff", "wall"]},
+                { interval: 0, name: "平原", scenes: ["start", "field", "rough", "field", "wall"], enemies: [0, 0, 3, 0, 0] },
+                { interval: 1, name: "岩場", scenes: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 0, 3, 0] },
+                { interval: 2, name: "洞窟", scenes: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 3, 1, 3, 0] },
+                { interval: 3, name: "城",   scenes: ["start", "criff", "field", "criff", "wall"], enemies: [0, 0, 2, 0, 1] },
             ];
             const map_scenes = map_scene_list[scene].scenes.reverse();
+            const map_enemies = map_scene_list[scene].enemies.reverse();
 
             while(map_scenes.length){
                 const scene = map_scenes.shift();
+                const _enemy = map_enemies.shift();
+                const enemy = ((lap - 1) >= _enemy);
                 switch(scene){
-                    case "wall": this.draw_map__wall(map_data, level, scene, flag); break;
-                    case "rough": this.draw_map__rough(map_data, level, scene, flag); break;
-                    case "criff": this.draw_map__criff(map_data, level, scene, flag); break;
-                    case "crack": this.draw_map__crack(map_data, level, scene, flag); break;
-                    case "field": this.draw_map__field(map_data, level, scene, flag); break;
-                    case "start": this.draw_map__start(map_data, level, scene, flag); break;
+                    case "wall":  this.draw_map__wall(map_data, level, scene, interval, lap, flag, chars, enemy);  break;
+                    case "rough": this.draw_map__rough(map_data, level, scene, interval, lap, flag, chars, enemy); break;
+                    case "criff": this.draw_map__criff(map_data, level, scene, interval, lap, flag, chars, enemy); break;
+                    case "crack": this.draw_map__crack(map_data, level, scene, interval, lap, flag, chars, enemy); break;
+                    case "field": this.draw_map__field(map_data, level, scene, interval, lap, flag, chars, enemy); break;
+                    case "start": this.draw_map__start(map_data, level, scene, interval, lap, flag, chars, enemy); break;
                     default: throw new error(`unknown scene: '${scene}'.`);
                 }
             }
 
             return map_data.tiles;
         },
-        draw_map__wall: function(map_data, level, scene, flag){
+        draw_map__wall: function(map_data, level, scene, interval, lap, flag, chars, enemy){
             const wall_height = 4;
             const wall_tiles = this.get_maplines(wall_height, MAPSYM_WALL, MAPSYM_EMPTY);
             this.push_tiles(map_data, wall_tiles);
@@ -86,11 +96,25 @@
             const ground_tiles = this.get_maplines(ground_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
             const p1 = {x: rnd.randint(1, 4), y: 1};
-            const p2 = {x: this.map_width - rnd.randint(1, 4), y: ground_height - rnd.randint(1, 3)};
+            const p2 = {x: this.map_width - 1 - rnd.randint(1, 4), y: ground_height - rnd.randint(1, 3)};
             ground_tiles.under = this.fill_rect(ground_tiles.under, p1, p2, MAPSYM_FLOOR2);
             this.push_tiles(map_data, ground_tiles);
+
+            //TODO: enemies
+            //0:field=off, 1:rockey=off, 2:cave=off, 3:castle=on
+            //TODO: event
+            //always: door
+            const door = EventDoor().autostyle(level);
+            this.set_position_from_map_point(door, map_data, this.map_width / 2, wall_height);
+            chars.events.push(door);
         },
-        draw_map__rough: function(map_data, level, scene, flag){
+        set_position_from_map_point: function(char, map_data, map_x, map_y){
+            const chip_width = map_data.chip_width;
+            const chip_height = map_data.chip_height;
+            char.x = map_x * chip_width;
+            char.bottom = map_y * chip_height;
+        },
+        draw_map__rough: function(map_data, level, scene, interval, lap, flag, chars, enemy){
             const rough_height = 8;
             const rough_tiles = this.get_maplines(rough_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
@@ -115,10 +139,13 @@
                 lays: [MAPSYM_BASE, MAPSYM_FLOOR1],
                 times: 4,
             });
-
             this.push_tiles(map_data, rough_tiles);
+
+            //TODO: enemies
+            //0:field=on, 1:rockey=on, 2:cave=on, 3:castle=on/2
+
         },
-        draw_map__criff: function(map_data, level, scene, flag){
+        draw_map__criff: function(map_data, level, scene, interval, lap, flag, chars, enemy){
             const rnd = this.random;
             const ranks = [
                 { rank: 0, upper: 3, main: 6, under: 3, times: 1, roads: 3 },
@@ -158,7 +185,7 @@
                 this.push_tiles(map_data, criff_under_tiles);
             }
         },
-        draw_map__crack: function(map_data, level, scene, flag){
+        draw_map__crack: function(map_data, level, scene, interval, lap, flag, chars, enemy){
             const rnd = this.random;
             const crack_height = Math.floor(Math.log2(level || 1) * 2) + 10;
             while(true){
@@ -245,13 +272,13 @@
                 });
 
                 //TODO: enemies
+                //0:field=off, 1:rockey=off, 2:cave=on/3, 3:castle=off
 
                 this.push_tiles(map_data, crack_tiles);
                 break;
             }
-            //TODO: draw bridge
         },
-        draw_map__field: function(map_data, level, scene, flag){
+        draw_map__field: function(map_data, level, scene, interval, lap, flag, chars, enemy){
             const field_height = 6;
             const field_tiles = this.get_maplines(field_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
@@ -273,13 +300,13 @@
 
             this.push_tiles(map_data, field_tiles);
         },
-        draw_map__start: function(map_data, level, scene, flag){
-            const start_height = 6;
+        draw_map__start: function(map_data, level, scene, interval, lap, flag, chars, enemy){
+            const start_height = 3;
             const start_tiles = this.get_maplines(start_height, MAPSYM_BASE, MAPSYM_EMPTY);
             this.push_tiles(map_data, start_tiles);
 
             const rnd = this.random;
-            const rough_height = rnd.randint(Math.floor(start_height / 2), start_height);
+            const rough_height = rnd.randint(2, start_height);
             const map_width = this.map_width;
             const rough_x = rnd.randint(0, 4);
             const p1 = {x: rough_x, y: start_height - rough_height};
@@ -430,7 +457,7 @@
             ];
             const get_symbol_at = function(x, y, symbol){
                 const not_equal = MAPSYM_EMPTY;
-                if(y < 0 || layer.length <= y ){ return not_equal; }
+                if(y < 0 || layer.length <= y ){ return symbol; }//not_equal
                 const row = layer[y];
                 if(x < 0 || row.length <= x ){ return symbol; }
                 return row[x];

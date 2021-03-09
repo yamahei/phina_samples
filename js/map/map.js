@@ -55,7 +55,9 @@
             this.total_height = null;//
             this.tracker = null;//追尾スクロール用
         },
-        addChar: function(char){ return this.layer_field.addChild(char); },
+        addChar: function(char){
+            return this.layer_field.addChild(char);
+        },
         setScrollTracker: function(char){
             this.tracker = char;
             if(char){
@@ -264,7 +266,7 @@
                         const map = current_layer.map;
                         let mapchip = (map[y] && map[y][x]) ? map[y][x] : null;
                         if(mapchip && mapchip.hitTestElement(sprite)){
-                            return mapchip.event_name || true;
+                            return mapchip || true;
                         }else{
                             index += 1;
                         }

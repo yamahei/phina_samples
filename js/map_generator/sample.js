@@ -10,12 +10,14 @@ const ASSETS = {
 		map_rockey_1: "ASSETS/image/maps/bg_rockey_1.png",
 		map_rockey_2: "ASSETS/image/maps/bg_rockey_2.png",
 		hero: "ASSETS/image/chars/hero.png",
+		door: "ASSETS/image/chars/doors.png",
 	},
 	json: {
 		map_sample: "ASSETS/json/map/map_sample.json"
 	},
 	spritesheet: {
 		char: "ASSETS/tmss/character.tmss",
+		door: "ASSETS/tmss/door.tmss",
 	},
 };
 
@@ -38,6 +40,7 @@ phina.define('MainScene', {
 		const generator = MapGenerator(mad_data);
 		const level = GAME_LEVEL;
 		const world = generator.create(level);
+
 		if(USE_WebGL){
 			const layer = this.layer = GLLayer(options);//USE GPU
 			layer.addChildTo(this);
@@ -48,7 +51,7 @@ phina.define('MainScene', {
 
 		//当たり判定と追尾スクロール
 		const collision = CharHero();//SpriteCharBase('hero');
-		collision.setAnimationAction('run');
+		collision.setAnimationAction('walk');
 		world.addChar(collision);
 		world.setScrollTracker(collision);
 		let collision_v = 1;
@@ -98,7 +101,7 @@ phina.main(function() {
 	// アプリケーション生成
 	const app = GameApp({
 		startLabel: 'main', // メインシーンから開始する
-		// fps: 16,
+		fps: 24,
 		assets: ASSETS,
 		...size,
 	});
