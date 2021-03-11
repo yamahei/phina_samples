@@ -29,6 +29,7 @@ phina.define('MainScene', {
 	superClass: 'DisplayScene',
 	init: function() {
 		this.superInit(size);
+		this.backgroundColor = '#212';
 		this.canvas.imageSmoothingEnabled = false;
 		const bg_images = Object.keys(AssetManager.assets.image);
 		const bg_image = bg_images[Math.floor(Math.random() * 1000) % bg_images.length];

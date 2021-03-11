@@ -33,7 +33,10 @@
                 {name: LAYER_OVER,  obj: this.layer_over,  map: [], sort: false},
                 {name: LAYER_UNDER, obj: this.layer_under, map: [], sort: false},
             ];
+            const self = this;
             this.layers.forEach(function(layer){
+                //当たり判定はMapTopViewに任せる
+                layer.obj.hitTestElement = self.hitTestElement;
                 //y座標の小さい順位ソート（上から順に描画）
                 if(layer.sort){
                     layer.obj.onenterframe = function(e){

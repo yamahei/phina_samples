@@ -10,7 +10,7 @@ const ASSETS = {
 	},
 };
 
-const size = GameSize.byWidth(384);
+const size = GameSize.byWidth(24 * 16);
 // phina.js をグローバル領域に展開
 phina.globalize();
 
@@ -19,6 +19,7 @@ phina.define('MainScene', {
   superClass: 'DisplayScene',
   init: function() {
     this.superInit(size);
+		this.backgroundColor = '#212';
     this.canvas.imageSmoothingEnabled = false;
 
     // スプライト画像作成
@@ -80,7 +81,7 @@ phina.define('MainScene', {
         self.x = p.x;
         self.y = p.y;
       });
-      const hit = this.hitTestElement(sprite);
+      const hit = this.hitTestElement(sprite) || this.hitTestElement(door);
       if(hit){
         this.visible = !this.visible;
       }else{

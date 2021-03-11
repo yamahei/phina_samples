@@ -9,8 +9,30 @@ const ASSETS = {
 		map_field_3: "ASSETS/image/maps/bg_field_3.png",
 		map_rockey_1: "ASSETS/image/maps/bg_rockey_1.png",
 		map_rockey_2: "ASSETS/image/maps/bg_rockey_2.png",
+
 		hero: "ASSETS/image/chars/hero.png",
 		door: "ASSETS/image/chars/doors.png",
+
+		//scene 0: 平原
+		snake: "ASSETS/image/chars/snake.png",
+		bee: "ASSETS/image/chars/bee.png",
+		butterfly: "ASSETS/image/chars/butterfly.png",
+		rooster: "ASSETS/image/chars/rooster.png",
+		gull: "ASSETS/image/chars/gull.png",
+		//scene 1: 岩場
+		slime: "ASSETS/image/chars/slime.png",
+		hawk: "ASSETS/image/chars/hawk.png",
+		wolf: "ASSETS/image/chars/wolf.png",
+		//scene 2: 洞窟
+		bat: "ASSETS/image/chars/bat.png",
+		dragon: "ASSETS/image/chars/dragon.png",
+		org: "ASSETS/image/chars/org.png",
+		//scene 3: 城
+		spirit3: "ASSETS/image/chars/spirit3.png",//flower
+		spirit2: "ASSETS/image/chars/spirit2.png",//water
+		spirit5: "ASSETS/image/chars/spirit5.png",//ice
+		spirit4: "ASSETS/image/chars/spirit4.png",//fire
+		spirit6: "ASSETS/image/chars/spirit6.png",//dark
 	},
 	json: {
 		map_sample: "ASSETS/json/map/map_sample.json"
@@ -22,7 +44,7 @@ const ASSETS = {
 };
 
 const USE_WebGL = true;//WebGLだと当たり判定枠が表示できない
-const size = GameSize.byWidth(256);
+const size = GameSize.byWidth(16 * 16);
 const GAME_LEVEL = (Queries.get().level || 0) * 1;
 
 // const size = GameSize.byWidth(384);
