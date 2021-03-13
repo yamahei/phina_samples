@@ -1,7 +1,7 @@
 (function(g){
 
     "use strict";
-    const MAP_DEBUG = true;
+    const MAP_DEBUG = false;
     const LAYER_MIXED = 'MIXED';//不定（chip.layerで決定する）
     const LAYER_HOVER = 'hover';//キャラクタを覆い隠すオブジェクトの層
     const LAYER_FIELD = 'field';//一般的にキャラクタを配置する層
@@ -36,7 +36,9 @@
             const self = this;
             this.layers.forEach(function(layer){
                 //当たり判定はMapTopViewに任せる
-                layer.obj.hitTestElement = self.hitTestElement;
+                layer.obj.hitTestElement = function(target){
+                    return self.hitTestElement(target);
+                }
                 //y座標の小さい順位ソート（上から順に描画）
                 if(layer.sort){
                     layer.obj.onenterframe = function(e){
@@ -54,8 +56,6 @@
             this.chip_of_null = null;
             this.chips = null;
             this.sprite_sheet = null;
-            this.total_width = null;//
-            this.total_height = null;//
             this.tracker = null;//追尾スクロール用
         },
         addChar: function(char){
@@ -72,8 +72,8 @@
                     const center_y = game_height / 2;
                     const gap_x = center_x - char.x;
                     const gap_y = center_y - char.y;
-                    const scrollable_width = self.total_width - game_width;
-                    const scrollable_height = self.total_height - game_height;
+                    const scrollable_width = self.width - game_width;
+                    const scrollable_height = self.height - game_height;
                     let offset_x = gap_x;
                     let offset_y = gap_y;
                     if(offset_x < -scrollable_width){ offset_x = -scrollable_width; }
@@ -204,8 +204,13 @@
             this.map_height = map_data.map_height;
             this.chip_width = map_data.chip_width;
             this.chip_height = map_data.chip_height;
-            this.total_width = this.map_width * this.chip_width;
-            this.total_height = this.map_height * this.chip_height;
+            this.width = this.map_width * this.chip_width;
+            this.height = this.map_height * this.chip_height;
+            const self = this;
+            this.layers.forEach(function(layer){
+                layer.obj.width = self.width;
+                layer.obj.height = self.height;
+            });
             this.symbol_digit = map_data.symbol_digit;
             this.chip_of_null = map_data.chip_of_null;
             this.chips = map_data.chips = this._convert_chips(_map_data.chips);

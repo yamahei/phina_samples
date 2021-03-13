@@ -43,7 +43,7 @@ const ASSETS = {
 	},
 };
 
-const USE_WebGL = true;//WebGLだと当たり判定枠が表示できない
+const USE_WebGL = false;//WebGLだと当たり判定枠が表示できない
 const size = GameSize.byWidth(16 * 16);
 const GAME_LEVEL = (Queries.get().level || 0) * 1;
 
@@ -82,8 +82,8 @@ phina.define('MainScene', {
 		collision.onenterframe = function(e){
 
 			collision.x += collision_v * collision_speed;
-			if(collision.x > world.total_width){
-				collision.x = world.total_width;
+			if(collision.x > world.width){
+				collision.x = world.width;
 				collision_v *= -1;
 			}
 			if(collision.x < 0){
@@ -91,8 +91,8 @@ phina.define('MainScene', {
 				collision_v *= -1;
 			}
 			collision.y += collision_w * collision_speed;
-			if(collision.y > world.total_height){
-				collision.y = world.total_height;
+			if(collision.y > world.height){
+				collision.y = world.height;
 				collision_w *= -1;
 			}
 			if(collision.y < 0){

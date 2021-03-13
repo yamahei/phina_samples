@@ -2,7 +2,7 @@
 
     "use strict";
 
-    const MAP_DEBUG = true;
+    const MAP_DEBUG = false;
 
     /**
      * ATTENTION: must include collision_rect.js
@@ -38,6 +38,9 @@
                 collision.y = collision_setting.offset_y;
                 this.collision_rect = collision;
             }
+        },
+        getCollisionRect: function(){
+            return this.collision_rect || this;
         },
         hitTestElement: function(target){//override
             if(!this.collision_rect){

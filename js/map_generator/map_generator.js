@@ -62,8 +62,8 @@
         draw_map: function(level, scene, lap, flag, map_data, chars){
 
             const map_stage_list = [
-                { scene: 0, name: "平原", stages: ["start", "field", "rough", "field", "wall"], enemies: [0, 0, 3, 0, 4] },
-                { scene: 1, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 0, 3, 3] },
+                { scene: 0, name: "平原", stages: ["start", "field", "rough", "field", "wall"], enemies: [0, 8, 3,10, 4] },
+                { scene: 1, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 6, 3, 3] },
                 { scene: 2, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 3, 1, 3, 2] },
                 { scene: 3, name: "城",   stages: ["start", "criff", "field", "criff", "wall"], enemies: [0, 4, 2, 3, 1] },
             ];
@@ -85,8 +85,31 @@
                 }
             }
 
+            this.debug_enemies(map_data, chars);
             return map_data.tiles;
         },
+
+        debug_enemies: function(map_data, chars){
+            const enemies = [
+                CharButterfly, CharBee, CharRooster,
+                CharSnake, CharSlime, CharHawk, CharWolf,
+                CharBat, CharOrg, CharDragon,
+                CharSpirit3, CharSpirit2, CharSpirit5, CharSpirit4, CharSpirit6
+            ];
+
+            for(let i=0; i<enemies.length; i++){
+                const w = 4;
+                const x = 2 + (i % w) * 3;
+                const y = 12 + Math.floor(i / w) * 3;
+                const char = enemies[i]();
+                char.autonomousOn();
+                this.set_position_from_map_point(char, map_data, x, y);
+                chars.enemies.push(char);
+            }
+
+        },
+
+
         draw_map__wall: function(map_data, level, scene, lap, flag, stage, chars, enemy){
             console.log([scene, lap]);
             const wall_height = 4;
@@ -529,7 +552,7 @@
             const SCENE_ROCKEY = 1;//岩場
             const SCENE_CAVE   = 2;//洞窟
             const SCENE_CASTLE = 3;//城
-            const enemies_field = [ CharButterfly, CharBee, CharRooster, CharGull ];
+            const enemies_field = [ CharButterfly, CharBee, CharRooster ];
             const enemies_rockey = [ CharSnake, CharSlime, CharHawk, CharWolf ];
             const enemies_cave = [ CharBat, CharOrg, CharDragon ];
             const enemies_catle = [ CharSpirit3, CharSpirit2, CharSpirit5, CharSpirit4, CharSpirit6 ];//flower, water, ice, fire, dark

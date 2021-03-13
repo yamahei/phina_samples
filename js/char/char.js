@@ -35,6 +35,7 @@
             this.direction = SpriteCharSetting.default_direction;
             this.action = SpriteCharSetting.default_action;
             this.setCharAnimation();
+            this.autonomousOff();
 
             /**
              * collision setting
@@ -91,6 +92,58 @@
                 return my_collision.hitTestElement(target);
             }
         },
+        autonomousOn: function(){
+            this.update = this.autonomousAction;
+            this.autoparam = this.getDefaultAutoParam();
+        },
+        autonomousOff: function(){
+            this.update = null;
+            this.autoparam = {};
+        },
+        getCollisionRect: function(){
+            return this.collision_rect || this;
+        },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){
+            console.log("TODO: must implent!");
+        },
+        getAcceleration: function(direction, speed){
+            const accel_per_dir = {
+                up:    {v: 0, w:-1},
+                down:  {v: 0, w: 1},
+                left:  {v:-1, w: 0},
+                right: {v: 1, w: 0},
+            }[direction] || {v: 0, w: 0};
+            accel_per_dir.v *= speed;
+            accel_per_dir.w *= speed;
+            return accel_per_dir;
+        },
+        moveBy: function(v, w){
+            const orgXY = {x: this.x, y: this.y};
+            const orgVW = {v: v, w: w};
+            this.x += v;
+            this.y += w;
+            //TODO: 最初から衝突している場合は想定していない
+            let hit = this.parent.hitTestElement(this);//判定一回目
+            if(!hit){ return null; }//衝突なく終了
+            const myrect = this.getCollisionRect();
+            const otherrect = hit.getCollisionRect();
+            if(v < 0){ this.x += (otherrect.right - myrect.left); }
+            if(v > 0){ this.x -= (myrect.right - otherrect.left); }
+            if(w < 0){ this.y += (otherrect.bottom - myrect.top); }
+            if(w > 0){ this.y -= (myrect.bottom - otherrect.top); }
+            return hit;//衝突したオブジェクト
+        },
+        outerLimit: function(){
+            let out = false;
+            if(this.x < 0){ out = true; this.x = 0; }
+            if(this.x > this.parent.width){ out = true; this.x = this.parent.width; }
+            if(this.y < 0){ out = true; this.y = 0; }
+            if(this.y > this.parent.height){ out = true; this.y = this.parent.height; }
+            return out;
+        },
     });
 
     phina.define('CharHero', {
@@ -108,177 +161,347 @@
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "butterfly";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 8;
+            this.collision_setting_height = 8;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
+        },
+        getDefaultAutoParam: function(){
+            return {
+                speed: 1, counter: 4, _counter: 4,
+                direction: "down", action: "walk",
+            };
+        },
+        autonomousAction: function(e){
+            const param = this.autoparam;
+            const rnd = this.random;
+            const self = this;
+            const turn = function(){
+                const directions = g.SpriteCharSetting.directions;
+                const index = rnd.randint(1, directions.length) - 1;
+                param.direction = directions[index];
+                param._counter = 0;
+                self.setAnimationDirection(param.direction);
+                self.setAnimationAction(param.action);
+            };
+            param._counter += 1;
+            if(param.counter <= param._counter){ turn(); }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            const hit = this.moveBy(accel.v, accel.w);
+            if(hit){ param._counter = param.counter; }
+            if(this.outerLimit()){ turn(); }
         },
     });
     phina.define('CharBee', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "bee";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 12;
+            this.collision_setting_height = 12;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
+        },
+        getDefaultAutoParam: function(){
+            return {
+                speed: 2, counter: 8, _counter: 8, waiting: true,
+                direction: "down", action: "run",
+            };
+        },
+        autonomousAction: function(e){
+            const param = this.autoparam;
+            const rnd = this.random;
+            const self = this;
+            const turn = function(){
+                param.waiting = !param.waiting;
+                param._counter = 0;
+                if(!param.waiting){//動き出す
+                    param.speed = 2;
+                }else{//方向転換して待つ
+                    const directions = g.SpriteCharSetting.directions;
+                    const index = rnd.randint(1, directions.length) - 1;
+                    param.direction = directions[index];
+                    param.speed = 0;
+                    self.setAnimationDirection(param.direction);
+                    self.setAnimationAction(param.action);
+                }
+            };
+            param._counter += 1;
+            if(param.counter <= param._counter){ turn(); }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            const hit = this.moveBy(accel.v, accel.w);
+            if(hit){ param._counter = param.counter; }
+            if(this.outerLimit()){ turn(); }
         },
     });
     phina.define('CharSnake', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "snake";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 12;
+            this.collision_setting_height = 12;
             this.collision_setting_offset_x = null;
-            this.collision_setting_offset_y = null;
+            this.collision_setting_offset_y = 8;
             this.superInit(image);
+        },
+        getDefaultAutoParam: function(){
+            return {
+                speed: 1, counter: 12, _counter: 12, interval: 0,
+                direction: "down", action: "walk",
+            };
+        },
+        autonomousAction: function(e){
+            const param = this.autoparam;
+            const rnd = this.random;
+            const self = this;
+            const turn = function(){
+                const directions = g.SpriteCharSetting.directions;
+                const index = rnd.randint(1, directions.length) - 1;
+                param.interval = (param.interval + 1) % 4;
+                if(param.interval == 0){// 1/4
+                    param.action = "run";
+                    param.speed = 3;
+                }else{
+                    param.action = "walk";
+                    param.speed = 1;
+                }
+                param.direction = directions[index];
+                param._counter = 0;
+                self.setAnimationDirection(param.direction);
+                self.setAnimationAction(param.action);
+            };
+            param._counter += 1;
+            if(param.counter <= param._counter){ turn(); }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            const hit = this.moveBy(accel.v, accel.w);
+            if(hit){ param._counter = param.counter; }
+            if(this.outerLimit()){ turn(); }
         },
     });
     phina.define('CharRooster', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "rooster";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 12;
+            this.collision_setting_height = 12;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
-    });
-    phina.define('CharGull', {
-        superClass: 'SpriteCharBase',
-        init: function() {
-            const image = "gull";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
-            this.collision_setting_offset_x = null;
-            this.collision_setting_offset_y = null;
-            this.superInit(image);
+        getDefaultAutoParam: function(){
+            return {
+                speed: 2, counter: 24, _counter: 24, waiting: true,
+                direction: "down", action: "walk",
+            };
+        },
+        autonomousAction: function(e){
+            const param = this.autoparam;
+            const rnd = this.random;
+            const self = this;
+            const turn = function(){
+                if(param.waiting){
+                    param.waiting = !!rnd.randint(0, 3);// 1/4
+                }else{
+                    param.waiting = !param.waiting;
+                }
+                param._counter = 0;
+                if(!param.waiting){//動き出す
+                    param.action = "walk";
+                    param.speed = 2;
+                }else{//方向転換して待つ
+                    const directions = g.SpriteCharSetting.directions;
+                    const index = rnd.randint(1, directions.length) - 1;
+                    param.action = "stand";
+                    param.direction = directions[index];
+                    param.speed = 0;
+                    self.setAnimationDirection(param.direction);
+                    self.setAnimationAction(param.action);
+                }
+            };
+            param._counter += 1;
+            if(param.counter <= param._counter){ turn(); }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            const hit = this.moveBy(accel.v, accel.w);
+            if(hit){ param._counter = param.counter; }
+            if(this.outerLimit()){ turn(); }
         },
     });
+    // phina.define('CharGull', {
+    //     superClass: 'SpriteCharBase',
+    //     init: function() {
+    //         const image = "gull";
+    //         this.collision_setting_width = 24;
+    //         this.collision_setting_height = 24;
+    //         this.collision_setting_offset_x = null;
+    //         this.collision_setting_offset_y = null;
+    //         this.superInit(image);
+    //     },
+    // });
     phina.define('CharSlime', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "slime";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 20;
+            this.collision_setting_height = 14;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharHawk', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "hawk";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 12;
+            this.collision_setting_height = 12;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharWolf', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "wolf";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 12;
+            this.collision_setting_height = 12;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharBat', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "bat";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 8;
+            this.collision_setting_height = 8;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharOrg', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "org";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 16;
+            this.collision_setting_height = 16;
             this.collision_setting_offset_x = null;
-            this.collision_setting_offset_y = null;
+            this.collision_setting_offset_y = 10;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharDragon', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "dragon";
-            this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_width = 16;
+            this.collision_setting_height = 16;
             this.collision_setting_offset_x = null;
-            this.collision_setting_offset_y = null;
+            this.collision_setting_offset_y = 10;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharSpirit3', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "spirit3";
             this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_height = 20;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharSpirit2', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "spirit2";
             this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_height = 20;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharSpirit5', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "spirit5";
             this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_height = 20;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharSpirit4', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "spirit4";
             this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_height = 20;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
     phina.define('CharSpirit6', {
         superClass: 'SpriteCharBase',
         init: function() {
             const image = "spirit6";
             this.collision_setting_width = 24;
-            this.collision_setting_height = 24;
+            this.collision_setting_height = 20;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){},
     });
 
 
