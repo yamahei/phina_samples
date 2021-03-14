@@ -349,9 +349,38 @@
             this.superInit(image);
         },
         getDefaultAutoParam: function(){
-            return {};
+            return {
+                speed: 1, counter: 12, _counter: 21, waiting: true,
+                direction: "down", action: "walk",
+            };
         },
-        autonomousAction: function(e){},
+        autonomousAction: function(e){
+            const param = this.autoparam;
+            const rnd = this.random;
+            const self = this;
+            const turn = function(){
+                param.waiting = !param.waiting;
+                param._counter = 0;
+                if(!param.waiting){//動き出す
+                    param.speed = 2;
+                    param.action = "walk";
+                }else{//方向転換して待つ
+                    const directions = g.SpriteCharSetting.directions;
+                    const index = rnd.randint(1, directions.length) - 1;
+                    param.direction = directions[index];
+                    param.action = "stand";
+                    param.speed = 0;
+                    self.setAnimationDirection(param.direction);
+                    self.setAnimationAction(param.action);
+                }
+            };
+            param._counter += 1;
+            if(param.counter <= param._counter){ turn(); }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            const hit = this.moveBy(accel.v, accel.w);
+            if(hit){ param._counter = param.counter; }
+            if(this.outerLimit()){ turn(); }
+        },
     });
     phina.define('CharHawk', {
         superClass: 'SpriteCharBase',
@@ -364,24 +393,41 @@
             this.superInit(image);
         },
         getDefaultAutoParam: function(){
-            return {};
+            const rnd = this.random;
+            return {
+                speed: 2, counter: 64, _counter: 64,
+                directionOffset: rnd.randint(0, 99),
+                directionIndex: rnd.randint(0, 99),
+                direction: "down", action: "stand",
+            };
         },
-        autonomousAction: function(e){},
-    });
-    phina.define('CharWolf', {
-        superClass: 'SpriteCharBase',
-        init: function() {
-            const image = "wolf";
-            this.collision_setting_width = 12;
-            this.collision_setting_height = 12;
-            this.collision_setting_offset_x = null;
-            this.collision_setting_offset_y = null;
-            this.superInit(image);
+        autonomousAction: function(e){
+            const param = this.autoparam;
+            const rnd = this.random;
+            const self = this;
+            const turn = function(){
+                const directions = g.SpriteCharSetting.directions;
+                param.directionIndex = (param.directionIndex + 1) % directions.length;
+                const index = (param.directionIndex + param.directionOffset) % directions.length
+                param.direction = directions[index];
+                if(rnd.randint(0, 5) == 0){
+                    param.action = 'walk';
+                    param._counter = param.counter * 0.6;
+                }else{
+                    param.action = 'stand';
+                    param._counter = 0;
+                }
+                self.setAnimationDirection(param.direction);
+                self.setAnimationAction(param.action);
+            };
+            param._counter += 1;
+            if(param.counter <= param._counter){ turn(); }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            this.x += accel.v;
+            this.y += accel.w;
+            if(this.outerLimit()){ turn(); }
         },
-        getDefaultAutoParam: function(){
-            return {};
-        },
-        autonomousAction: function(e){},
+
     });
     phina.define('CharBat', {
         superClass: 'SpriteCharBase',
@@ -389,6 +435,55 @@
             const image = "bat";
             this.collision_setting_width = 8;
             this.collision_setting_height = 8;
+            this.collision_setting_offset_x = null;
+            this.collision_setting_offset_y = null;
+            this.superInit(image);
+        },
+        getDefaultAutoParam: function(){
+            const rnd = this.random;
+            return {
+                speed: 5, counter: 32, _counter: 32,
+                v: (rnd.randint(0, 99) % 2) * 2 - 1, w: 0,
+                mode: "fly", direction: "down", action: "run",
+            };
+        },
+        autonomousAction: function(e){
+            const param = this.autoparam;
+            const rnd = this.random;
+            const seek = function(){
+                param.mode = "seek";
+                param._counter = 0;
+                param.w = (rnd.randint(0, 99) % 2) * 2 - 1;
+            };
+            const fly = function(){
+                param.mode = "fly";
+                param._counter = 0;
+                param.v *= -1;
+            };
+            if(param.mode == "fly"){
+                param.direction = (param.v < 0) ? "left" : "right";
+                param.action = "run";
+                param.speed = 5;
+                this.x += param.v * param.speed;
+                if(this.x < 0 || this.x > this.parent.width){ seek(); }
+            }else if(param.mode == "seek"){
+                param.direction = (param.w < 0) ? "up" : "down";
+                param.action = "walk";
+                param.speed = 1;
+                this.y += param.w * param.speed;
+                param._counter += 1;
+                if(param.counter <= param._counter){ fly(); }
+            }
+            this.setAnimationDirection(param.direction);
+            this.setAnimationAction(param.action);
+        },
+    });
+    phina.define('CharWolf', {
+        superClass: 'SpriteCharBase',
+        init: function() {
+            const image = "wolf";
+            this.collision_setting_width = 12;
+            this.collision_setting_height = 12;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);

@@ -39,6 +39,10 @@
                 layer.obj.hitTestElement = function(target){
                     return self.hitTestElement(target);
                 }
+                //スクロール基準（主に主人公）の取得
+                layer.obj.getScrollTarget = function(){
+                    return self.tracker;
+                }
                 //y座標の小さい順位ソート（上から順に描画）
                 if(layer.sort){
                     layer.obj.onenterframe = function(e){

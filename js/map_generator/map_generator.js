@@ -36,10 +36,7 @@
 
             map_data.map_width = MapGeneratorSetting.map_width || map_data.map_width;
             map_data.tiles = { over: [], under: [] };
-            // this.tiles = map_data.tiles;
             this.map_width = map_data.map_width;
-            // this.map_height = 0;//未確定
-
 
             const stage_interval = MapGeneratorSetting.level_interval || 4;
             const stage_flag = !!(Math.floor(level / stage_interval) % 2);
@@ -55,7 +52,10 @@
             const map = this.map.create(sprite_sheet, map_data);
             if(chars.hero){ map.addChar(chars.hero); }
             chars.events.forEach(function(event){ map.addChar(event); });
-            chars.enemies.forEach(function(enemie){ map.addChar(enemie); });
+            chars.enemies.forEach(function(enemy){
+                map.addChar(enemy);
+                enemy.autonomousOn();//DEBUG
+            });
             return map;
         },
 
