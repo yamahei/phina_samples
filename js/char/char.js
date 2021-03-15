@@ -489,9 +489,71 @@
             this.superInit(image);
         },
         getDefaultAutoParam: function(){
-            return {};
+            const rnd = this.random;
+            return {
+                mode: "run",
+                direction: "down",
+                walk: {
+                    speed: 1, counter: 24, _counter: 24,
+                    counter2: 4, _counter2: 4,
+                    v: 0, w: 0,
+                    action: "walk",
+                },
+                run: {
+                    speed: 3, counter: 24, _counter: 24,
+                    v: 0, w: 0, action: "run",
+                },
+            };
         },
-        autonomousAction: function(e){},
+        autonomousAction: function(e){
+            const target = this.parent.getScrollTarget();
+            if(!target){ return; }
+
+            const param = this.autoparam;
+            const target_is_upper = !!(target.y < this.y);
+            const turn_to_walk = function(){
+                param.mode = "walk";
+                param.walk._counter = 0;
+                param.walk._counter2 = 0;
+                param.run.w = target_is_upper ? -1 : 1;
+                param.direction = target_is_upper ? "up" : "down";
+                };
+            const turn_to_run = function(){
+                param.mode = "run";
+                param.run._counter = 0;
+                param.run.w = target_is_upper ? -1 : 1;
+                param.direction = target_is_upper ? "up" : "down";
+                };
+            const turn = !!(param.mode == "walk") ? turn_to_run : turn_to_walk;
+            let v = 0;
+            let w = 0;
+            let speed = 0;
+            let action = "";
+            if(param.mode == "walk"){
+                v = param.walk.v;
+                w = param.walk.w;
+                speed = param.walk.speed;
+                action = "walk";
+                param.walk._counter += 1;
+                if(param.walk.counter <= param.walk._counter){
+                    const target_is_left = !!(target.x < this.x);
+                    param.walk.v = target_is_left ? -1 : 1;
+                    param.walk._counter2 += 1;
+                    if(param.walk.counter2 <= param.walk._counter2){ turn(); }
+                }
+            }else if(param.mode == "run"){
+                v = param.run.v;
+                w = param.run.w;
+                speed = param.run.speed;
+                action = "run";
+                param.run._counter += 1;
+                if(param.run.counter <= param.run._counter){ turn(); }
+            }
+            this.setAnimationDirection(param.direction);
+            this.setAnimationAction(action);
+            this.moveBy(v * speed, w * speed);
+            this.outerLimit();
+        },
     });
     phina.define('CharOrg', {
         superClass: 'SpriteCharBase',

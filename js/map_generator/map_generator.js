@@ -575,25 +575,28 @@
 
         set_enemy: function(map_data, chars, scene, lap, stage, top_y, bottom_y){
             const rnd = this.random;
-
+            const num = Math.min(3, Math.floor(lap / 3.5)) + 1;
             let counter = 0;
-            while(true){
-                const x = rnd.randint(0, this.map_width - 1 - 1);
-                const y = rnd.randint(top_y, bottom_y - 1);
-                const p1 = {x: x, y: y};
-                const p2 = {x: x + 1, y: y + 1};
-                const is_in = this.is_in(map_data.tiles.under, p1, p2, MAPSYM_HOLE);
-                const is_all = is_in && this.is_all(map_data.tiles.over, p1, p2, MAPSYM_EMPTY);
-                if(!is_all){
-                    if(counter++ > 99){ break; }//無限ループ防止
-                    else{ continue; }
+            for(let i=0; i<num; i++){
+                while(true){
+                    const x = rnd.randint(0, this.map_width - 1 - 1);
+                    const y = rnd.randint(top_y, bottom_y - 1);
+                    const p1 = {x: x, y: y};
+                    const p2 = {x: x + 1, y: y + 1};
+                    const is_in = this.is_in(map_data.tiles.under, p1, p2, MAPSYM_HOLE);
+                    const is_all = is_in && this.is_all(map_data.tiles.over, p1, p2, MAPSYM_EMPTY);
+                    if(!is_all){
+                        if(counter++ > 99){ break; }//無限ループ防止
+                        else{ continue; }
+                    }
+                    const enemies = this.get_enemies_in_scene(scene, stage);
+                    const max_index = Math.min(lap, enemies.length-1) + 1;
+                    const _index = rnd.randint(1, 65536);
+                    const char = enemies[_index % max_index]();
+                    this.set_position_from_map_point(char, map_data, x + 0.5, y + 1);
+                    chars.enemies.push(char);
+                    break;
                 }
-                const enemies = this.get_enemies_in_scene(scene, stage);
-                const max_index = Math.min(lap, enemies.length-1);
-                const char = enemies[rnd.randint(0, max_index)]();
-                this.set_position_from_map_point(char, map_data, x + 0.5, y + 1);
-                chars.enemies.push(char);
-                break;
             }
         },
 
