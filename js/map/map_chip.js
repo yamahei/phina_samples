@@ -2,7 +2,7 @@
 
     "use strict";
 
-    const MAP_DEBUG = false;
+    const MAP_DEBUG = true;
 
     /**
      * ATTENTION: must include collision_rect.js

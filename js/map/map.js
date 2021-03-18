@@ -41,7 +41,7 @@
                 }
                 //スクロール基準（主に主人公）の取得
                 layer.obj.getScrollTarget = function(){
-                    return self.tracker;
+                    return self.getScrollTarget();
                 }
                 //y座標の小さい順位ソート（上から順に描画）
                 if(layer.sort){
@@ -64,6 +64,9 @@
         },
         addChar: function(char){
             return this.layer_field.addChild(char);
+        },
+        getScrollTarget: function(){
+            return this.tracker;
         },
         setScrollTracker: function(char){
             this.tracker = char;

@@ -1,4 +1,5 @@
 const ASSETS = {
+	font:　{'PressStart2P': 'fonts/PressStart2P-Regular.ttf'},
 	image: {
 		map_castle_1: "ASSETS/image/maps/bg_castle_1.png",
 		map_castle_2: "ASSETS/image/maps/bg_castle_2.png",
@@ -113,6 +114,9 @@ phina.define('MainScene', {
 				this.visible = true;
 			}
 		};
+
+		const text = `Level ${level}`;
+		const label = TextBox(text).addChildTo(this).setPosition(this.gridX.center(), this.gridY.center(-3));
 
 	},
 

@@ -315,9 +315,9 @@
                     param.action = "stand";
                     param.direction = directions[index];
                     param.speed = 0;
-                    self.setAnimationDirection(param.direction);
-                    self.setAnimationAction(param.action);
                 }
+                self.setAnimationDirection(param.direction);
+                self.setAnimationAction(param.action);
             };
             param._counter += 1;
             if(param.counter <= param._counter){ turn(); }
@@ -511,43 +511,45 @@
 
             const param = this.autoparam;
             const target_is_upper = !!(target.y < this.y);
+            const target_is_left = !!(target.x < this.x);
             const turn_to_walk = function(){
                 param.mode = "walk";
                 param.walk._counter = 0;
                 param.walk._counter2 = 0;
-                param.run.w = target_is_upper ? -1 : 1;
-                param.direction = target_is_upper ? "up" : "down";
-                };
+            };
             const turn_to_run = function(){
                 param.mode = "run";
                 param.run._counter = 0;
                 param.run.w = target_is_upper ? -1 : 1;
                 param.direction = target_is_upper ? "up" : "down";
-                };
+            };
             const turn = !!(param.mode == "walk") ? turn_to_run : turn_to_walk;
+
             let v = 0;
             let w = 0;
             let speed = 0;
             let action = "";
             if(param.mode == "walk"){
+                param.walk._counter += 1;
+                if(param.walk.counter <= param.walk._counter){
+                    param.run.w = target_is_upper ? -1 : 1;
+                    param.direction = target_is_upper ? "up" : "down";
+                    param.walk.v = target_is_left ? -1 : 1;
+                    param.walk._counter2 += 1;
+                    param.walk._counter = 0;
+                    if(param.walk.counter2 <= param.walk._counter2){ turn(); }
+                }
                 v = param.walk.v;
                 w = param.walk.w;
                 speed = param.walk.speed;
                 action = "walk";
-                param.walk._counter += 1;
-                if(param.walk.counter <= param.walk._counter){
-                    const target_is_left = !!(target.x < this.x);
-                    param.walk.v = target_is_left ? -1 : 1;
-                    param.walk._counter2 += 1;
-                    if(param.walk.counter2 <= param.walk._counter2){ turn(); }
-                }
             }else if(param.mode == "run"){
+                param.run._counter += 1;
+                if(param.run.counter <= param.run._counter){ turn(); }
                 v = param.run.v;
                 w = param.run.w;
                 speed = param.run.speed;
                 action = "run";
-                param.run._counter += 1;
-                if(param.run.counter <= param.run._counter){ turn(); }
             }
             this.setAnimationDirection(param.direction);
             this.setAnimationAction(action);
@@ -566,9 +568,43 @@
             this.superInit(image);
         },
         getDefaultAutoParam: function(){
-            return {};
+            return {
+                speed: 1, counter: 16, _counter: 16, waiting: true,
+                direction: "down", action: "run",
+            };
         },
-        autonomousAction: function(e){},
+        autonomousAction: function(e){
+            const target = this.parent.getScrollTarget();
+            if(!target){ return; }
+            const param = this.autoparam;
+            const self = this;
+            const target_is_upper = !!(target.y < this.y);
+            const target_is_left = !!(target.x < this.x);
+            const target_x_per_y = Math.abs((target.x - this.x) / (target.y - this.y));
+
+            const turn = function(){
+                param.waiting = !param.waiting;
+                param._counter = 0;
+                if(!param.waiting){//動き出す
+                    param.action = "walk";
+                    param.speed = 2;
+                }else{//方向転換して待つ
+                    param.direction = target_x_per_y < 0.4
+                        ? (target_is_upper ? "up" : "down")
+                        : (target_is_left ? "left" : "right");
+                    param.action = "stand";
+                    param.speed = 0;
+                }
+                self.setAnimationDirection(param.direction);
+                self.setAnimationAction(param.action);
+            };
+            param._counter += 1;
+            if(param.counter <= param._counter){ turn(); }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            const hit = this.moveBy(accel.v, accel.w);
+            if(hit){ param._counter = param.counter; }
+            if(this.outerLimit()){ turn(); }
+        },
     });
     phina.define('CharDragon', {
         superClass: 'SpriteCharBase',
