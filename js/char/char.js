@@ -5,7 +5,7 @@
      * ATTENTION: must include collision_rect.js
      */
     const SpriteCharSetting = g.SpriteCharSetting = {
-        debug: true,
+        debug: false,
         width: 24, height: 32,
         animation_asset: 'char',//ASSETS.spritesheet
         directions: ["up","right","down","left"],
@@ -120,14 +120,18 @@
             accel_per_dir.w *= speed;
             return accel_per_dir;
         },
-        moveBy: function(v, w){
-            const orgXY = {x: this.x, y: this.y};
+        moveBy: function(v, w, _option){
+            const option = _option || {};
             const orgVW = {v: v, w: w};
             this.x += v;
             this.y += w;
             //TODO: 最初から衝突している場合は想定していない
             let hit = this.parent.hitTestElement(this);//判定一回目
             if(!hit){ return null; }//衝突なく終了
+            const event_name = hit.event_name || "";
+            if(event_name && option.repell_events && !option.repell_events[event_name]){
+                return hit;//repell_events(位置補正)が定義かつ今回は補正なし⇒イベント返却のみ
+            }
             const myrect = this.getCollisionRect();
             const otherrect = hit.getCollisionRect();
             if(v < 0){ this.x += (otherrect.right - myrect.left); }
@@ -319,12 +323,17 @@
                 self.setAnimationDirection(param.direction);
                 self.setAnimationAction(param.action);
             };
+            const stop = function(){
+                param.waiting = false;
+                param._counter = param.counter;
+                turn();
+            }
             param._counter += 1;
             if(param.counter <= param._counter){ turn(); }
             const accel = this.getAcceleration(param.direction, param.speed);
             const hit = this.moveBy(accel.v, accel.w);
-            if(hit){ param._counter = param.counter; }
-            if(this.outerLimit()){ turn(); }
+            if(hit){ stop(); }
+            if(this.outerLimit()){ stop(); }
         },
     });
     // phina.define('CharGull', {

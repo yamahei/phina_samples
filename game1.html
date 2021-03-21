@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html>
+  <head>
+    <style>
+      canvas { transform: translate3d(0, 0, 0); }
+    </style>
+    <meta charset='utf-8' />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <title>sample</title>
+
+
+    <script src='js/util.js'></script>
+
+    <script src='js/lib/phina.js'></script>
+    <script>
+      phina.globalize();// phina.js をグローバル領域に展開
+    </script>
+    <script src="js/lib/phina-gl2d.js"></script>
+
+    <script src='js/char/collision_rect.js'></script>
+    <script src='js/map/map_chip.js'></script>
+    <script src='js/map/map.js'></script>
+    <script src='js/map_generator/map_generator.js'></script>
+
+    <script src='js/textbox/textbox.js'></script>
+    <script src='js/char/char.js'></script>
+    <script src='js/char/event.js'></script>
+
+    <script src='js/game1/title_scene.js'></script>
+    <script src='js/game1/game_scene.js'></script>
+    <script src='js/game1/main.js'></script>
+
+  </head>
+  <body style="background-color: black;">
+    <!-- ATTENTION: canvasサイズの誤差で1px隙間ができる場合があるので、背景を黒にしてごまかす -->
+  </body>
+</html>

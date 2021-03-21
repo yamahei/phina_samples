@@ -29,7 +29,7 @@
             this.map = MapTopView();
         },
         create: function(level){//0スタート
-            const chars = {hero: null, events: [], enemies: []};
+            const chars = this.chars = {hero: null, events: [], enemies: []};
             const map_data = JSON.parse(JSON.stringify(this.map_data_org));
             const rand = this.random = Random(level || 99);
             rand.random();//init?
@@ -54,7 +54,6 @@
             chars.events.forEach(function(event){ map.addChar(event); });
             chars.enemies.forEach(function(enemy){
                 map.addChar(enemy);
-                enemy.autonomousOn();//DEBUG
             });
             return map;
         },
@@ -85,7 +84,7 @@
                 }
             }
 
-            this.debug_enemies(map_data, chars);
+            // this.debug_enemies(map_data, chars);
             return map_data.tiles;
         },
 
@@ -102,7 +101,7 @@
                 const x = 2 + (i % w) * 3;
                 const y = 12 + Math.floor(i / w) * 3;
                 const char = enemies[i]();
-                char.autonomousOn();
+                //char.autonomousOn();
                 this.set_position_from_map_point(char, map_data, x, y);
                 chars.enemies.push(char);
             }
@@ -446,8 +445,8 @@
                 let counter = 0;
                 while(true){
                     if(counter++ > 9){ break; }//無限ループ防止
-                    const x = rnd.randint(0, self.map_width);
-                    const y = rnd.randint(0, conf.under.length);
+                    const x = rnd.randint(1, self.map_width) - 1;
+                    const y = rnd.randint(1, conf.under.length) - 1;
                     if(conf.under[y] && conf.under[y][x]){
                         const symbol = conf.under[y][x];
                         if(conf.lays.indexOf(symbol) < 0){ continue; }

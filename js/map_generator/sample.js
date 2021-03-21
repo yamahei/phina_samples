@@ -72,11 +72,15 @@ phina.define('MainScene', {
 			this.addChild(world);
 		}
 
+		this.onpointstart = function(e){
+			console.log("touch");
+		};
+
 		//当たり判定と追尾スクロール
 		const collision = CharHero();//SpriteCharBase('hero');
 		collision.setAnimationAction('walk');
 		world.addChar(collision);
-		world.setScrollTracker(collision);
+		world.setScrollTracker(collision, {x: 0, y: size.height / 3.5});
 		let collision_v = 1;
 		let collision_w = 1;
 		const collision_speed = 4;
@@ -115,6 +119,7 @@ phina.define('MainScene', {
 			}
 		};
 
+		// const text = `GAME OVER\n\nLevel ${level}\nScore 0000`;
 		const text = `Level ${level}`;
 		const label = TextBox(text).addChildTo(this).setPosition(this.gridX.center(), this.gridY.center(-3));
 
@@ -135,3 +140,5 @@ phina.main(function() {
 	app.enableStats();
 	app.run();
 });
+//(phina.js)好きなシーンへ遷移して引数も渡す方法
+//https://www.mizukinoko.com/entry/2019/05/27/163817

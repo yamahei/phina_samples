@@ -66,6 +66,7 @@
     phina.define('EventDoor', {
         superClass: 'SpriteEventBase',
         init: function() {
+            this.collision_setting_height = 34;//壁に先に当たるのでちょっと大きく
             const image = "door";
             this.superInit(image);
             this.animation = FrameAnimation("door").attachTo(this);

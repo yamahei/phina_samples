@@ -16,8 +16,8 @@
                 cornerRadius: _rectangle_options.cornerRadius || 0,
                 height: label.calcCanvasHeight(),
                 width: label.calcCanvasWidth(),
-                margin: space,
-                padding: space,
+                margin: _rectangle_options.margin || space,
+                padding: _rectangle_options.padding || space,
             };
             this.superInit(rectangle_options);
             label.addChildTo(this);

@@ -7,6 +7,7 @@
     const LAYER_FIELD = 'field';//一般的にキャラクタを配置する層
     const LAYER_OVER  = 'over';//地面を覆い隠すオブジェクトの層（キャラクタよりは下）
     const LAYER_UNDER = 'under';//地面を配置する層
+    const LAYER_BOTTOM = 'bottom';//落ちる演出
 
     phina.define('MapLayer', {
         superClass: 'phina.display.DisplayElement',
@@ -22,16 +23,18 @@
         init: function(options) {
             this.superInit(options);
             //下から追加
+            this.addChild(this.layer_bottom = MapLayer(options));
             this.addChild(this.layer_under = MapLayer(options));
             this.addChild(this.layer_over  = MapLayer(options));
             this.addChild(this.layer_field = MapLayer(options));
-            this.addChild(this.layer_hover = MapLayer(options));
+            //this.addChild(this.layer_hover = MapLayer(options));
             //管理は上から
             this.layers = [
-                {name: LAYER_HOVER, obj: this.layer_hover, map: [], sort: false},
-                {name: LAYER_FIELD, obj: this.layer_field, map: [], sort: true},
-                {name: LAYER_OVER,  obj: this.layer_over,  map: [], sort: false},
-                {name: LAYER_UNDER, obj: this.layer_under, map: [], sort: false},
+                //{name: LAYER_HOVER, obj: this.layer_hover, map: [], sort: false, hit: false},
+                {name: LAYER_FIELD, obj: this.layer_field, map: [], sort: true, hit: true},
+                {name: LAYER_OVER,  obj: this.layer_over,  map: [], sort: false, hit: true},
+                {name: LAYER_UNDER, obj: this.layer_under, map: [], sort: false, hit: true},
+                {name: LAYER_BOTTOM, obj: this.layer_bottom, map: [], sort: false, hit: false},
             ];
             const self = this;
             this.layers.forEach(function(layer){
@@ -61,24 +64,43 @@
             this.chips = null;
             this.sprite_sheet = null;
             this.tracker = null;//追尾スクロール用
+            this.hitMap = null;//当たり判定高速化用
         },
         addChar: function(char){
             return this.layer_field.addChild(char);
         },
+        switchCharLayer: function(char, from, _to){
+            const current_layer = char.parent;
+            const _layer_from = this.layers.find(function(layer){ return layer.name == from; });
+            const _layer_to = this.layers.find(function(layer){ return layer.name == _to; });
+            if(!_layer_from || !_layer_to){
+                throw new Error(`${from} or ${_to} is not found.`);
+            }
+            if(_layer_from.obj != current_layer){
+                throw new Error(`${from} is not current layer for char.`);
+            }else{
+                _layer_from.obj.removeChild(char);
+                _layer_to.obj.addChild(char);
+            }
+        },
+        getBottomY: function(){
+            return this.parent.height - this.height;
+        },
         getScrollTarget: function(){
             return this.tracker;
         },
-        setScrollTracker: function(char){
+        setScrollTracker: function(char, _offset){
             this.tracker = char;
             if(char){
                 const self = this;
+                const offset = _offset || {x:0, y:0};
                 this.onenterframe = function(e){
                     const game_width = e.app.gridX.width;
                     const game_height = e.app.gridY.width;
                     const center_x = game_width / 2;
                     const center_y = game_height / 2;
-                    const gap_x = center_x - char.x;
-                    const gap_y = center_y - char.y;
+                    const gap_x = center_x - char.x + offset.x;
+                    const gap_y = center_y - char.y + offset.y;
                     const scrollable_width = self.width - game_width;
                     const scrollable_height = self.height - game_height;
                     let offset_x = gap_x;
@@ -106,6 +128,8 @@
             Object.keys(tiles).forEach(function(layer){
                 self.layout_tile(layer, tiles[layer]);
             });
+
+            this.hitMap = this.createHitMap();
 
             return this;
         },
@@ -254,7 +278,37 @@
             return tiles;
         },
 
+        /**
+         * 当たり判定に関わるマップチップを
+         * 1枚の2次元配列にまとめておく（高速化のため
+         */
+        createHitMap: function(){
+            const maps = this.layers
+            .filter(function(layer){ return layer.hit; })//当たり判定する層のみ
+            .map(function(layer){ return layer.map; });
+            const height = maps[0].length;
+            const width = maps[0][0].length;
+            const hitMap = [];
+            const search_mapchip = function(_x, _y){
+                for(let i=0; i<maps.length; i++){
+                    const chip = maps[i][_y][_x];
+                    if(chip){ return chip; }
+                    // if(chip && chip.collision_rect){ return chip; }
+                }
+                return null;
+            };
+            for(let y=0; y<height; y++){
+                const row = [];
+                for(let x=0; x<width; x++){
+                    row.push(search_mapchip(x, y));
+                }
+                hitMap.push(row);
+            }
+            return hitMap;
+        },
+
         hitTestElement: function(sprite){
+            const map = this.hitMap;
             const leftX = Math.floor(sprite.left / this.chip_width);
             const rightX = Math.ceil(sprite.right / this.chip_width);
             const topY = Math.floor(sprite.top / this.chip_height);
@@ -262,10 +316,6 @@
             if(MAP_DEBUG){
                 this.append_rect(leftX*this.chip_width, rightX*this.chip_width, topY*this.chip_height, bottomY*this.chip_height, "red");
             }
-            const layer = this.layers.find(function(_layer){
-                return _layer.name = LAYER_FIELD;
-            });
-            const layer_index = this.layers.indexOf(layer);
             for(let y=topY; y<bottomY; y++){
                 if(y < 0 || this.map_height <= y){ continue; }
                 for(let x=leftX; x<rightX; x++){
@@ -273,18 +323,9 @@
                     if(MAP_DEBUG){
                         this.append_rect(x*this.chip_width, (x+1)*this.chip_width, y*this.chip_height, (y+1)*this.chip_height, "blue");
                     }
-                    let index = layer_index;
-                    while(true){
-                        let current_layer = this.layers[index];
-                        if(!current_layer){ break; }
-
-                        const map = current_layer.map;
-                        let mapchip = (map[y] && map[y][x]) ? map[y][x] : null;
-                        if(mapchip && mapchip.hitTestElement(sprite)){
-                            return mapchip || true;
-                        }else{
-                            index += 1;
-                        }
+                    let mapchip = (map[y] && map[y][x]) ? map[y][x] : null;
+                    if(mapchip && mapchip.hitTestElement(sprite)){
+                        return mapchip || true;
                     }
                 }
             }
