@@ -110,7 +110,6 @@
 
 
         draw_map__wall: function(map_data, level, scene, lap, flag, stage, chars, enemy){
-            console.log([scene, lap]);
             const wall_height = 4;
             const wall_tiles = this.get_maplines(wall_height, MAPSYM_WALL, MAPSYM_EMPTY);
             this.push_tiles(map_data, wall_tiles);

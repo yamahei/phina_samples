@@ -66,6 +66,20 @@
             this.tracker = null;//追尾スクロール用
             this.hitMap = null;//当たり判定高速化用
         },
+        translatePositionToMapXY: function(realX, realY){
+            return {
+                mapX: Math.floor(realX / this.chip_width),
+                mapY: Math.floor(realY / this.chip_height),
+            }
+        },
+        getHitMap: function(mapX, mapY){
+            const map = this.hitMap;
+            const maxY = map.length - 1;
+            const maxX = map[0].length - 1;
+            if(mapX < 0 || maxX < mapX){ return null; }
+            if(mapY < 0 || maxY < mapY){ return null; }
+            return map[mapY][mapX];
+        },
         addChar: function(char){
             return this.layer_field.addChild(char);
         },
@@ -190,7 +204,9 @@
                             sprite_sheet, symbol,
                             chip_width, chip_height,
                             col.index, col.collision,
-                            col.proportion, col.event
+                            col.proportion,
+                            col.offset_x, col.offset_y,
+                            col.event
                         );
                         mapchip.x = x * chip_width;
                         mapchip.y = y * chip_height;
@@ -264,6 +280,8 @@
                     layer: chip.layer || LAYER_UNDER,
                     collision: chip.collision || 0,
                     proportion: chip.proportion || 0,
+                    offset_x: chip.offset_x || 0,
+                    offset_y: chip.offset_y || 0,
                     event: chip.event || null,
                 };
             });
@@ -293,7 +311,6 @@
                 for(let i=0; i<maps.length; i++){
                     const chip = maps[i][_y][_x];
                     if(chip){ return chip; }
-                    // if(chip && chip.collision_rect){ return chip; }
                 }
                 return null;
             };

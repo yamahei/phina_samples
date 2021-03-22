@@ -5,7 +5,7 @@
      * ATTENTION: must include collision_rect.js
      */
     const SpriteEventSetting = g.SpriteEventSetting = {
-        debug: true,
+        debug: false,
         width: 24, height: 32,
         // animation_asset: 'char',//ASSETS.spritesheet
         // directions: ["up","right","down","left"],
@@ -80,7 +80,6 @@
             const types = ["A", "B", "C"];
             const state = ["on", "off"];
             const index = rand.randint(0, types.length * state.length * seed);
-            console.log(index);
             this.type = types[index % types.length];
             this.state = state[index % state.length];
             this.setEventAnimation();

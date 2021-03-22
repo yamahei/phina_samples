@@ -6,6 +6,7 @@
 		this.directions = ["up", "left", "up", "right"];//タップ時[0]を採用してローテーション
 		this.damage = 0;//ダメージ中/カウンターとしても機能する
 		this.goal = false;
+		this.timeup = false;
 		this.fall = 0;
 		this.switch_direction();
 
@@ -42,6 +43,7 @@
 				}
 			}
 			if(ctrl.goal){ action = "walk"; }
+			if(ctrl.timeup){ action = "damage"; }
 			this.setAnimationDirection(ctrl.direction);
 			this.setAnimationAction(action);
 		};
@@ -61,6 +63,8 @@
 		set goal(v){ this._goal = !!v; },
 		get fall(){ return this._fall; },
 		set fall(v){ this._fall = v * 1; },
+		get timeup(){ return this._timeup; },
+		set timeup(v){ this._timeup = !!v; },
 	};
 	HeroController.prototype.switch_direction = function(){
 		this.direction = this.directions[0];
@@ -99,7 +103,8 @@
 
 			//ready action - 1.label-on 2.scroll 3.label-off
 			const level_text = `Level ${level + 1}`;
-			const level_label = TextBox(level_text).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-4));
+			const level_label = TextBox(level_text).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
+			const timer = Timer().addChildTo(this).initialize(this, 60);
 			const bottom_y = world.getBottomY();
 			world.update = function(e){
 				//goal?
@@ -129,23 +134,43 @@
 				chars.enemies.forEach(function(enemy){
 					enemy.autonomousOn();
 				});
+				timer.count_start();
 			});
 
 			const action_stop = function(stop_hero_event){
-				hero.clear(stop_hero_event);
+				if(stop_hero_event){
+					hero.clear(stop_hero_event);
+				}
 				world.setScrollTracker(null);
 				chars.enemies.forEach(function(enemy){
 					enemy.autonomousOff();
 				});
 				scene.clear("pointstart");////一旦OFF
 			};
+			const game_over = function(){
+				const fall_texts = [
+					`GAME OVER`, "",
+					`Level  ${options.level+1}`,
+					`Score  ${options.score}`,
+				];
+				const fall_label = TextBox(fall_texts).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
+			};
 
+			//timeup
+			timer.on("timeup", function(){
+				action_stop(null);
+				ctrl.timeup = true;
+				game_over();
+				// this.remove();
+			});
 			//fall action
 			hero.on("fall", function(e){
-				console.log("fall");
 				const hero = e.hero;
 				action_stop("fall");
-				if(hero.direction == "up"){//TODO: 地面にめり込むのが解消していない
+				const map_pos = world.translatePositionToMapXY(hero.x, hero.y);
+				const upper_chip1 = world.getHitMap(map_pos.mapX, map_pos.mapY - 1);
+				const upper_chip2 = world.getHitMap(map_pos.mapX, map_pos.mapY - 2);
+				if(upper_chip1.collision_rect && upper_chip2.collision_rect){//TODO: 地面にめり込むのが解消していない
 					world.switchCharLayer(hero, "field", "bottom");
 				}else{
 					setTimeout(function(){
@@ -155,12 +180,7 @@
 				ctrl.set_fall();
 				hero.on("falled", function(_){
 					action_stop("falled");
-					const fall_text = `GAME OVER`;
-					const fall_label = TextBox(fall_text).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-4));
-					// setTimeout(function(){
-					// 	options.level += 1;
-					// 	scene.exit("game", options);
-					// }, 1500);
+					game_over();
 				});
 			});
 
@@ -178,13 +198,13 @@
 					if(hero.x < goal.x){ ctrl.direction = "right"; }
 					if(hero.x > goal.x){ ctrl.direction = "left"; }
 				}).wait(500)
-				.to({x: goal.x, y: hero.y}, distance * 80, "linear").wait(500)
+				.to({x: goal.x, y: hero.y}, distance * 80, "linear").wait(200)
 				.call(function(){ ctrl.direction = "up"; }).wait(500)
-				.call(function(){ hero.visible = false; }).wait(500)
+				.call(function(){ hero.visible = false; }).wait(100)
 				.call(function(){ goal.do_close(); }).wait(500)
 				.call(function(){
 					const goal_text = `Clear`;
-					const goal_label = TextBox(goal_text).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-4));
+					const goal_label = TextBox(goal_text).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
 					setTimeout(function(){
 						options.level += 1;
 						scene.exit("game", options);
