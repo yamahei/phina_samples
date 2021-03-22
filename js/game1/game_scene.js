@@ -9,13 +9,20 @@
 		this.timeup = false;
 		this.fall = 0;
 		this.switch_direction();
+		const rand = this.random = Random();
 
 		const ctrl = this;
 		sprite.update = function(e){
 			//ゴール
 			if(!ctrl.goal){
+				let dv = 0;
+				let dw = 0;
+				if(ctrl.damage > 0){
+					dv = (rand.randint(0, 99) % 2) * 2 - 1;
+					dw = (rand.randint(0, 99) % 2) * 2 - 1;
+				}
 				const accel = this.getAcceleration(ctrl.direction, ctrl.speed);
-				const hit = this.moveBy(accel.v, accel.w, {repell_events:{wall: true, fall: false}});
+				const hit = this.moveBy(accel.v + dv, accel.w + dw, {repell_events:{wall: true, fall: false}});
 				if(hit && hit.event_name == "fall"){
 					this.fire({ type: "fall", hero: sprite });
 				}
