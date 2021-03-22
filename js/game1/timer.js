@@ -28,6 +28,8 @@
             this.end = null;
             this.timeup = false;
             this.meter = 0;
+            this.stop = false;
+            this.remain = limit_sec;
 
             this.visible = true;
             return this;
@@ -51,11 +53,14 @@
         set_width_from_date: function(){
             const start_msec = +this.start;
             const now_msec = +new Date();
-            const limit_msec = this.limit_sec * 1000;
-            const _per = (now_msec - start_msec) / limit_msec;
+            const remain = (now_msec - start_msec) / 1000;
+            const limit_sec = this.limit_sec;
+            const _per = remain / limit_sec;
+            this.remain = this.limit_sec - Math.ceil(remain);
             this.set_width(1 - _per);
         },
         set_width: function(_per){
+            if(this.stop){ return; }
             let per = _per;
             if(per < 0){ per = 0; }
             if(per > 1){ per = 1; }

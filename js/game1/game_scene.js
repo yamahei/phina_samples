@@ -141,6 +141,7 @@
 				if(stop_hero_event){
 					hero.clear(stop_hero_event);
 				}
+				timer.stop = true;
 				world.setScrollTracker(null);
 				chars.enemies.forEach(function(enemy){
 					enemy.autonomousOff();
@@ -190,6 +191,7 @@
 				const goal = e.goal;
 				const distance = Math.floor(Math.abs(hero.x - goal.x));
 				action_stop("goal");
+				const score = timer.remain;
 				ctrl.set_goal();
 				ctrl.speed = 0;
 				hero.tweener
@@ -203,10 +205,14 @@
 				.call(function(){ hero.visible = false; }).wait(100)
 				.call(function(){ goal.do_close(); }).wait(500)
 				.call(function(){
-					const goal_text = `Clear`;
-					const goal_label = TextBox(goal_text).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
+					const goal_texts = [
+						"Clear", "",
+						`Score +${score.toString()}`
+					];
+					const goal_label = TextBox(goal_texts).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
 					setTimeout(function(){
 						options.level += 1;
+						options.score += score;
 						scene.exit("game", options);
 					}, 1500);
 				})
