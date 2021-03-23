@@ -168,6 +168,7 @@
 			timer.on("timeup", function(){
 				action_stop(null);
 				ctrl.timeup = true;
+				ctrl.speed = 0;
 				game_over();
 				// this.remove();
 			});
