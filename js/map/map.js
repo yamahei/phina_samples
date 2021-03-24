@@ -10,6 +10,9 @@
     const LAYER_BOTTOM = 'bottom';//落ちる演出
 
     phina.define('MapLayer', {
+        // superClass: 'phina.display.CanvasLayer',//横が細くなる
+        // superClass: 'phina.display.PlainElement',
+        // superClass: 'phina.display.Layer',
         superClass: 'phina.display.DisplayElement',
         init: function(options) {
             this.superInit(options);
@@ -32,8 +35,8 @@
             this.layers = [
                 //{name: LAYER_HOVER, obj: this.layer_hover, map: [], sort: false, hit: false},
                 {name: LAYER_FIELD, obj: this.layer_field, map: [], sort: true, hit: true},
-                {name: LAYER_OVER,  obj: this.layer_over,  map: [], sort: false, hit: true},
-                {name: LAYER_UNDER, obj: this.layer_under, map: [], sort: false, hit: true},
+                {name: LAYER_OVER,  obj: this.layer_over,  map: [], sort: false, hit: true, assemble: true, sprite: null},
+                {name: LAYER_UNDER, obj: this.layer_under, map: [], sort: false, hit: true, assemble: true, sprite: null},
                 {name: LAYER_BOTTOM, obj: this.layer_bottom, map: [], sort: false, hit: false},
             ];
             const self = this;
@@ -144,6 +147,15 @@
             });
 
             this.hitMap = this.createHitMap();
+            this.layers.forEach(function(layer){
+                if(layer.assemble){
+                    self.assemble_sprite(layer, sprite_sheet);
+                    while(layer.obj.children.length > 0){
+                        layer.obj.children.first.remove();
+                    }
+                    layer.obj.addChild(layer.sprite);
+                }
+            });
 
             return this;
         },
@@ -349,6 +361,46 @@
             return false;
         },
 
+
+        /**
+         * 敷き詰めたタイルのままだと描画が激重（glLayerでも無理がある
+         * canvasに描画して1枚絵として扱う⇒劇的に高速化
+         * 【参考】Tiled Map Editorのデータを扱う
+         * https://www.monochromesoft.com/dokuwiki/phinajs/tiled_map_editor
+         * @param {*} layer
+         * @param {*} asset_name
+         */
+        assemble_sprite: function(layer, asset_name){
+            const asset = phina.asset.AssetManager.get('image', asset_name);
+            const map = layer.map;
+            const canvas = phina.graphics.Canvas().setSize(this.width, this.height);
+            canvas.clear(0, 0, this.width, this.height);
+
+
+            for(let y=0; y<map.length; y++){
+                const row = map[y];
+                for(let x=0; x<row.length; x++){
+                    const mapchip = row[x];
+                    if(!mapchip){ continue; }
+                    const mx = mapchip.x;
+                    const my = mapchip.y;
+                    const mwidth = mapchip.width;
+                    const mheight = mapchip.height;
+                    const index = mapchip.frameIndex;
+                    const image = mapchip.image;
+                    const image_wlen = Math.floor(image.domElement.width / mwidth);
+                    const image_hlen = Math.floor(image.domElement.height / mheight);
+                    const px = index % image_wlen; const ix = px * mwidth;
+                    const py = Math.floor(index / image_wlen); const iy = py * mheight;
+                    canvas.context.drawImage(asset.domElement, ix, iy, mwidth, mheight, mx, my, mwidth, mheight);
+                }
+            }
+            const texture = phina.asset.Texture();
+            texture.domElement = canvas.domElement;
+            const sprite = Sprite(texture).setOrigin(0, 0).setPosition(0, 0);
+            layer.sprite = sprite;
+        },
+
         append_rect: function(x1, x2, y1, y2, color){
             const rect = RectangleShape({
                 width: Math.abs(x1 - x2),
@@ -368,6 +420,7 @@
                 rect.remove();
             }, 20);
         },
+
     });
 
 })(this);

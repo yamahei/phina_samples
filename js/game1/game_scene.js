@@ -87,8 +87,8 @@
 			this.superInit(options);
 			this.backgroundColor = '#212';
 			this.canvas.imageSmoothingEnabled = false;
-			const mad_data = AssetManager.assets.json.map_sample.data;
-			const generator = MapGenerator(mad_data);
+			const map_data = AssetManager.assets.json.map_sample.data;
+			const generator = MapGenerator(map_data);
 			const level = options.level;
 			const world = generator.create(level);
 			const chars = generator.chars;
@@ -129,10 +129,11 @@
 			};
 			world.setPosition(0, bottom_y);
 			world.tweener
+			.wait(500)
+			.wait(500)
+			.to({x: 0, y: 0}, 2000, "linear")
 			.wait(800)
-			.to({x: 0, y: 0}, 1500, "linear")
-			.wait(800)
-			.to({x: 0, y: bottom_y}, 1500, "linear")
+			.to({x: 0, y: bottom_y}, 2000, "linear")
 			.call(function(){
 				//start action
 				level_label.remove();
@@ -156,12 +157,21 @@
 				scene.clear("pointstart");////一旦OFF
 			};
 			const game_over = function(){
+				const score_text = (options.score).toString();
+				let level_text = (options.level+1).toString();
+				level_text = (" ").repeat(score_text.length) + level_text;
+				level_text = level_text.slice(-score_text.length);
 				const fall_texts = [
 					`GAME OVER`, "",
-					`Level  ${options.level+1}`,
-					`Score  ${options.score}`,
+					`Level  ${level_text}`,
+					`Score  ${score_text}`,
 				];
 				const fall_label = TextBox(fall_texts).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
+				//twitterに画像付きで登校する
+				//$x("//canvas")[0].toDataURL("image/jpeg");
+
+				//TODO: continue
+				//TODO: title
 			};
 
 			//timeup
@@ -170,7 +180,6 @@
 				ctrl.timeup = true;
 				ctrl.speed = 0;
 				game_over();
-				// this.remove();
 			});
 			//fall action
 			hero.on("fall", function(e){
@@ -184,7 +193,7 @@
 				}else{
 					setTimeout(function(){
 						world.switchCharLayer(hero, "field", "bottom");
-					}, 500);
+					}, 800);
 				}
 				ctrl.set_fall();
 				hero.on("falled", function(_){
@@ -199,7 +208,7 @@
 				const goal = e.goal;
 				const distance = Math.floor(Math.abs(hero.x - goal.x));
 				action_stop("goal");
-				const score = timer.remain;
+				const score = Math.floor(timer.remain * (1 + Math.log10(options.level + 1)));
 				ctrl.set_goal();
 				ctrl.speed = 0;
 				hero.tweener
