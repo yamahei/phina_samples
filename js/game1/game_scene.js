@@ -167,8 +167,26 @@
 					`Score  ${score_text}`,
 				];
 				const fall_label = TextBox(fall_texts).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
-				//twitterに画像付きで登校する
-				//$x("//canvas")[0].toDataURL("image/jpeg");
+				const selections = [
+					{label: "Continue", event: "continue"},
+					{label: "Tweet", event: "tweet"},
+					{},
+					{label: "Exit", event: "exit"},
+				];
+				const select = Selector(selections, {}).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(+2));
+				select.on("select", function(e){
+					switch(e.event){
+						case "continue":
+							options.score = 0;
+							scene.exit("game", options);
+							break;
+						case "tweet": alert("not yet");
+							//twitterに画像付きで登校する
+							//$x("//canvas")[0].toDataURL("image/jpeg");
+							break;
+						case "exit": scene.exit("title", options); break;
+					}
+				});
 
 				//TODO: continue
 				//TODO: title
