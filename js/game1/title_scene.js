@@ -21,7 +21,7 @@
 				switch(e.event){
 					case "game":
 						options.score = 0;
-						options.level = 0;
+						//options.level = 0;
 						self.exit("game", options);
 						break;
 					case "catalog": alert("not yet"); break;

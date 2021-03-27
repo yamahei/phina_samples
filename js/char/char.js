@@ -5,7 +5,7 @@
      * ATTENTION: must include collision_rect.js
      */
     const SpriteCharSetting = g.SpriteCharSetting = {
-        debug: false,
+        debug: true,
         width: 24, height: 32,
         animation_asset: 'char',//ASSETS.spritesheet
         directions: ["up","right","down","left"],
@@ -336,17 +336,6 @@
             if(this.outerLimit()){ stop(); }
         },
     });
-    // phina.define('CharGull', {
-    //     superClass: 'SpriteCharBase',
-    //     init: function() {
-    //         const image = "gull";
-    //         this.collision_setting_width = 24;
-    //         this.collision_setting_height = 24;
-    //         this.collision_setting_offset_x = null;
-    //         this.collision_setting_offset_y = null;
-    //         this.superInit(image);
-    //     },
-    // });
     phina.define('CharSlime', {
         superClass: 'SpriteCharBase',
         init: function() {
@@ -498,7 +487,6 @@
             this.superInit(image);
         },
         getDefaultAutoParam: function(){
-            const rnd = this.random;
             return {
                 mode: "run",
                 direction: "down",
@@ -615,6 +603,45 @@
             if(this.outerLimit()){ turn(); }
         },
     });
+    phina.define('CharFire', {
+        superClass: 'SpriteCharBase',
+        init: function() {
+            const image = "fire";
+            this.collision_setting_width = 14;
+            this.collision_setting_height = 16;
+            this.collision_setting_offset_x = null;
+            this.collision_setting_offset_y = 4;
+            this.superInit(image);
+        },
+        getDefaultAutoParam: function(){
+            return {
+                speed: 8, counter: 12, _counter: 21,
+                direction: this.direction || "down",
+                action: "damage",
+            };
+        },
+        autonomousAction: function(e){
+            const param = this.autoparam;
+            if(!!param.speed){
+                param.speed *= 0.9;
+                if(param.speed < 1){ param.speed = 0; }
+            }else{
+                this.visible = !this.visible;
+                param.counter -= 1;
+                if(param.counter <= 0){
+                    this.parent.delChar(this);
+                    return;
+                }
+            }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            this.setAnimationDirection(param.direction);
+            this.setAnimationAction(param.action);
+            if(this.parent){
+                this.moveBy(accel.v, accel.w);
+                this.outerLimit();
+            }
+        },
+    });
     phina.define('CharDragon', {
         superClass: 'SpriteCharBase',
         init: function() {
@@ -626,12 +653,166 @@
             this.superInit(image);
         },
         getDefaultAutoParam: function(){
-            return {};
+            return {
+                speed: 2, counter: 24, _counter: 24, waiting: true,
+                direction: "down", action: "walk",
+            };
         },
-        autonomousAction: function(e){},
+        autonomousAction: function(e){
+            const target = this.parent.getScrollTarget();
+            if(!target){ return; }
+            const param = this.autoparam;
+            const rnd = this.random;
+            const self = this;
+            const turn = function(){
+                if(param.waiting){
+                    param.waiting = !!rnd.randint(0, 3);// 1/4
+                }else{
+                    param.waiting = !param.waiting;
+                }
+                param._counter = 0;
+                if(!param.waiting){//動き出す
+                    param.action = "walk";
+                    param.speed = 2;
+                }else{//方向転換して待つ
+                    const target_is_upper = !!(target.y < self.y);
+                    const target_is_left = !!(target.x < self.x);
+                    const target_x_per_y = Math.abs((target.x - self.x) / (target.y - self.y));
+                    param.direction = target_x_per_y < 0.6
+                    ? (target_is_upper ? "up" : "down")
+                    : (target_is_left ? "left" : "right");
+                    param.action = "stand";
+                    param.speed = 0;
+                    //fire
+                    if(rnd.randint(0, 4) < 3){//3/5
+                        const offset = self.getAcceleration(param.direction, 16);
+                        const fire = CharFire().setPosition(self.x + offset.v, self.y + offset.w);
+                        self.parent.addChar(fire);
+                        fire.direction = param.direction;
+                        fire.autonomousOn();
+                    }
+                }
+                self.setAnimationDirection(param.direction);
+                self.setAnimationAction(param.action);
+            };
+            const stop = function(){
+                param.waiting = false;
+                param._counter = param.counter;
+                turn();
+            }
+            param._counter += 1;
+            if(param.counter <= param._counter){ turn(); }
+            const accel = this.getAcceleration(param.direction, param.speed);
+            const hit = this.moveBy(accel.v, accel.w);
+            if(hit){ stop(); }
+            if(this.outerLimit()){ stop(); }
+        },
+
     });
-    phina.define('CharSpirit3', {
+    phina.define('CharSpiritCommon', {
         superClass: 'SpriteCharBase',
+        init: function(image) {
+            this.collision_setting_width = 24;
+            this.collision_setting_height = 20;
+            this.collision_setting_offset_x = null;
+            this.collision_setting_offset_y = null;
+            this.superInit(image);
+            /**
+             * Spiritの基本動作
+             * 0.wait_frame間待つ
+             * 1.heroのx方向にside_step回、step_width幅ずつ移動
+             * 2.damageアクションしながらx,yともに±rotate_lenずつrotate_frame回ブルブルする
+             */
+            this.boss_wait_frame = 48;
+            this.boss_side_step = 4;
+            this.boss_step_width = 24;
+            this.boss_rotate_len = 2;
+            this.boss_rotate_frame = 36;
+        },
+        getDefaultAutoParam: function(){
+            return {
+                state: ["wait", "step", "rotate"],
+                wait_frame: this.boss_wait_frame, _wait_frame: 0,
+                step_easing: 0,// -1: easeout, 0: liner, 1: easein
+                side_step: this.boss_side_step, _side_step: 0,
+                step_width: this.boss_step_width, _step_width: 0,
+                rotate_len: this.boss_rotate_len, //_rotate_len: 0,
+                rotate_frame: this.boss_rotate_frame, _rotate_frame: 0,
+                base_x: 0, base_y: 0, direction: 0,
+            };
+        },
+        autonomousAction: function(e){
+            const target = this.parent.getScrollTarget();
+            if(!target){ return; }
+
+            const self = this;
+            const param = this.autoparam;
+            const target_is_left = !!(target.x < this.x);
+            let v = 0;
+            let w = 0;
+            let action = "stand";
+            const next = function(){
+                param._wait_frame = 0;
+                param._side_step = 0;
+                param._step_width = 0;
+                param._rotate_len = 0;
+                param._rotate_frame = 0;
+                param.base_x = self.x;
+                param.base_y = self.y;
+                param.direction = target_is_left ? -1 : 1;
+                param.state.push(param.state.shift());
+            };
+            const waiting = function(){
+                if(param.wait_frame <= param._wait_frame++){ next(); }
+                else{
+                    action = "stand";
+                    v = 0; w = 0;
+                }
+            };
+            const stepping = function(){
+                if(param.step_width <= param._step_width++){
+                    if(param.side_step <= param._side_step++){ next(); }
+                    else{
+                        param._step_width = 0;
+                        param.direction = target_is_left ? -1 : 1;
+                    }
+                }
+                const per = param._step_width / param.step_width;
+                let ease = 1;
+                if(param.step_easing < 0){//ease out
+                    ease =  Math.sqrt(1 - Math.pow(per - 1, 2));
+                }
+                if(param.step_easing > 0){//ease in
+                    ease = 1 - Math.sqrt(1 - Math.pow(per, 2));
+                }
+                action = "stand";
+                v = param.step_width * ease * param.direction;
+                w = 0;
+            };
+            const rotation = function(){
+                if(param.rotate_frame <= param._rotate_frame++){ next(); }
+                else{
+                    const rnd = self.random;
+                    action = "damage";
+                    v = rnd.randint(-param.rotate_len, param.rotate_len);
+                    w = rnd.randint(-param.rotate_len, param.rotate_len);
+                }
+            };
+            switch(param.state[0]){
+                case "wait": waiting(); break;
+                case "step": stepping(); break;
+                case "rotate": rotation(); break;
+                default: next();
+            }
+            this.setAnimationDirection("down");
+            this.setAnimationAction(action);
+            this.moveBy(v, w);
+            this.outerLimit();
+        },
+    });
+
+    phina.define('CharSpirit3', {
+        superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit3";
             this.collision_setting_width = 24;
@@ -640,13 +821,9 @@
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
-        getDefaultAutoParam: function(){
-            return {};
-        },
-        autonomousAction: function(e){},
     });
     phina.define('CharSpirit2', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit2";
             this.collision_setting_width = 24;
@@ -655,13 +832,9 @@
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
-        getDefaultAutoParam: function(){
-            return {};
-        },
-        autonomousAction: function(e){},
     });
     phina.define('CharSpirit5', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit5";
             this.collision_setting_width = 24;
@@ -670,13 +843,9 @@
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
-        getDefaultAutoParam: function(){
-            return {};
-        },
-        autonomousAction: function(e){},
     });
     phina.define('CharSpirit4', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit4";
             this.collision_setting_width = 24;
@@ -685,13 +854,9 @@
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
-        getDefaultAutoParam: function(){
-            return {};
-        },
-        autonomousAction: function(e){},
     });
     phina.define('CharSpirit6', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit6";
             this.collision_setting_width = 24;
@@ -700,10 +865,6 @@
             this.collision_setting_offset_y = null;
             this.superInit(image);
         },
-        getDefaultAutoParam: function(){
-            return {};
-        },
-        autonomousAction: function(e){},
     });
 
 

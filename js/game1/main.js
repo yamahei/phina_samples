@@ -19,6 +19,7 @@
             hero: "ASSETS/image/chars/hero.png",
             door: "ASSETS/image/chars/doors.png",
 
+            fire: "ASSETS/image/chars/fire.png",
             //scene 0: 平原
             snake: "ASSETS/image/chars/snake.png",
             bee: "ASSETS/image/chars/bee.png",

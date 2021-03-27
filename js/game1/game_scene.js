@@ -107,6 +107,20 @@
 			scene.onpointstart = function(e){
 				ctrl.switch_direction();
 			};
+			world.on("addchar", function(e){
+				//ゲーム開始後の動的追加
+				const index = chars.enemies.indexOf(e.char);
+				if(index < 0){
+					chars.enemies.push(e.char);
+				}
+			});
+			world.on("delchar", function(e){
+				//ゲーム開始後の動的削除
+				const index = chars.enemies.indexOf(e.char);
+				if(index >= 0){
+					chars.enemies.splice(index, 1);
+				}
+			});
 
 			//ready action - 1.label-on 2.scroll 3.label-off
 			const level_text = `Level ${level + 1}`;
@@ -127,13 +141,13 @@
 				});
 				if(damage){ ctrl.damage = 10; }
 			};
+			const scroll_time = Math.abs(world.getBottomY()) * 5;
 			world.setPosition(0, bottom_y);
 			world.tweener
-			.wait(500)
-			.wait(500)
-			.to({x: 0, y: 0}, 2000, "linear")
+			.wait(1000)
+			.to({x: 0, y: 0}, scroll_time, "linear")
 			.wait(800)
-			.to({x: 0, y: bottom_y}, 2000, "linear")
+			.to({x: 0, y: bottom_y}, scroll_time, "linear")
 			.call(function(){
 				//start action
 				level_label.remove();
@@ -173,7 +187,7 @@
 					{},
 					{label: "Exit", event: "exit"},
 				];
-				const select = Selector(selections, {}).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(+2));
+				const select = Selector(selections, {}).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(+1));
 				select.on("select", function(e){
 					switch(e.event){
 						case "continue":
@@ -183,13 +197,16 @@
 						case "tweet": alert("not yet");
 							//twitterに画像付きで登校する
 							//$x("//canvas")[0].toDataURL("image/jpeg");
+							//Javascriptで画像付きツイートを行う
+							//https://qiita.com/miura/items/036ef6da8f93bb65caac
+							//https://github.com/oauth-io/oauth-js
 							break;
-						case "exit": scene.exit("title", options); break;
+						case "exit":
+							options.level = 0;
+							scene.exit("title", options);
+							break;
 					}
 				});
-
-				//TODO: continue
-				//TODO: title
 			};
 
 			//timeup

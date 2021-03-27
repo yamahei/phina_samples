@@ -49,6 +49,14 @@
                 layer.obj.getScrollTarget = function(){
                     return self.getScrollTarget();
                 }
+                //オブジェクトの追加
+                layer.obj.addChar = function(char){
+                    return self.addChar(char);
+                }
+                //オブジェクトの削除
+                layer.obj.delChar = function(char){
+                    return self.delChar(char);
+                }
                 //y座標の小さい順位ソート（上から順に描画）
                 if(layer.sort){
                     layer.obj.onenterframe = function(e){
@@ -84,7 +92,12 @@
             return map[mapY][mapX];
         },
         addChar: function(char){
+            this.fire({type: "addchar", char: char});
             return this.layer_field.addChild(char);
+        },
+        delChar: function(char){
+            this.fire({type: "delchar", char: char});
+            return this.layer_field.removeChild(char);
         },
         switchCharLayer: function(char, from, _to){
             const current_layer = char.parent;
