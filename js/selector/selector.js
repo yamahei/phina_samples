@@ -20,6 +20,7 @@
                 //align: _label_options.align,// || "center",
                 baseline: _label_options.baseline,
                 lineHeight: _label_options.lineHeight,
+                backgroundColor: "black",
             }
             const objects = _selections.map(function(select){
                 // const label = (select.label + space).slice(0, max_length);

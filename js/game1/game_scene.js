@@ -265,7 +265,9 @@
 					setTimeout(function(){
 						options.level += 1;
 						options.score += score;
-						scene.exit("game", options);
+						const is_bonus = (options.level > 0) && (options.level % 4 == 0);
+						const next_scene = is_bonus ? "bonus" : "game";
+						scene.exit(next_scene, options);
 					}, 1500);
 				})
 			});

@@ -61,10 +61,10 @@
         draw_map: function(level, scene, lap, flag, map_data, chars){
 
             const map_stage_list = [
-                { scene: 0, name: "平原", stages: ["start", "field", "rough", "field", "wall"], enemies: [0, 8, 3,10, 4] },
-                { scene: 1, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 6, 3, 3] },
-                { scene: 2, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 3, 1, 3, 2] },
-                { scene: 3, name: "城",   stages: ["start", "criff", "field", "criff", "wall"], enemies: [0, 4, 2, 3, 1] },
+                { scene: 0, name: "平原", stages: ["start", "field", "rough", "field", "wall"], enemies: [0, 3, 1, 4, 2] },
+                { scene: 1, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 1, 3, 1] },
+                { scene: 2, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 1, 2, 1, 3] },
+                { scene: 3, name: "城",   stages: ["start", "criff", "field", "criff", "wall"], enemies: [0, 3, 1, 2, 1] },
             ];
             const map_stages = map_stage_list[scene].stages.reverse();
             const map_enemies = map_stage_list[scene].enemies.reverse();
@@ -90,10 +90,11 @@
 
         debug_enemies: function(map_data, chars){
             const enemies = [
-                CharButterfly, CharBee, CharRooster,
-                CharSnake, CharSlime, CharHawk, CharWolf,
-                CharBat, CharOrg, CharDragon,
-                CharSpirit3, CharSpirit2, CharSpirit5, CharSpirit4, CharSpirit6
+                // CharButterfly, CharBee, CharRooster,
+                // CharSnake, CharSlime, CharHawk, CharWolf,
+                // CharBat, CharOrg, CharDragon,
+                // CharSpirit3, CharSpirit2, CharSpirit5, CharSpirit4, CharSpirit6
+                CharSpirit6
             ];
 
             for(let i=0; i<enemies.length; i++){
@@ -154,8 +155,8 @@
             //hole
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
-                times: Math.min(Math.floor(level / 3) + 1, 4),
-                minarea: 12, maxarea: 24, minsize: 4, offset: 1,
+                times: Math.min(Math.floor(level / 3) + 3, 8),
+                minarea: 6, maxarea: 25, minsize: 4, offset: 1,
                 fill: MAPSYM_HOLE, lay: null, exclude: MAPSYM_HOLE,
             });
             //block
@@ -444,19 +445,27 @@
                 let counter = 0;
                 while(true){
                     if(counter++ > 9){ break; }//無限ループ防止
-                    const x = rnd.randint(1, self.map_width) - 1;
-                    const y = rnd.randint(1, conf.under.length) - 1;
-                    if(conf.under[y] && conf.under[y][x]){
-                        const symbol = conf.under[y][x];
-                        if(conf.lays.indexOf(symbol) < 0){ continue; }
-                        const block = (rnd.randint(0, 10) < 3) ? MAPSYM_BLOCK2 : MAPSYM_BLOCK1;
-                        if(conf.over[y] && conf.over[y][x]){
-                            if(conf.over[y][x] == MAPSYM_EMPTY){
-                                conf.over[y][x] = block;
-                                break;
+                    const x = rnd.randint(1, self.map_width - 1) - 1;
+                    const y = rnd.randint(1, conf.under.length - 1) - 1;
+
+                    let flag = true;
+                    for(let _y=y-1; _y<=y+1; _y++){
+                        if(!flag){ break;}
+                        for(let _x=x-1; _x<=x+1; _x++){
+                            if(!flag){ break;}
+                            if(conf.under[_y] && conf.under[_y][_x]){
+                                if(conf.lays.indexOf(conf.under[_y][_x]) < 0){ flag = false; }
                             }
-                            else{ continue; }
+                        }    
+                    }
+                    if(!flag){ continue; }
+                    const block = (rnd.randint(0, 10) < 3) ? MAPSYM_BLOCK2 : MAPSYM_BLOCK1;
+                    if(conf.over[y] && conf.over[y][x]){
+                        if(conf.over[y][x] == MAPSYM_EMPTY){
+                            conf.over[y][x] = block;
+                            break;
                         }
+                        else{ continue; }
                     }
                 }
             });

@@ -55,6 +55,7 @@
     const GAME_LEVEL = (Queries.get().level || 0) * 1;
     const SCENES = [
         {label: "title", className: "TitleScene"},
+        {label: "bonus", className: "BonusScene"},
         {label: "game", className: "GameScene"},
     ];
 
@@ -63,7 +64,7 @@
     phina.main(function() {
         // アプリケーション生成
         const app = GameApp({
-            startLabel: 'title',
+            startLabel: 'game',
             fps: 24,
             scenes: SCENES,
             assets: ASSETS,

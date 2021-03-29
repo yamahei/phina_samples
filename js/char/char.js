@@ -5,7 +5,7 @@
      * ATTENTION: must include collision_rect.js
      */
     const SpriteCharSetting = g.SpriteCharSetting = {
-        debug: true,
+        debug: false,
         width: 24, height: 32,
         animation_asset: 'char',//ASSETS.spritesheet
         directions: ["up","right","down","left"],
@@ -724,6 +724,8 @@
              * 2.damageアクションしながらx,yともに±rotate_lenずつrotate_frame回ブルブルする
              */
             this.boss_wait_frame = 48;
+            this.boss_step_easing = 0;// -1: easeout, 0: liner, 1: easein
+            this.boss_step_speed = 1;
             this.boss_side_step = 4;
             this.boss_step_width = 24;
             this.boss_rotate_len = 2;
@@ -733,12 +735,13 @@
             return {
                 state: ["wait", "step", "rotate"],
                 wait_frame: this.boss_wait_frame, _wait_frame: 0,
-                step_easing: 0,// -1: easeout, 0: liner, 1: easein
+                step_easing: this.boss_step_easing,
+                step_speed: this.boss_step_speed,
                 side_step: this.boss_side_step, _side_step: 0,
                 step_width: this.boss_step_width, _step_width: 0,
                 rotate_len: this.boss_rotate_len, //_rotate_len: 0,
                 rotate_frame: this.boss_rotate_frame, _rotate_frame: 0,
-                base_x: 0, base_y: 0, direction: 0,
+                base_x: this.x, base_y: this.y, direction: 0,
             };
         },
         autonomousAction: function(e){
@@ -773,21 +776,24 @@
                 if(param.step_width <= param._step_width++){
                     if(param.side_step <= param._side_step++){ next(); }
                     else{
+                        param.base_x = self.x;
+                        param.base_y = self.y;
                         param._step_width = 0;
                         param.direction = target_is_left ? -1 : 1;
                     }
                 }
                 const per = param._step_width / param.step_width;
-                let ease = 1;
+                let ease = per;
                 if(param.step_easing < 0){//ease out
                     ease =  Math.sqrt(1 - Math.pow(per - 1, 2));
                 }
                 if(param.step_easing > 0){//ease in
                     ease = 1 - Math.sqrt(1 - Math.pow(per, 2));
                 }
-                action = "stand";
-                v = param.step_width * ease * param.direction;
+                const _v = param.step_width * ease * param.direction * param.step_speed;
+                v = (param.base_x + _v) - self.x;
                 w = 0;
+                action = (Math.abs(v) > 3) ? "run" : "walk";
             };
             const rotation = function(){
                 if(param.rotate_frame <= param._rotate_frame++){ next(); }
@@ -804,14 +810,16 @@
                 case "rotate": rotation(); break;
                 default: next();
             }
+            if(v != 0 || w != 0){
+                this.moveBy(v, w);
+                this.outerLimit();
+            }
             this.setAnimationDirection("down");
             this.setAnimationAction(action);
-            this.moveBy(v, w);
-            this.outerLimit();
         },
     });
 
-    phina.define('CharSpirit3', {
+    phina.define('CharSpirit3', {//flower
         superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit3";
@@ -820,9 +828,16 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
+            this.boss_wait_frame = 24;
+            this.boss_step_easing = 0;// -1: easeout, 0: liner, 1: easein
+            this.boss_step_speed = 1;
+            this.boss_side_step = 1;
+            this.boss_step_width = 96;
+            this.boss_rotate_len = 0;
+            this.boss_rotate_frame = 12;
         },
     });
-    phina.define('CharSpirit2', {
+    phina.define('CharSpirit2', {//water
         superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit2";
@@ -831,9 +846,16 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
+            this.boss_wait_frame = 12;
+            this.boss_step_easing = -1;// -1: easeout, 0: liner, 1: easein
+            this.boss_step_speed = 1;
+            this.boss_side_step = 3;
+            this.boss_step_width = 24;
+            this.boss_rotate_len = 0;
+            this.boss_rotate_frame = 12;
         },
     });
-    phina.define('CharSpirit5', {
+    phina.define('CharSpirit5', {//snow
         superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit5";
@@ -842,9 +864,16 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
+            this.boss_wait_frame = 96;
+            this.boss_step_easing = -1;// -1: easeout, 0: liner, 1: easein
+            this.boss_step_speed = 1;
+            this.boss_side_step = 4;
+            this.boss_step_width = 16;
+            this.boss_rotate_len = 0;
+            this.boss_rotate_frame = 12;
         },
     });
-    phina.define('CharSpirit4', {
+    phina.define('CharSpirit4', {//flare
         superClass: 'CharSpiritCommon',
         init: function() {
             const image = "spirit4";
@@ -853,6 +882,13 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
+            this.boss_wait_frame = 48;
+            this.boss_step_easing = 0;// -1: easeout, 0: liner, 1: easein
+            this.boss_step_speed = 2;
+            this.boss_side_step = 8;
+            this.boss_step_width = 8;
+            this.boss_rotate_len = 3;
+            this.boss_rotate_frame = 36;
         },
     });
     phina.define('CharSpirit6', {
@@ -864,6 +900,13 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
+            this.boss_wait_frame = 72;
+            this.boss_step_easing = -1;// -1: easeout, 0: liner, 1: easein
+            this.boss_step_speed = 8;
+            this.boss_side_step = 4;
+            this.boss_step_width = 8;
+            this.boss_rotate_len = 8;
+            this.boss_rotate_frame = 12;
         },
     });
 
