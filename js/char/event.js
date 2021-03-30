@@ -66,13 +66,15 @@
     phina.define('EventDoor', {
         superClass: 'SpriteEventBase',
         init: function() {
-            this.collision_setting_height = 34;//壁に先に当たるのでちょっと大きく
+            this.collision_setting_height = 38;//壁に先に当たるのでちょっと大きく
             const image = "door";
             this.superInit(image);
+            this.event = "door";
             this.animation = FrameAnimation("door").attachTo(this);
             this.type = 'A';//'B', 'C'
             this.state = 'off';//'on'
             this.action = 'closed';
+            this.is_open = false;
         },
         autostyle: function(seed){
             const rand = Random(seed || 99);
@@ -96,13 +98,61 @@
         do_open: function(){
             this.action = 'opening';
             this.setEventAnimation();
+            this.is_open = true;
         },
         do_close: function(){
             this.action = 'closing';
             this.setEventAnimation();
+            this.is_open = false;
         },
         setEventAnimation(){
             const animation = `${this.type}_${this.state}_${this.action}`;
+            this.animation.gotoAndPlay(animation);
+        },
+    });
+
+    phina.define('EventTreasure', {
+        superClass: 'SpriteEventBase',
+        init: function() {
+            const image = "treasure";
+            this.collision_setting_height = 24;
+            this.collision_setting_offset_y = 4;
+            this.superInit(image);
+            this.event = "treasure";
+            this.animation = FrameAnimation("treasure").attachTo(this);
+            this.type = 'A';//'B', 'C', 'D'
+            this.action = 'closed';
+            this.is_open = false;
+        },
+        autostyle: function(seed){
+            const rand = Random(seed || 99);
+            rand.random();//init?
+            const types = ["A", "B", "C", "D"];
+            const index = rand.randint(0, types.length * seed);
+            this.type = types[index % types.length];
+            this.setEventAnimation();
+            return this;
+        },
+        update: function(e){
+            if(this.animation.finished){
+                const name = this.animation.currentAnimationName;
+                const param = { obj: this, name: name };
+                const action = name.split(/_/g).pop();
+                this.flare('finished', param);
+            }
+        },
+        do_open: function(){
+            this.action = 'opening';
+            this.setEventAnimation();
+            this.is_open = true;
+        },
+        do_close: function(){
+            this.action = 'closing';
+            this.setEventAnimation();
+            this.is_open = false;
+        },
+        setEventAnimation(){
+            const animation = `${this.type}_${this.action}`;
             this.animation.gotoAndPlay(animation);
         },
     });

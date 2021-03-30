@@ -3,10 +3,12 @@ const ASSETS = {
 		hero: "ASSETS/image/chars/hero.png",
 		elf: "ASSETS/image/chars/elf.png",
 		door: "ASSETS/image/chars/doors.png",
+    treasure: "ASSETS/image/chars/treasure_chest.png",
 	},
 	spritesheet: {
 		char: "ASSETS/tmss/character.tmss",
 		door: "ASSETS/tmss/door.tmss",
+    treasure: "ASSETS/tmss/treasure.tmss",
 	},
 };
 
@@ -62,6 +64,7 @@ phina.define('MainScene', {
 
     //ドア
     const door = EventDoor().addChildTo(this);
+    door.autostyle(Math.floor(Math.random()*999));
     door.x = this.gridX.center(+2);
     door.y = this.gridY.center();
     const door_actions = ["do_open", "do_close"];
@@ -73,6 +76,20 @@ phina.define('MainScene', {
       door_actions.push(door_actions.shift());
     };
 
+    //宝箱
+    const treasure = EventTreasure().addChildTo(this);
+    treasure.autostyle(Math.floor(Math.random()*999));
+    treasure.x = this.gridX.center(-2);
+    treasure.y = this.gridY.center();
+    const treasure_actions = ["do_open", "do_close"];
+    const treasureButton = this.treasureButton = Button({ text: 'treasure'}).addChildTo(this);
+    treasureButton.x = this.gridX.center();
+    treasureButton.y = this.gridY.center(-2);
+    treasureButton.onclick = function(){
+      treasure[treasure_actions[0]]();
+      treasure_actions.push(treasure_actions.shift());
+    };
+
     //当たり判定
     const collision = SpriteCharBase('hero').addChildTo(this);
     collision.onenterframe = function(e){
@@ -81,7 +98,7 @@ phina.define('MainScene', {
         self.x = p.x;
         self.y = p.y;
       });
-      const hit = this.hitTestElement(sprite) || this.hitTestElement(door);
+      const hit = this.hitTestElement(sprite) || this.hitTestElement(door) || this.hitTestElement(treasure);
       if(hit){
         this.visible = !this.visible;
       }else{

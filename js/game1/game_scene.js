@@ -92,6 +92,8 @@
 			const level = options.level;
 			const world = generator.create(level);
 			const chars = generator.chars;
+			const door = chars.events.find(function(event){ return event.event == "door"; });
+			const treasure = chars.events.find(function(event){ return event.event == "treasure"; });
 			const scene = this;
 
 			if(options.usegl){
@@ -129,17 +131,16 @@
 			const bottom_y = world.getBottomY();
 			world.update = function(e){
 				//goal?
-				const goal = chars.events.find(function(event){
-					const far = (Math.abs(hero.y - event.y) > 100);
-					return (far || !hero.hitTestElement(event)) ? false : true;
-				});
-				if(goal){ hero.fire({ type: "goal", hero: hero, goal: goal }); }
+				const goal = !hero.hitTestElement(door) ? false : true;
+				if(goal){ hero.fire({ type: "goal", hero: hero, goal: door }); }
 				//damage?
 				const damage = chars.enemies.some(function(enemy){
 					const far = (Math.abs(hero.y - enemy.y) > 100);
 					return far ? false : hero.hitTestElement(enemy);
 				});
 				if(damage){ ctrl.damage = 10; }
+				//treasure?
+				//TODO:
 			};
 			const scroll_time = Math.abs(world.getBottomY()) * 5;
 			world.setPosition(0, bottom_y);
@@ -151,7 +152,7 @@
 			.call(function(){
 				//start action
 				level_label.remove();
-				world.setScrollTracker(hero, {x: 0, y: options.height / 3.5});
+				world.setScrollTracker(hero, {x: 0, y: options.height / 4});
 				ctrl.speed = 2;
 				chars.enemies.forEach(function(enemy){
 					enemy.autonomousOn();

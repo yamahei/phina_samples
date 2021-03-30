@@ -69,6 +69,7 @@
             const map_stages = map_stage_list[scene].stages.reverse();
             const map_enemies = map_stage_list[scene].enemies.reverse();
 
+            //generate
             while(map_stages.length){
                 const stage = map_stages.shift();
                 const _enemy = map_enemies.shift();
@@ -82,6 +83,29 @@
                     case "start": this.draw_map__start(map_data, level, scene, lap, flag, stage, chars, enemy); break;
                     default: throw new error(`unknown stage: '${stage}'.`);
                 }
+            }
+            //treasure
+            const stage_length = map_data.tiles.under.length;
+            const map_under = map_data.tiles.under;
+            const map_over = map_data.tiles.over;
+            const candi_lines = [];
+            for(let y=0; y<stage_length; y++){
+                const under_is_flat = map_under[y].every(function(col){ return col != MAPSYM_HOLE && col != MAPSYM_BRIDGE;});
+                const over_is_empty = map_over[y].every(function(col){ return col == MAPSYM_EMPTY; });
+                if(under_is_flat && over_is_empty){
+                    candi_lines.push ({ y: y, center: Math.abs((stage_length/2) - y) });
+                }
+            }
+            candi_lines.sort(function(a, b){ return a.center - b.center; });
+            if(candi_lines.length > 0){
+                const rnd = this.random;
+                const one_third = Math.floor(this.map_width / 3);
+                const y = candi_lines[0].y;
+                const x = rnd.randint(one_third, one_third * 2);
+                const treasure = EventTreasure();
+                treasure.autostyle(level);
+                this.set_position_from_map_point(treasure, map_data, x, y);
+                chars.events.push(treasure);
             }
 
             // this.debug_enemies(map_data, chars);
@@ -456,7 +480,7 @@
                             if(conf.under[_y] && conf.under[_y][_x]){
                                 if(conf.lays.indexOf(conf.under[_y][_x]) < 0){ flag = false; }
                             }
-                        }    
+                        }
                     }
                     if(!flag){ continue; }
                     const block = (rnd.randint(0, 10) < 3) ? MAPSYM_BLOCK2 : MAPSYM_BLOCK1;

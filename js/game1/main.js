@@ -18,6 +18,7 @@
 
             hero: "ASSETS/image/chars/hero.png",
             door: "ASSETS/image/chars/doors.png",
+            treasure: "ASSETS/image/chars/treasure_chest.png",
 
             fire: "ASSETS/image/chars/fire.png",
             //scene 0: 平原
@@ -47,6 +48,7 @@
         spritesheet: {
             char: "ASSETS/tmss/character.tmss",
             door: "ASSETS/tmss/door.tmss",
+            treasure: "ASSETS/tmss/treasure.tmss",
         },
     };
 

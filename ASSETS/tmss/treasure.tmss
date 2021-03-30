@@ -1,0 +1,21 @@
+{
+  "frame": { "width": 24, "height": 32, "rows": 4, "cols": 4 },
+  "animations": {
+    "A_opened":  {"frames": [0] },
+    "A_closed":  {"frames": [12] },
+    "A_opening": {"frames": [12, 8, 4, 0], "frequency": 3, "next": "A_opened" },
+    "A_closing": {"frames": [0, 4, 8, 12], "frequency": 3, "next": "A_closed" },
+    "B_opened":  {"frames": [1] },
+    "B_closed":  {"frames": [13] },
+    "B_opening": {"frames": [13, 9, 5, 1], "frequency": 3, "next": "B_opened" },
+    "B_closing": {"frames": [1, 5, 9, 13], "frequency": 3, "next": "B_closed" },
+    "C_opened":  {"frames": [2] },
+    "C_closed":  {"frames": [14] },
+    "C_opening": {"frames": [14, 10, 6, 2], "frequency": 3, "next": "C_opened" },
+    "C_closing": {"frames": [2, 6, 10, 14], "frequency": 3, "next": "C_closed" },
+    "D_opened":  {"frames": [3] },
+    "D_closed":  {"frames": [15] },
+    "D_opening": {"frames": [15, 11, 7, 3], "frequency": 3, "next": "D_opened" },
+    "D_closing": {"frames": [3, 7, 11, 15], "frequency": 3, "next": "D_closed" }
+  }
+}
