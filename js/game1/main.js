@@ -18,6 +18,7 @@
 
             hero: "ASSETS/image/chars/hero.png",
             hero_ken: "ASSETS/image/chars/hero_ken.png",
+            hero_kentate: "ASSETS/image/chars/hero_kentate.png",
             door: "ASSETS/image/chars/doors.png",
             treasure: "ASSETS/image/chars/treasure_chest.png",
             item: "ASSETS/image/chars/item5.png",

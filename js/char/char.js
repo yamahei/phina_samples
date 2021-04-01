@@ -144,16 +144,17 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
-            this.image_no_weapon = phina.asset.AssetManager.get('image', 'hero');
-            this.image_has_ken = phina.asset.AssetManager.get('image', 'hero_ken');
-            this.image_has_kentate = phina.asset.AssetManager.get('image', 'hero_kentate');
+            this.dom_no_weapon = phina.asset.AssetManager.get('image', 'hero').domElement;
+            this.dom_has_ken = phina.asset.AssetManager.get('image', 'hero_ken').domElement;
+            this.dom_has_kentate = phina.asset.AssetManager.get('image', 'hero_kentate').domElement;
         },
         change_equipment: function(equipment){
+            let dom = this.dom_no_weapon;
             switch(equipment){
-                case "ken": this.image = this.image_has_ken; break;
-                case "kentate": this.image = this.image_has_kentate; break;
-                default: this.image = this.image_no_weapon; break;
+                case "ken": dom = this.dom_has_ken; break;
+                case "kentate": dom = this.dom_has_kentate; break;
             }
+            this.image.domElement = dom;
         },
     });
     phina.define('CharEnemyBase', {
