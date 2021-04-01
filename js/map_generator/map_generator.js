@@ -60,11 +60,15 @@
 
         draw_map: function(level, scene, lap, flag, map_data, chars){
 
+            const scene_field = 0;
+            const scene_rock = 1;
+            const scene_cave = 2;
+            const scene_castle = 3;
             const map_stage_list = [
-                { scene: 0, name: "平原", stages: ["start", "field", "rough", "field", "wall"], enemies: [0, 3, 1, 4, 2] },
-                { scene: 1, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 1, 3, 1] },
-                { scene: 2, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 1, 2, 1, 3] },
-                { scene: 3, name: "城",   stages: ["start", "criff", "field", "criff", "wall"], enemies: [0, 3, 1, 2, 1] },
+                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", "field", "wall"], enemies: [0, 3, 1, 4, 2] },
+                { scene: scene_rock, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 1, 3, 1] },
+                { scene: scene_cave, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 1, 2, 1, 3] },
+                { scene: scene_castle, name: "城",   stages: ["start", "criff", "field", "criff", "wall"], enemies: [0, 3, 1, 2, 1] },
             ];
             const map_stages = map_stage_list[scene].stages.reverse();
             const map_enemies = map_stage_list[scene].enemies.reverse();
@@ -85,6 +89,7 @@
                 }
             }
             //treasure
+            const put_treasure = (scene != scene_field);
             const stage_length = map_data.tiles.under.length;
             const map_under = map_data.tiles.under;
             const map_over = map_data.tiles.over;
@@ -92,8 +97,8 @@
             for(let y=0; y<stage_length; y++){
                 const under_is_flat = map_under[y].every(function(col){ return col != MAPSYM_HOLE && col != MAPSYM_BRIDGE;});
                 const over_is_empty = map_over[y].every(function(col){ return col == MAPSYM_EMPTY; });
-                if(under_is_flat && over_is_empty){
-                    candi_lines.push ({ y: y, center: Math.abs((stage_length/2) - y) });
+                if(put_treasure && under_is_flat && over_is_empty){
+                    candi_lines.push ({ y: y + 0.5, center: Math.abs((stage_length/2) - y) });
                 }
             }
             candi_lines.sort(function(a, b){ return a.center - b.center; });

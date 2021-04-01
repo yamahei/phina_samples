@@ -35,7 +35,6 @@
             this.direction = SpriteCharSetting.default_direction;
             this.action = SpriteCharSetting.default_action;
             this.setCharAnimation();
-            this.autonomousOff();
 
             /**
              * collision setting
@@ -92,22 +91,8 @@
                 return my_collision.hitTestElement(target);
             }
         },
-        autonomousOn: function(){
-            this.update = this.autonomousAction;
-            this.autoparam = this.getDefaultAutoParam();
-        },
-        autonomousOff: function(){
-            this.update = null;
-            this.autoparam = {};
-        },
         getCollisionRect: function(){
             return this.collision_rect || this;
-        },
-        getDefaultAutoParam: function(){
-            return {};
-        },
-        autonomousAction: function(e){
-            console.log("TODO: must implent!");
         },
         getAcceleration: function(direction, speed){
             const accel_per_dir = {
@@ -159,10 +144,57 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
+            this.image_no_weapon = phina.asset.AssetManager.get('image', 'hero');
+            this.image_has_ken = phina.asset.AssetManager.get('image', 'hero_ken');
+            this.image_has_kentate = phina.asset.AssetManager.get('image', 'hero_kentate');
+        },
+        change_equipment: function(equipment){
+            switch(equipment){
+                case "ken": this.image = this.image_has_ken; break;
+                case "kentate": this.image = this.image_has_kentate; break;
+                default: this.image = this.image_no_weapon; break;
+            }
+        },
+    });
+    phina.define('CharEnemyBase', {
+        superClass: 'SpriteCharBase',
+        init: function(image) {
+            this.superInit(image);
+            this.autonomous = false;
+            this.damagecounter = 0;
+            this.autonomousOff();
+        },
+        autonomousOn: function(){
+            this.autonomous = true;
+            this.update = this.autonomousAction;
+            this.autoparam = this.getDefaultAutoParam();
+        },
+        autonomousOff: function(){
+            this.autonomous = false;
+            this.update = null;
+            this.autoparam = {};
+        },
+        getDefaultAutoParam: function(){
+            return {};
+        },
+        autonomousAction: function(e){
+            console.log("TODO: must implent!");
+        },
+        damageOn: function(){
+            this.autonomous = false;
+            this.damagecounter = 10;
+            this.update = this.damageAction;
+        },
+        damageAction: function(e){
+            if(--this.damagecounter <= 0){
+                this.autonomous = true;
+                this.update = this.autonomousAction;
+            }
+            this.setAnimationAction("damage");
         },
     });
     phina.define('CharButterfly', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "butterfly";
             this.collision_setting_width = 8;
@@ -198,7 +230,7 @@
         },
     });
     phina.define('CharBee', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "bee";
             this.collision_setting_width = 12;
@@ -240,7 +272,7 @@
         },
     });
     phina.define('CharSnake', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "snake";
             this.collision_setting_width = 12;
@@ -284,7 +316,7 @@
         },
     });
     phina.define('CharRooster', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "rooster";
             this.collision_setting_width = 12;
@@ -337,7 +369,7 @@
         },
     });
     phina.define('CharSlime', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "slime";
             this.collision_setting_width = 20;
@@ -381,7 +413,7 @@
         },
     });
     phina.define('CharHawk', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "hawk";
             this.collision_setting_width = 12;
@@ -428,7 +460,7 @@
 
     });
     phina.define('CharBat', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "bat";
             this.collision_setting_width = 8;
@@ -477,7 +509,7 @@
         },
     });
     phina.define('CharWolf', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "wolf";
             this.collision_setting_width = 12;
@@ -555,7 +587,7 @@
         },
     });
     phina.define('CharOrg', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "org";
             this.collision_setting_width = 16;
@@ -604,7 +636,7 @@
         },
     });
     phina.define('CharFire', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "fire";
             this.collision_setting_width = 14;
@@ -643,7 +675,7 @@
         },
     });
     phina.define('CharDragon', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function() {
             const image = "dragon";
             this.collision_setting_width = 16;
@@ -710,7 +742,7 @@
 
     });
     phina.define('CharSpiritCommon', {
-        superClass: 'SpriteCharBase',
+        superClass: 'CharEnemyBase',
         init: function(image) {
             this.collision_setting_width = 24;
             this.collision_setting_height = 20;

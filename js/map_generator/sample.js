@@ -13,6 +13,7 @@ const ASSETS = {
 
 		hero: "ASSETS/image/chars/hero.png",
 		door: "ASSETS/image/chars/doors.png",
+		treasure: "ASSETS/image/chars/treasure_chest.png",
 
 		//scene 0: 平原
 		snake: "ASSETS/image/chars/snake.png",
@@ -41,6 +42,7 @@ const ASSETS = {
 	spritesheet: {
 		char: "ASSETS/tmss/character.tmss",
 		door: "ASSETS/tmss/door.tmss",
+		treasure: "ASSETS/tmss/treasure.tmss",
 	},
 };
 

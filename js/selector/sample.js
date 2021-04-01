@@ -23,6 +23,7 @@ phina.define('MainScene', {
 		select.setPosition(this.gridX.center(), this.gridY.center());
 		select.on("select", function(e){
 			console.log(e);
+			alert(e.event);
 		});
 	},
 

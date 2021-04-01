@@ -51,16 +51,18 @@
             this.set_width(per);
         },
         set_width_from_date: function(){
-            const start_msec = +this.start;
-            const now_msec = +new Date();
-            const remain = (now_msec - start_msec) / 1000;
-            const limit_sec = this.limit_sec;
-            const _per = remain / limit_sec;
-            this.remain = this.limit_sec - Math.ceil(remain);
-            this.set_width(1 - _per);
+            if(!this.init && !this.stop){
+                const start_msec = +this.start;
+                const now_msec = +new Date();
+                const remain = (now_msec - start_msec) / 1000;
+                const limit_sec = this.limit_sec;
+                const _per = remain / limit_sec;
+                this.remain = this.limit_sec - Math.ceil(remain);
+                if(this.remain <= 0){ this.remain = 0; }
+                this.set_width(1 - _per);
+            }
         },
         set_width: function(_per){
-            if(this.stop){ return; }
             let per = _per;
             if(per < 0){ per = 0; }
             if(per > 1){ per = 1; }
@@ -73,6 +75,11 @@
             if(per <= 0 && !this.init && !this.timeup){
                 this.timeup = true;
                 this.fire({type: "timeup"});
+            }
+        },
+        minus: function(){
+            if(!this.stop){
+                this.start.setMilliseconds(this.start.getMilliseconds() - 100);
             }
         },
 

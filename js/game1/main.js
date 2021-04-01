@@ -17,8 +17,10 @@
             map_rockey_2: "ASSETS/image/maps/bg_rockey_2.png",
 
             hero: "ASSETS/image/chars/hero.png",
+            hero_ken: "ASSETS/image/chars/hero_ken.png",
             door: "ASSETS/image/chars/doors.png",
             treasure: "ASSETS/image/chars/treasure_chest.png",
+            item: "ASSETS/image/chars/item5.png",
 
             fire: "ASSETS/image/chars/fire.png",
             //scene 0: 平原
@@ -73,6 +75,7 @@
             ...size,
             //
             level: GAME_LEVEL,
+            items: [],
             usegl: USE_WebGL,
             score: 0,
             timeout: 60,//sec

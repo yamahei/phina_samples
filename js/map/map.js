@@ -10,9 +10,6 @@
     const LAYER_BOTTOM = 'bottom';//落ちる演出
 
     phina.define('MapLayer', {
-        // superClass: 'phina.display.CanvasLayer',//横が細くなる
-        // superClass: 'phina.display.PlainElement',
-        // superClass: 'phina.display.Layer',
         superClass: 'phina.display.DisplayElement',
         init: function(options) {
             this.superInit(options);
@@ -30,7 +27,7 @@
             this.addChild(this.layer_under = MapLayer(options));
             this.addChild(this.layer_over  = MapLayer(options));
             this.addChild(this.layer_field = MapLayer(options));
-            //this.addChild(this.layer_hover = MapLayer(options));
+            //this.addChild(this.layer_hover = MapLayer(options));//今回は使ってないので消しとく
             //管理は上から
             this.layers = [
                 //{name: LAYER_HOVER, obj: this.layer_hover, map: [], sort: false, hit: false},

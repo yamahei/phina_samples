@@ -8,6 +8,9 @@
 		this.goal = false;
 		this.timeup = false;
 		this.fall = 0;
+		this._visible = true;
+		this.is_hide = false;//アイテムhide使用中
+		this.is_sword = false;//アイテムsword使用中
 		this.switch_direction();
 		const rand = this.random = Random();
 
@@ -27,24 +30,27 @@
 					this.fire({ type: "fall", hero: sprite });
 				}
 				this.outerLimit();
+				this.visible = ctrl.is_hide ? !this.visible : true;
+			}else{
+				this.visible = ctrl._visible;
 			}
 			//転落
-			if(ctrl.fall && sprite.visible){
+			if(ctrl.fall && ctrl._visible){
 				this.y += ctrl.fall;
-				ctrl.fall *= 1.2;
-				if(ctrl.fall > 5){
+				ctrl.fall *= 1.4;
+				if(ctrl.fall > 8){
 					this.fire({ type: "falled", hero: sprite });
 					sprite.visible = false;
 				}
 			}
 			//通常の行動
 			let action = this.action;
-			if(!ctrl.goal && !ctrl.fall && sprite.visible){
+			if(!ctrl.goal && !ctrl.fall && ctrl._visible){
 				if(ctrl.damage > 0){
 					ctrl.damage -= 1;
 					action = "damage";
 				}else{
-					if(ctrl.speed > 5){ action = "run"; }
+					if(ctrl.speed >= 3){ action = "run"; }
 					else if(ctrl.speed > 0){ action = "walk"; }
 					else{ action = "stand"; }
 				}
@@ -67,11 +73,26 @@
 		get damage(){ return this._damage; },
 		set damage(v){ this._damage = v * 1; },
 		get goal(){ return this._goal; },
-		set goal(v){ this._goal = !!v; },
+		set goal(v){
+			this._goal = !!v;
+			this.is_hide = false;
+			this._visible = true;
+		},
 		get fall(){ return this._fall; },
-		set fall(v){ this._fall = v * 1; },
+		set fall(v){
+			this._fall = v * 1;
+			this.is_hide = false;
+			this._visible = true;
+		},
 		get timeup(){ return this._timeup; },
 		set timeup(v){ this._timeup = !!v; },
+		get is_hide(){ return this._is_hide; },
+		set is_hide(v){ this._is_hide = !!v; },
+		get is_sword(){ return this._is_sword; },
+		set is_sword(v){
+			this._is_sword = !!v;
+			this.switch_sword();
+		},
 	};
 	HeroController.prototype.switch_direction = function(){
 		this.direction = this.directions[0];
@@ -80,6 +101,10 @@
 	};
 	HeroController.prototype.set_goal = function(){ this.goal = true; };
 	HeroController.prototype.set_fall = function(){ this.fall = 1; };
+	HeroController.prototype.switch_sword = function(){
+		const name = this.is_sword ? "ken" : "";
+		this.sprite.change_equipment(name);
+	};
 
 	phina.define('GameScene', {
 		superClass: 'DisplayScene',
@@ -105,10 +130,6 @@
 			}
 
 			const ctrl = this.hero_ctrl = new HeroController(chars.hero);
-			const hero = ctrl.sprite;
-			scene.onpointstart = function(e){
-				ctrl.switch_direction();
-			};
 			world.on("addchar", function(e){
 				//ゲーム開始後の動的追加
 				const index = chars.enemies.indexOf(e.char);
@@ -124,25 +145,56 @@
 				}
 			});
 
-			//ready action - 1.label-on 2.scroll 3.label-off
-			const level_text = `Level ${level + 1}`;
-			const level_label = TextBox(level_text).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
+			const hero = ctrl.sprite;
+			const hero_damage_count = 10;
+			const hero_walk_speed = 2;
+			const hero_run_speed = 4;
+			let hero_registed_speed = 0;
+			const items = Items(options.items, options.width, options.height).addChildTo(scene);
 			const timer = Timer().addChildTo(this).initialize(this, 60);
-			const bottom_y = world.getBottomY();
+			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items.top - timer.bottom);
+			tappable.onpointstart = function(e){
+				ctrl.switch_direction();
+			};
+			items.on("useitem", function(e){
+				const item = e.item.type;
+				switch(item){
+					case "wing": console.log(`TODO: use '${item}'`); break;
+					case "sword": ctrl.is_sword = true; break;
+					case "shoe":
+						if(ctrl.speed){ ctrl.speed = hero_run_speed; }
+						else{ hero_registed_speed = hero_run_speed; };
+						break;
+					case "time": timer.stop = true; break;
+					case "hide": ctrl.is_hide = true; break;
+				}
+			});
+
 			world.update = function(e){
 				//goal?
 				const goal = !hero.hitTestElement(door) ? false : true;
 				if(goal){ hero.fire({ type: "goal", hero: hero, goal: door }); }
 				//damage?
-				const damage = chars.enemies.some(function(enemy){
-					const far = (Math.abs(hero.y - enemy.y) > 100);
-					return far ? false : hero.hitTestElement(enemy);
+				const hit_enemy = chars.enemies.find(function(enemy){
+					return enemy.autonomous && hero.hitTestElement(enemy);
 				});
-				if(damage){ ctrl.damage = 10; }
+				if(!ctrl.is_hide && hit_enemy){
+					if(ctrl.is_sword){ hit_enemy.damageOn(); }
+					else{ ctrl.damage = hero_damage_count; }
+				}
+				if(ctrl.damage > 0){ timer.minus(); }
 				//treasure?
-				//TODO:
+				if(treasure && !treasure.is_open && hero.hitTestElement(treasure)){
+					treasure.do_open();
+					items.get_item();
+				}
 			};
+
+			//ready action - 1.label-on 2.scroll 3.label-off
+			const level_text = `Level ${level + 1}`;
+			const level_label = TextBox(level_text).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
 			const scroll_time = Math.abs(world.getBottomY()) * 5;
+			const bottom_y = world.getBottomY();
 			world.setPosition(0, bottom_y);
 			world.tweener
 			.wait(1000)
@@ -153,7 +205,7 @@
 				//start action
 				level_label.remove();
 				world.setScrollTracker(hero, {x: 0, y: options.height / 4});
-				ctrl.speed = 2;
+				ctrl.speed = hero_registed_speed || hero_walk_speed;
 				chars.enemies.forEach(function(enemy){
 					enemy.autonomousOn();
 				});
@@ -255,7 +307,7 @@
 				}).wait(500)
 				.to({x: goal.x, y: hero.y}, distance * 80, "linear").wait(200)
 				.call(function(){ ctrl.direction = "up"; }).wait(500)
-				.call(function(){ hero.visible = false; }).wait(100)
+				.call(function(){ ctrl._visible = false; }).wait(100)
 				.call(function(){ goal.do_close(); }).wait(500)
 				.call(function(){
 					const goal_texts = [
@@ -266,6 +318,7 @@
 					setTimeout(function(){
 						options.level += 1;
 						options.score += score;
+						options.items = items.get_item_names();
 						const is_bonus = (options.level > 0) && (options.level % 4 == 0);
 						const next_scene = is_bonus ? "bonus" : "game";
 						scene.exit(next_scene, options);
