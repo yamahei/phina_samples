@@ -219,8 +219,7 @@
 			const hero_walk_speed = 2;
 			const hero_run_speed = 4;
 			let hero_registed_speed = 0;
-			const items = Items(["wing"], options.width, options.height).addChildTo(scene);
-			// const items = Items(options.items, options.width, options.height).addChildTo(scene);
+			const items = Items(options.items, options.width, options.height).addChildTo(scene);
 			const timer = Timer().addChildTo(this).initialize(this, 60);
 			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items.top - timer.bottom);
 			tappable.onpointstart = function(e){
