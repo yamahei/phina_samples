@@ -147,6 +147,8 @@
             this.dom_no_weapon = phina.asset.AssetManager.get('image', 'hero').domElement;
             this.dom_has_ken = phina.asset.AssetManager.get('image', 'hero_ken').domElement;
             this.dom_has_kentate = phina.asset.AssetManager.get('image', 'hero_kentate').domElement;
+            this.image = this.hero_image = this.image.clone();
+            this.change_equipment();
         },
         change_equipment: function(equipment){
             let dom = this.dom_no_weapon;
@@ -154,7 +156,8 @@
                 case "ken": dom = this.dom_has_ken; break;
                 case "kentate": dom = this.dom_has_kentate; break;
             }
-            this.image.domElement = dom;
+            this.hero_image.domElement = dom;
+            this.visible = false;//一回消す
         },
     });
     phina.define('CharEnemyBase', {
@@ -670,8 +673,10 @@
             this.setAnimationDirection(param.direction);
             this.setAnimationAction(param.action);
             if(this.parent){
-                this.moveBy(accel.v, accel.w);
-                this.outerLimit();
+                this.x += accel.v;
+                this.y += accel.w;
+                // this.moveBy(accel.v, accel.w);
+                // this.outerLimit();
             }
         },
     });

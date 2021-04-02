@@ -24,6 +24,7 @@
             item: "ASSETS/image/chars/item5.png",
 
             fire: "ASSETS/image/chars/fire.png",
+            gull: "ASSETS/image/chars/gull.png",
             //scene 0: 平原
             snake: "ASSETS/image/chars/snake.png",
             bee: "ASSETS/image/chars/bee.png",

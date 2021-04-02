@@ -9,6 +9,7 @@
 		this.timeup = false;
 		this.fall = 0;
 		this._visible = true;
+		this.is_flyng = false;//アイテムwing使用中
 		this.is_hide = false;//アイテムhide使用中
 		this.is_sword = false;//アイテムsword使用中
 		this.switch_direction();
@@ -24,23 +25,26 @@
 					dv = (rand.randint(0, 99) % 2) * 2 - 1;
 					dw = (rand.randint(0, 99) % 2) * 2 - 1;
 				}
-				const accel = this.getAcceleration(ctrl.direction, ctrl.speed);
-				const hit = this.moveBy(accel.v + dv, accel.w + dw, {repell_events:{wall: true, fall: false}});
-				if(hit && hit.event_name == "fall"){
-					this.fire({ type: "fall", hero: sprite });
+				if(!ctrl.is_flyng){
+					const accel = this.getAcceleration(ctrl.direction, ctrl.speed);
+					const hit = this.moveBy(accel.v + dv, accel.w + dw, {repell_events:{wall: true, fall: false}});
+					if(hit && hit.event_name == "fall"){
+						this.fire({ type: "fall", hero: sprite });
+					}
+					this.outerLimit();
 				}
-				this.outerLimit();
 				this.visible = ctrl.is_hide ? !this.visible : true;
 			}else{
 				this.visible = ctrl._visible;
 			}
 			//転落
 			if(ctrl.fall && ctrl._visible){
-				this.y += ctrl.fall;
-				ctrl.fall *= 1.4;
 				if(ctrl.fall > 8){
 					this.fire({ type: "falled", hero: sprite });
 					sprite.visible = false;
+				}else{
+					this.y += ctrl.fall;
+					ctrl.fall *= 1.4;
 				}
 			}
 			//通常の行動
@@ -86,6 +90,8 @@
 		},
 		get timeup(){ return this._timeup; },
 		set timeup(v){ this._timeup = !!v; },
+		get is_flyng(){ return this._is_flyng; },
+		set is_flyng(v){ this._is_flyng = !!v; },
 		get is_hide(){ return this._is_hide; },
 		set is_hide(v){ this._is_hide = !!v; },
 		get is_sword(){ return this._is_sword; },
@@ -120,6 +126,16 @@
 			const door = chars.events.find(function(event){ return event.event == "door"; });
 			const treasure = chars.events.find(function(event){ return event.event == "treasure"; });
 			const scene = this;
+			const all_enemy_on = function(){
+				chars.enemies.forEach(function(enemy){
+					enemy && enemy.autonomousOn && enemy.autonomousOn();
+				});
+			}
+			const all_enemy_off = function(){
+				chars.enemies.forEach(function(enemy){
+					enemy && enemy.autonomousOff && enemy.autonomousOff();
+				});
+			}
 
 			if(options.usegl){
 				const layer = scene.layer = GLLayer(options);//USE GPU
@@ -144,13 +160,67 @@
 					chars.enemies.splice(index, 1);
 				}
 			});
+			const gull_speed = 2;
+			const speed_per_fps = 1000 / (options.fps * gull_speed);
+			const on_wing_use = function(){
+				const gull = SpriteCharBase("gull");
+				world.addChar(gull);
+				const hero_state = { speed: ctrl.speed };
+				ctrl.is_flyng = true;
+				ctrl.speed = 0;
+				all_enemy_off();
+				gull.tweener
+				.call(function(){
+					gull.setPosition(hero.x, hero.y + (16*8));
+					gull.action = "stand";
+					gull.direction = "up";
+					gull.setCharAnimation();
+				})
+				.to({x: hero.x, y: hero.y+1}, (16*8) * speed_per_fps)
+				.wait(250)
+				.call(function(){
+					gull.action = "walk";
+					gull.setCharAnimation();
+					let counter = 8 * 16;//8ブロックぶん
+					const gull_leave = function(){
+						gull.tweener
+						.clear()
+						.wait(250)
+						.call(function(){
+							gull.action = "stand";
+							gull.direction = "left";
+							gull.setCharAnimation();
+						})
+						.to({x: -24, y: gull.y}, (gull.x + 24) * speed_per_fps)
+						.call(function(){ world.delChar(gull); })
+					}
+					const carry_action = function(){
+						const hit = world.hitTestElement(gull);
+						const end_by_wall = (hit && hit.event_name == "wall");
+						const now_not_fall = (!hit || hit.event_name != "fall");
+						if(end_by_wall || (--counter <= 0 && now_not_fall)){//終わる条件
+							all_enemy_on();///
+							ctrl.speed = hero_state.speed;
+							ctrl.is_flyng = false;
+							gull_leave();
+						}else{
+							gull.y -= 1;
+							hero.y = gull.y - 1;
+							setTimeout(carry_action, speed_per_fps);
+						}
+					};
+					carry_action();//1回目
+				})
+
+			};
 
 			const hero = ctrl.sprite;
 			const hero_damage_count = 10;
 			const hero_walk_speed = 2;
 			const hero_run_speed = 4;
 			let hero_registed_speed = 0;
-			const items = Items(options.items, options.width, options.height).addChildTo(scene);
+			const items = Items(["wing"], options.width, options.height).addChildTo(scene);
+			// const items = Items(options.items, options.width, options.height).addChildTo(scene);
 			const timer = Timer().addChildTo(this).initialize(this, 60);
 			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items.top - timer.bottom);
 			tappable.onpointstart = function(e){
@@ -159,11 +229,11 @@
 			items.on("useitem", function(e){
 				const item = e.item.type;
 				switch(item){
-					case "wing": console.log(`TODO: use '${item}'`); break;
+					case "wing": on_wing_use(); break;
 					case "sword": ctrl.is_sword = true; break;
 					case "shoe":
 						if(ctrl.speed){ ctrl.speed = hero_run_speed; }
-						else{ hero_registed_speed = hero_run_speed; };
+						else{ hero_registed_speed = hero_run_speed; }//まだ始まってない時
 						break;
 					case "time": timer.stop = true; break;
 					case "hide": ctrl.is_hide = true; break;
@@ -206,9 +276,7 @@
 				level_label.remove();
 				world.setScrollTracker(hero, {x: 0, y: options.height / 4});
 				ctrl.speed = hero_registed_speed || hero_walk_speed;
-				chars.enemies.forEach(function(enemy){
-					enemy.autonomousOn();
-				});
+				all_enemy_on();
 				timer.count_start();
 			});
 
@@ -218,12 +286,12 @@
 				}
 				timer.stop = true;
 				world.setScrollTracker(null);
-				chars.enemies.forEach(function(enemy){
-					enemy.autonomousOff();
-				});
+				all_enemy_off();
+				tappable.clear("pointstart");
 				scene.clear("pointstart");////一旦OFF
 			};
 			const game_over = function(){
+				ctrl.speed = 0;
 				const score_text = (options.score).toString();
 				let level_text = (options.level+1).toString();
 				level_text = (" ").repeat(score_text.length) + level_text;
@@ -245,6 +313,7 @@
 					switch(e.event){
 						case "continue":
 							options.score = 0;
+							// options.items = [];//クリアしない⇒開始時点のアイテム
 							scene.exit("game", options);
 							break;
 						case "tweet": alert("not yet");
@@ -256,6 +325,7 @@
 							break;
 						case "exit":
 							options.level = 0;
+							options.items = [];
 							scene.exit("title", options);
 							break;
 					}
@@ -285,6 +355,7 @@
 				}
 				ctrl.set_fall();
 				hero.on("falled", function(_){
+					//hero.remove();
 					action_stop("falled");
 					game_over();
 				});

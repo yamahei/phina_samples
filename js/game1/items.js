@@ -92,11 +92,11 @@
         },
         get_item: function(){
             const candies = [
-                { type: "wing",  per: 1 },
+                { type: "wing",  per: 2 },
                 { type: "sword", per: 3 },
-                { type: "hide",  per: 5 },
-                { type: "shoe",  per: 10 },
-                { type: "time",  per: 15 },
+                { type: "hide",  per: 4 },
+                { type: "time",  per: 8 },
+                { type: "shoe",  per: 9 },
             ];
             const total_odds = candies
             .map(function(c){ return c.per; })

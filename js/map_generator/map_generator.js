@@ -379,7 +379,7 @@
 
         },
         draw_map__start: function(map_data, level, scene, lap, flag, stage, chars, enemy){
-            const start_height = 3;
+            const start_height = 5;
             const start_tiles = this.get_maplines(start_height, MAPSYM_BASE, MAPSYM_EMPTY);
             this.push_tiles(map_data, start_tiles);
 
@@ -395,7 +395,7 @@
 
             const hero = CharHero();
             const hero_x = map_width / 2;
-            const hero_y = map_data.tiles.under.length - 1;
+            const hero_y = map_data.tiles.under.length;
             this.set_position_from_map_point(hero, map_data, hero_x, hero_y);
             chars.hero = hero;
 

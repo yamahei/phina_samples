@@ -38,9 +38,14 @@
 			const score_label = Label(score_label_conf).addChildTo(this).setPosition(this.gridX.center(), this.gridY.center(+1));
 
 			this.tweener
+			.wait(10)
+			.call(function(){
+				hero.visible = true;//武器切り替えの都合で消えてるので再表示
+			})
 			.wait(500)
 			.call(function(){
 				self.update = function(e){
+					hero.visible = true;//武器切り替えの都合で消えてるので再表示
 					if(self._bonus > 0){
 						const p = (self._bonus >= self.step) ? self.step : 1;
 						self._bonus -= p;
