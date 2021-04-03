@@ -225,6 +225,7 @@
 			tappable.onpointstart = function(e){
 				ctrl.switch_direction();
 			};
+			if(options.level == 0){ items.get_item(); }
 			items.on("useitem", function(e){
 				const item = e.item.type;
 				switch(item){

@@ -94,14 +94,15 @@
             }
         },
         get_item: function(chest_type){
-            const candies = [
+            const _candies = [
                 { type: "wing",  per: 2, chests: ["B"] },
                 { type: "sword", per: 3, chests: ["A", "B"] },
                 { type: "hide",  per: 4, chests: ["C"] },
                 { type: "time",  per: 8, chests: ["C"] },
                 { type: "shoe",  per: 9, chests: ["D"] },
-            ].filter(function(candy){ return (candy.chests.indexOf(chest_type) >= 0); });
-            if(candies.length <= 0){ return; }
+            ];
+            const candies = _candies.filter(function(candy){ return (candy.chests.indexOf(chest_type) >= 0); });
+            if(candies.length <= 0){ candies.push(..._candies); }
 
             let type = (candies.length==1) ? candies[0].type : null;
             const total_odds = candies

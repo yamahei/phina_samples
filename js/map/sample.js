@@ -20,7 +20,8 @@ const ASSETS = {
 	},
 };
 
-const size = GameSize.byWidth(384);
+const size = GameSize.byWidth(96);
+// const size = GameSize.byWidth(384);
 // phina.js をグローバル領域に展開
 phina.globalize();
 

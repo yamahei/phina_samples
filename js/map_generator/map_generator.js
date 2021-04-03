@@ -50,9 +50,11 @@
             const map_image = map_data.images[stage_scene];
             const sprite_sheet = map_image.sheets[rand.randint(0, map_image.sheets.length-1)];
             const map = this.map.create(sprite_sheet, map_data);
+            let _seed = level;
             if(chars.hero){ map.addChar(chars.hero); }
             chars.events.forEach(function(event){ map.addChar(event); });
             chars.enemies.forEach(function(enemy){
+                enemy.setRandom(_seed++);
                 map.addChar(enemy);
             });
             return map;

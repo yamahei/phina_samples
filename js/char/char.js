@@ -209,7 +209,7 @@
         },
         getDefaultAutoParam: function(){
             return {
-                speed: 1, counter: 4, _counter: 4,
+                speed: 1, counter: 4, _counter: this.random.randint(0, 4),
                 direction: "down", action: "walk",
             };
         },
@@ -245,8 +245,8 @@
         },
         getDefaultAutoParam: function(){
             return {
-                speed: 2, counter: 8, _counter: 8, waiting: true,
-                direction: "down", action: "run",
+                speed: 2, counter: 8, _counter: this.random.randint(0, 8),
+                waiting: true, direction: "down", action: "run",
             };
         },
         autonomousAction: function(e){
@@ -287,8 +287,8 @@
         },
         getDefaultAutoParam: function(){
             return {
-                speed: 1, counter: 12, _counter: 12, interval: 0,
-                direction: "down", action: "walk",
+                speed: 1, counter: 12, _counter: this.random.randint(0, 12),
+                interval: 0, direction: "down", action: "walk",
             };
         },
         autonomousAction: function(e){
@@ -331,8 +331,8 @@
         },
         getDefaultAutoParam: function(){
             return {
-                speed: 2, counter: 24, _counter: 24, waiting: true,
-                direction: "down", action: "walk",
+                speed: 2, counter: 24, _counter: this.random.randint(0, 24),
+                waiting: true, direction: "down", action: "walk",
             };
         },
         autonomousAction: function(e){
@@ -384,8 +384,8 @@
         },
         getDefaultAutoParam: function(){
             return {
-                speed: 1, counter: 12, _counter: 21, waiting: true,
-                direction: "down", action: "walk",
+                speed: 1, counter: 12, _counter: this.random.randint(0, 12),
+                waiting: true, direction: "down", action: "walk",
             };
         },
         autonomousAction: function(e){
@@ -429,10 +429,11 @@
         getDefaultAutoParam: function(){
             const rnd = this.random;
             return {
-                speed: 2, counter: 64, _counter: 64,
+                speed: 2, counter: 64, _counter: rnd.randint(0, 64),
                 directionOffset: rnd.randint(0, 99),
                 directionIndex: rnd.randint(0, 99),
-                direction: "down", action: "stand",
+                direction: "down",
+                action: "stand",
             };
         },
         autonomousAction: function(e){
@@ -476,7 +477,7 @@
         getDefaultAutoParam: function(){
             const rnd = this.random;
             return {
-                speed: 5, counter: 32, _counter: 32,
+                speed: 5, counter: 32, _counter: rnd.randint(0, 32),
                 v: (rnd.randint(0, 99) % 2) * 2 - 1, w: 0,
                 mode: "fly", direction: "down", action: "run",
             };
@@ -527,13 +528,13 @@
                 mode: "run",
                 direction: "down",
                 walk: {
-                    speed: 1, counter: 24, _counter: 24,
+                    speed: 1, counter: 24, _counter: this.random.randint(0, 24),
                     counter2: 4, _counter2: 4,
                     v: 0, w: 0,
                     action: "walk",
                 },
                 run: {
-                    speed: 3, counter: 24, _counter: 24,
+                    speed: 3, counter: 24, _counter: this.random.randint(0, 24),
                     v: 0, w: 0, action: "run",
                 },
             };
@@ -602,8 +603,8 @@
         },
         getDefaultAutoParam: function(){
             return {
-                speed: 1, counter: 16, _counter: 16, waiting: true,
-                direction: "down", action: "run",
+                speed: 1, counter: 16, _counter: this.random.randint(0, 16),
+                waiting: true, direction: "down", action: "run",
             };
         },
         autonomousAction: function(e){
@@ -692,8 +693,8 @@
         },
         getDefaultAutoParam: function(){
             return {
-                speed: 2, counter: 24, _counter: 24, waiting: true,
-                direction: "down", action: "walk",
+                speed: 2, counter: 24, _counter: this.random.randint(0, 24),
+                waiting: true, direction: "down", action: "walk",
             };
         },
         autonomousAction: function(e){
@@ -764,9 +765,9 @@
             this.boss_wait_frame = 48;
             this.boss_step_easing = 0;// -1: easeout, 0: liner, 1: easein
             this.boss_step_speed = 1;
-            this.boss_side_step = 4;
+            this.boss_side_step = 1;
             this.boss_step_width = 24;
-            this.boss_rotate_len = 2;
+            this.boss_rotate_len = 1;
             this.boss_rotate_frame = 36;
         },
         getDefaultAutoParam: function(){
@@ -866,11 +867,11 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
-            this.boss_wait_frame = 24;
+            this.boss_wait_frame = 6;
             this.boss_step_easing = 0;// -1: easeout, 0: liner, 1: easein
             this.boss_step_speed = 1;
             this.boss_side_step = 1;
-            this.boss_step_width = 96;
+            this.boss_step_width = 72;
             this.boss_rotate_len = 0;
             this.boss_rotate_frame = 12;
         },
@@ -902,7 +903,7 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
-            this.boss_wait_frame = 96;
+            this.boss_wait_frame = 48;
             this.boss_step_easing = -1;// -1: easeout, 0: liner, 1: easein
             this.boss_step_speed = 1;
             this.boss_side_step = 4;
@@ -938,7 +939,7 @@
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
-            this.boss_wait_frame = 72;
+            this.boss_wait_frame = 64;
             this.boss_step_easing = -1;// -1: easeout, 0: liner, 1: easein
             this.boss_step_speed = 8;
             this.boss_side_step = 4;

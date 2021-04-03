@@ -32,8 +32,8 @@
             this.layers = [
                 //{name: LAYER_HOVER, obj: this.layer_hover, map: [], sort: false, hit: false},
                 {name: LAYER_FIELD, obj: this.layer_field, map: [], sort: true, hit: true},
-                {name: LAYER_OVER,  obj: this.layer_over,  map: [], sort: false, hit: true, assemble: true, sprite: null},
-                {name: LAYER_UNDER, obj: this.layer_under, map: [], sort: false, hit: true, assemble: true, sprite: null},
+                {name: LAYER_OVER,  obj: this.layer_over,  map: [], sort: false, hit: true, assemble: !MAP_DEBUG, sprite: null},
+                {name: LAYER_UNDER, obj: this.layer_under, map: [], sort: false, hit: true, assemble: !MAP_DEBUG, sprite: null},
                 {name: LAYER_BOTTOM, obj: this.layer_bottom, map: [], sort: false, hit: false},
             ];
             const self = this;

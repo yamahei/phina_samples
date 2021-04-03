@@ -1,5 +1,5 @@
 {
-    "map_width": 5, "map_height": 5,
+    "map_width": 5, "map_height": 9,
     "chip_width": 16, "chip_height": 16,
     "symbol_digit": 2,
     "chip_of_null": "  ",
@@ -11,15 +11,15 @@
         { "index": 2, "symbol": "*2", "layer": "over", "collision": 1, "event": "wall"},
 
         { "name": "//橋(#)",
-          "index":  3, "symbol": "#7", "layer": "over", "collision": 1, "proportion": -0.8, "offset_x": -8, "event": "wall" },
+          "index":  3, "symbol": "#7", "layer": "over", "collision": 1, "proportion": -0.75, "offset_x": -6, "event": "wall" },
         { "index":  4, "symbol": "#8", "layer": "over" },
-        { "index":  5, "symbol": "#9", "layer": "over", "collision": 1, "proportion": -0.8, "offset_x": 8, "event": "wall" },
-        { "index":  6, "symbol": "#4", "layer": "over", "collision": 1, "proportion": -0.8, "offset_x": -8, "event": "wall" },
+        { "index":  5, "symbol": "#9", "layer": "over", "collision": 1, "proportion": -0.75, "offset_x": 6, "event": "wall" },
+        { "index":  6, "symbol": "#4", "layer": "over", "collision": 1, "proportion": -0.75, "offset_x": -6, "event": "wall" },
         { "index":  7, "symbol": "#+", "layer": "over" },
-        { "index":  8, "symbol": "#6", "layer": "over", "collision": 1, "proportion": -0.8, "offset_x": 8, "event": "wall" },
-        { "index":  9, "symbol": "#1", "layer": "over", "collision": 1, "proportion": -0.8, "offset_x": -8, "event": "wall" },
+        { "index":  8, "symbol": "#6", "layer": "over", "collision": 1, "proportion": -0.75, "offset_x": 6, "event": "wall" },
+        { "index":  9, "symbol": "#1", "layer": "over", "collision": 1, "proportion": -0.75, "offset_x": -6, "event": "wall" },
         { "index": 10, "symbol": "#2", "layer": "over" },
-        { "index": 11, "symbol": "#3", "layer": "over", "collision": 1, "proportion": -0.8, "offset_x": 8, "event": "wall" },
+        { "index": 11, "symbol": "#3", "layer": "over", "collision": 1, "proportion": -0.75, "offset_x": 6, "event": "wall" },
 
         { "name": "//ベース背景(@)",
           "index": 13, "symbol": "@+", "layer": "under" },
@@ -48,13 +48,13 @@
 
         { "name": "//穴(X)",
           "index": 39, "symbol": "X7", "layer": "under", "collision": 0.5, "event": "fall", "offset_x": 3, "offset_y": 3 },
-        { "index": 40, "symbol": "X8", "layer": "under", "collision": 1.2, "proportion": 0.9, "event": "fall" },
+        { "index": 40, "symbol": "X8", "layer": "under", "collision": 1.25, "proportion": 0.9, "event": "fall" },
         { "index": 41, "symbol": "X9", "layer": "under", "collision": 0.5, "event": "fall", "offset_x": -3, "offset_y": 3 },
-        { "index": 42, "symbol": "X4", "layer": "under", "collision": 1.2, "proportion": -0.9, "event": "fall" },
-        { "index": 43, "symbol": "X+", "layer": "under", "collision": 0.7, "event": "fall" },
-        { "index": 44, "symbol": "X6", "layer": "under", "collision": 1.2, "proportion": -0.9, "event": "fall" },
+        { "index": 42, "symbol": "X4", "layer": "under", "collision": 1.25, "proportion": -0.9, "event": "fall" },
+        { "index": 43, "symbol": "X+", "layer": "under", "collision": 0.75, "event": "fall" },
+        { "index": 44, "symbol": "X6", "layer": "under", "collision": 1.25, "proportion": -0.9, "event": "fall" },
         { "index": 45, "symbol": "X1", "layer": "under", "collision": 0.5, "event": "fall", "offset_x": 3, "offset_y": -3 },
-        { "index": 46, "symbol": "X2", "layer": "under", "collision": 1.2, "proportion": 0.9, "event": "fall" },
+        { "index": 46, "symbol": "X2", "layer": "under", "collision": 1.25, "proportion": 0.9, "event": "fall" },
         { "index": 47, "symbol": "X3", "layer": "under", "collision": 0.5, "event": "fall", "offset_x": -3, "offset_y": -3 }
 
 	],
@@ -64,15 +64,25 @@
 			"@+@+X4X+X6",
 			"$7$9X1X2X3",
 			"$1$3@+@+@+",
-			"@+@+%7%8%9"
+			"%7%8%9@+@+",
+
+      "@+@+@+@+@+",
+      "@+#7#8#9@+",
+			"@+#4#+#6@+",
+			"@+#1#2#3@+"
 		],
 		"over": [
 			"          ",
 			"          ",
 			"          ",
 			"          ",
-			"*0        "
-		]
+			"*0        ",
+
+      "          ",
+      "          ",
+			"          ",
+			"          "
+    ]
 	},
   "images": [
     {"name": "field", "sheets": ["map_field_1", "map_field_2", "map_field_3"]},
