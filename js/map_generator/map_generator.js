@@ -154,7 +154,7 @@
 
             //enemies
             if(enemy){
-                const enemies = this.get_enemies_in_scene(scene, stage);
+                const enemies = this.get_enemies_in_scene(lap, scene, stage);
                 const char = enemies[lap % enemies.length]();
                 this.set_position_from_map_point(char, map_data, this.map_width / 2, wall_height + ground_height / 2);
                 chars.enemies.push(char);
@@ -583,7 +583,7 @@
             return layer;
         },
 
-        get_enemies_in_scene: function(scene, stage){
+        get_enemies_in_scene: function(lap, scene, stage){
             const SCENE_FIELD  = 0;//平原
             const SCENE_ROCKEY = 1;//岩場
             const SCENE_CAVE   = 2;//洞窟
@@ -591,7 +591,9 @@
             const enemies_field = [ CharButterfly, CharBee, CharRooster ];
             const enemies_rockey = [ CharSnake, CharSlime, CharHawk, CharWolf ];
             const enemies_cave = [ CharBat, CharOrg, CharDragon ];
-            const enemies_catle = [ CharSpirit3, CharSpirit2, CharSpirit5, CharSpirit4, CharSpirit6 ];//flower, water, ice, fire, dark
+            const enemies_crack = [ CharBat, CharHawk, CharSnake, CharWolf, CharOrg, CharDragon ];
+            const enemies_boss = [ CharRooster, CharSnake, CharSlime, CharWolf, CharOrg, CharDragon ];
+            const enemies_castle = [ CharSpirit3, CharSpirit2, CharSpirit5, CharSpirit4, CharSpirit6 ];//flower, water, ice, fire, dark
             const enemies_all = [enemies_field, enemies_rockey, enemies_cave].flat(Infinity);
 
             const enemies_list = [
@@ -599,8 +601,11 @@
                 { stage: "wall", scene: SCENE_FIELD, enemies: enemies_cave },
                 { stage: "rough", scene: SCENE_ROCKEY, enemies: enemies_rockey },
                 { stage: "rough", scene: SCENE_CAVE, enemies: enemies_cave },
-                { stage: "crack", scene: SCENE_CAVE, enemies: enemies_field },
-                { stage: "wall", scene: SCENE_CASTLE, enemies: enemies_catle },
+                { stage: "crack", scene: SCENE_CAVE, enemies: enemies_crack },
+                { stage: "wall", scene: SCENE_CASTLE, enemies: enemies_castle },
+                { stage: "wall", scene: SCENE_FIELD, enemies: enemies_boss },
+                { stage: "wall", scene: SCENE_ROCKEY, enemies: enemies_boss },
+                { stage: "wall", scene: SCENE_CAVE, enemies: enemies_boss },
                 { stage: "criff", scene: SCENE_CASTLE, enemies: enemies_rockey },
             ];
             const enmies_item = enemies_list.find(function(item){
@@ -611,7 +616,8 @@
 
         set_enemy: function(map_data, chars, scene, lap, stage, top_y, bottom_y){
             const rnd = this.random;
-            const num = Math.min(3, Math.floor(lap / 3.5)) + 1;
+            const num = Math.floor(Math.log10(lap || 1) * 7) + 1 + scene;
+            // const num = Math.max(3, Math.floor(lap / 2)) + 1;
             let counter = 0;
             for(let i=0; i<num; i++){
                 while(true){
@@ -625,7 +631,7 @@
                         if(counter++ > 99){ break; }//無限ループ防止
                         else{ continue; }
                     }
-                    const enemies = this.get_enemies_in_scene(scene, stage);
+                    const enemies = this.get_enemies_in_scene(lap, scene, stage);
                     const max_index = Math.min(lap, enemies.length-1) + 1;
                     const _index = rnd.randint(1, 65536);
                     const char = enemies[_index % max_index]();

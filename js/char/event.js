@@ -127,9 +127,13 @@
         autostyle: function(seed){
             const rand = Random(seed || 99);
             rand.random();//init?
-            const types = ["A", "B", "C", "D"];
-            const index = rand.randint(0, types.length * seed);
-            this.type = types[index % types.length];
+            const types = [
+                ..."B".repeat(1),
+                ..."A".repeat(2),
+                ..."C".repeat(4),
+                ..."D".repeat(5),
+            ].shuffle();//敢えてレベルに連動しない
+            this.type = types[0];
             this.setEventAnimation();
             return this;
         },
