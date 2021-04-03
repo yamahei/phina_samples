@@ -255,7 +255,7 @@
 				//treasure?
 				if(treasure && !treasure.is_open && hero.hitTestElement(treasure)){
 					treasure.do_open();
-					items.get_item();
+					items.get_item(treasure.type);
 				}
 			};
 
@@ -277,12 +277,14 @@
 				ctrl.speed = hero_registed_speed || hero_walk_speed;
 				all_enemy_on();
 				timer.count_start();
+				items.usable = true;
 			});
 
 			const action_stop = function(stop_hero_event){
 				if(stop_hero_event){
 					hero.clear(stop_hero_event);
 				}
+				items.usable = false;
 				timer.stop = true;
 				world.setScrollTracker(null);
 				all_enemy_off();

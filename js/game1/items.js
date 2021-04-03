@@ -59,6 +59,7 @@
             this.x = 0;
             this.y = screen_height - this.height * 2;
             this.items = [];
+            this.usable = false;
             const self = this;
             for(let i=0; i<default_items.length; i++){
                 const type = default_items[i];
@@ -76,9 +77,11 @@
                 item.obj.setSortIndex(i);
                 item.obj.clear('pointstart');
                 item.obj.on('pointstart', function(e){
-                    item.obj.clear('pointstart');
-                    item.obj.remove();
-                    self.use_item(item);
+                    if(self.usable){
+                        item.obj.clear('pointstart');
+                        item.obj.remove();
+                        self.use_item(item);
+                    }
                 });
             }
         },
@@ -90,18 +93,20 @@
                 this.fire({type: "useitem", item: item});
             }
         },
-        get_item: function(){
+        get_item: function(chest_type){
             const candies = [
-                { type: "wing",  per: 2 },
-                { type: "sword", per: 3 },
-                { type: "hide",  per: 4 },
-                { type: "time",  per: 8 },
-                { type: "shoe",  per: 9 },
-            ];
+                { type: "wing",  per: 2, chests: ["B"] },
+                { type: "sword", per: 3, chests: ["A", "B"] },
+                { type: "hide",  per: 4, chests: ["C"] },
+                { type: "time",  per: 8, chests: ["C"] },
+                { type: "shoe",  per: 9, chests: ["D"] },
+            ].filter(function(candy){ return (candy.chests.indexOf(chest_type) >= 0); });
+            if(candies.length <= 0){ return; }
+
+            let type = (candies.length==1) ? candies[0].type : null;
             const total_odds = candies
             .map(function(c){ return c.per; })
             .reduce(function(sum, per){ return sum + per; }, 0);
-            let type = null;
             while(!type){
                 const per = Math.floor(Math.random() * total_odds);//敢えてレベルに連動しない
                 const candy = candies[0];
