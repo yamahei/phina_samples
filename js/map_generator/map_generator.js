@@ -184,10 +184,12 @@
                 fill: MAPSYM_FLOOR1, lay: null, exclude: MAPSYM_HOLE,
             });
             //hole
+            const maxarea = 20 + (Math.log10(level || 1) * 8);//40?
+            console.log(`maxarea to hole: ${maxarea}`);
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
                 times: Math.min(Math.floor(level / 3) + 3, 8),
-                minarea: 6, maxarea: 25, minsize: 4, offset: 1,
+                minarea: 6, maxarea: maxarea, minsize: 4, offset: 1,
                 fill: MAPSYM_HOLE, lay: null, exclude: MAPSYM_HOLE,
             });
             //block
