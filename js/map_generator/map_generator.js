@@ -91,7 +91,7 @@
                 }
             }
             //treasure
-            const put_treasure = (scene != scene_field);
+            const put_treasure = true;//(scene != scene_field);
             const stage_length = map_data.tiles.under.length;
             const map_under = map_data.tiles.under;
             const map_over = map_data.tiles.over;

@@ -77,7 +77,8 @@
             ...size,
             //
             level: GAME_LEVEL,
-            items: [],
+            items: {},
+            // items: [],
             usegl: USE_WebGL,
             score: 0,
             timeout: 60,//sec

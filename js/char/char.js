@@ -94,6 +94,28 @@
         getCollisionRect: function(){
             return this.collision_rect || this;
         },
+        char_isin_my_direction: function(char){
+            const direction = this.direction;
+            const accel = this.getAcceleration(direction, 1);
+            const dv = char.x - this.x;
+            const dw = char.y - this.y;
+            const sv = Math.sign(dv);
+            const sw = Math.sign(dw);
+            const v = (accel.v != 0 && accel.w == 0) ? {accel: accel.v, axis: dv, angle: dw / dv} : {accel: accel.w, axis: dw, angle: dv / dw};
+            if(Math.sign(v.accel) * Math.sign(v.axis) < 0){
+                //向きの符号と座標差の向きが異なる
+                // console.log({isin:false, riyu: "dir", ...v});
+                return false;
+            }
+            //距離が近いと変になる
+            // if(Math.abs(v.angle) > 0.5 ){/* 0.5 */
+            //     //向きに対して45度を超えた範囲
+            //     // console.log({isin:false, riyu: "ang", ...v});
+            //     return false;
+            // }
+            // console.log({isin:true, ...v});
+            return true;
+        },
         getAcceleration: function(direction, speed){
             const accel_per_dir = {
                 up:    {v: 0, w:-1},
@@ -184,9 +206,9 @@
         autonomousAction: function(e){
             console.log("TODO: must implent!");
         },
-        damageOn: function(){
+        damageOn: function(_damage){
             this.autonomous = false;
-            this.damagecounter = 10;
+            this.damagecounter = _damage || 10;
             this.update = this.damageAction;
         },
         damageAction: function(e){

@@ -92,6 +92,7 @@ phina.define('MainScene', {
 
     //当たり判定
     const collision = SpriteCharBase('hero').addChildTo(this);
+    let last_attack = null;
     collision.onenterframe = function(e){
       const self = this;
       e.app.pointers.forEach(function(p){
@@ -99,6 +100,11 @@ phina.define('MainScene', {
         self.y = p.y;
       });
       const hit = this.hitTestElement(sprite) || this.hitTestElement(door) || this.hitTestElement(treasure);
+      const attack = sprite.char_isin_my_direction(this);
+
+      console.log(attack);
+      last_attack = attack;
+
       if(hit){
         this.visible = !this.visible;
       }else{

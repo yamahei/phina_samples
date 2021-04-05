@@ -1,5 +1,9 @@
 (function(g){
 
+	const CTRL_DEFAULT_SPEED = 2;
+	const CTRL_DEFAULT_SWORDS = 0;
+	const DEFAULT_TIMER = 60;//sec
+
 	const HeroController = function(sprite){
 		this.sprite = sprite;
 		this.speed = 0;
@@ -98,6 +102,11 @@
 		set is_sword(v){
 			this._is_sword = !!v;
 			this.switch_sword();
+		},
+		get swords(){ return this._swords; },
+		set swords(v){
+			this._swords = v * 1;
+			this.is_sword = !!this.swords;
 		},
 	};
 	HeroController.prototype.switch_direction = function(){
@@ -216,29 +225,19 @@
 
 			const hero = ctrl.sprite;
 			const hero_damage_count = 10;
-			const hero_walk_speed = 2;
-			const hero_run_speed = 4;
-			let hero_registed_speed = 0;
-			const items = Items(options.items, options.width, options.height).addChildTo(scene);
-			const timer = Timer().addChildTo(this).initialize(this, 60);
-			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items.top - timer.bottom);
+			const items2 = Items2(options.items, options.width, options.height).addChildTo(scene);
+			const item_setter = {
+				shoe: function(){ ctrl.speed = CTRL_DEFAULT_SPEED + Math.log10(items2.get_item_state("shoe") || 1) * 3; },
+				sword: function(){ ctrl.swords = CTRL_DEFAULT_SWORDS + (items2.get_item_state("sword") || 0); },
+				time: null,//動的に設定しない
+				wing: null,//動的に設定しない
+			};
+			const timer_sec = DEFAULT_TIMER + (options.items.time || 0) * 5;
+			const timer = Timer().addChildTo(this).initialize(this, timer_sec);
+			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items2.top - timer.bottom);
 			tappable.onpointstart = function(e){
 				ctrl.switch_direction();
 			};
-			if(options.level == 0){ items.get_item(); }
-			items.on("useitem", function(e){
-				const item = e.item.type;
-				switch(item){
-					case "wing": on_wing_use(); break;
-					case "sword": ctrl.is_sword = true; break;
-					case "shoe":
-						if(ctrl.speed){ ctrl.speed = hero_run_speed; }
-						else{ hero_registed_speed = hero_run_speed; }//まだ始まってない時
-						break;
-					case "time": timer.stop = true; break;
-					case "hide": ctrl.is_hide = true; break;
-				}
-			});
 
 			world.update = function(e){
 				//goal?
@@ -248,15 +247,24 @@
 				const hit_enemy = chars.enemies.find(function(enemy){
 					return enemy.autonomous && hero.hitTestElement(enemy);
 				});
-				if(!ctrl.is_hide && hit_enemy){
-					if(ctrl.is_sword){ hit_enemy.damageOn(); }
-					else{ ctrl.damage = hero_damage_count; }
+				if(!ctrl.is_hide && !ctrl.damage && hit_enemy){
+					const attack = hero.char_isin_my_direction(hit_enemy);
+					if(ctrl.is_sword && attack){
+						const fps_of_6 = options.fps / 6;
+						const damage = (2 + items2.get_item_state("sword")) * fps_of_6;
+						hit_enemy.damageOn(damage);
+					}
+					else{
+						//TODO: shield?
+						ctrl.damage = hero_damage_count;
+					}
 				}
 				if(ctrl.damage > 0){ timer.minus(); }
 				//treasure?
 				if(treasure && !treasure.is_open && hero.hitTestElement(treasure)){
 					treasure.do_open();
-					items.get_item(treasure.type);
+					const type = items2.get_item(treasure.type);
+					item_setter[type] && item_setter[type]();//セットする
 				}
 			};
 
@@ -275,17 +283,18 @@
 				//start action
 				level_label.remove();
 				world.setScrollTracker(hero, {x: 0, y: options.height / 4});
-				ctrl.speed = hero_registed_speed || hero_walk_speed;
+				item_setter.shoe();//set speed
+				item_setter.sword();
 				all_enemy_on();
 				timer.count_start();
-				items.usable = true;
+				// items.usable = true;
 			});
 
 			const action_stop = function(stop_hero_event){
 				if(stop_hero_event){
 					hero.clear(stop_hero_event);
 				}
-				items.usable = false;
+				// items.usable = false;
 				timer.stop = true;
 				world.setScrollTracker(null);
 				all_enemy_off();
@@ -315,7 +324,7 @@
 					switch(e.event){
 						case "continue":
 							options.score = 0;
-							// options.items = [];//クリアしない⇒開始時点のアイテム
+							//アイテムクリアしない⇒開始時点のアイテム
 							scene.exit("game", options);
 							break;
 						case "tweet": alert("not yet");
@@ -327,7 +336,7 @@
 							break;
 						case "exit":
 							options.level = 0;
-							options.items = [];
+							options.items = {};
 							scene.exit("title", options);
 							break;
 					}
@@ -343,6 +352,11 @@
 			});
 			//fall action
 			hero.on("fall", function(e){
+				if(items2.get_item_state("wing")){
+					items2.use_item("wing");
+					on_wing_use();
+					return;
+				}
 				const hero = e.hero;
 				action_stop("fall");
 				const map_pos = world.translatePositionToMapXY(hero.x, hero.y);
@@ -357,7 +371,6 @@
 				}
 				ctrl.set_fall();
 				hero.on("falled", function(_){
-					//hero.remove();
 					action_stop("falled");
 					game_over();
 				});
@@ -391,7 +404,7 @@
 					setTimeout(function(){
 						options.level += 1;
 						options.score += score;
-						options.items = items.get_item_names();
+						options.items = items2.get_item_properties();
 						const is_bonus = (options.level > 0) && (options.level % 4 == 0);
 						const next_scene = is_bonus ? "bonus" : "game";
 						scene.exit(next_scene, options);

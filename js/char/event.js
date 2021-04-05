@@ -120,7 +120,7 @@
             this.superInit(image);
             this.event = "treasure";
             this.animation = FrameAnimation("treasure").attachTo(this);
-            this.type = 'A';//'B', 'C', 'D'
+            this.type = 'A';//'B', 'C', 'D', 'E'
             this.action = 'closed';
             this.is_open = false;
         },
@@ -128,10 +128,10 @@
             const rand = Random(seed || 99);
             rand.random();//init?
             const types = [
-                ..."B".repeat(1),
-                ..."A".repeat(2),
-                ..."C".repeat(4),
-                ..."D".repeat(5),
+                ..."B".repeat(1),//wing
+                ..."C".repeat(2),//sword
+                ..."D".repeat(3),//shoe
+                ..."E".repeat(3),//time
             ].shuffle();//敢えてレベルに連動しない
             this.type = types[0];
             this.setEventAnimation();
