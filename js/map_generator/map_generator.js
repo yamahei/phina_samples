@@ -62,15 +62,30 @@
 
         draw_map: function(level, scene, lap, flag, map_data, chars){
 
+
+            const rand = this.random
+            const stage_AorB = function(stageA, stageB, switchLevel, currentLevel){
+                const per = (currentLevel / switchLevel) * 100;
+                const random = rand.randint(0, 100);
+                return (per < random) ? stageA : stageB;
+            };
+            const ForC = function(currentLevel){
+                return stage_AorB("field", "criff", 20, currentLevel);
+            };
+            const ForR = function(currentLevel){
+                return stage_AorB("field", "crack", 15, currentLevel);
+            };
+
+            const lv = level;
             const scene_field = 0;
             const scene_rock = 1;
             const scene_cave = 2;
             const scene_castle = 3;
             const map_stage_list = [
-                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", "field", "wall"], enemies: [0, 3, 1, 4, 2] },
+                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", ForC(lv), "wall"], enemies: [0, 3, 1, 4, 2] },
                 { scene: scene_rock, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 1, 3, 1] },
                 { scene: scene_cave, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 1, 2, 1, 3] },
-                { scene: scene_castle, name: "城",   stages: ["start", "criff", "field", "criff", "wall"], enemies: [0, 3, 1, 2, 1] },
+                { scene: scene_castle, name: "城",   stages: ["start", "criff", ForR(lv), "criff", "wall"], enemies: [0, 3, 1, 2, 1] },
             ];
             const map_stages = map_stage_list[scene].stages.reverse();
             const map_enemies = map_stage_list[scene].enemies.reverse();
@@ -176,6 +191,20 @@
             const rough_height = 8;
             const rough_tiles = this.get_maplines(rough_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
+            //side blank
+            const times = Math.floor(level / 8) * rnd.randint(0, level);
+            const under = rough_tiles.under;
+            for(let i=0; i<times; i++){
+                const y = rnd.randint(1, under.length - 1);
+                if(rnd.randbool()){
+                    under[y].first = MAPSYM_HOLE;
+                    under[y-1].first = MAPSYM_HOLE;
+                }
+                if(rnd.randbool()){
+                    under[y].last = MAPSYM_HOLE;
+                    under[y-1].last = MAPSYM_HOLE;
+                }
+            }
             //rough
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
@@ -186,9 +215,10 @@
             //hole
             const maxarea = 20 + (Math.log10(level || 1) * 8);//40?
             console.log(`maxarea to hole: ${maxarea}`);
+            const hole_times = Math.floor(8/15) * level + 8;
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
-                times: Math.min(Math.floor(level / 3) + 3, 8),
+                times: (hole_times < 1) ? 1 : hole_times,
                 minarea: 6, maxarea: maxarea, minsize: 4, offset: 1,
                 fill: MAPSYM_HOLE, lay: null, exclude: MAPSYM_HOLE,
             });
@@ -311,7 +341,7 @@
                 });
                 const bridge_x1 = Math.min(...[
                     bridge_crack.p1.x + Math.floor((bridge_crack.p2.x - bridge_crack.p1.x) / 2),
-                    this.map_width - 3,
+                    this.map_width - 4,
                 ]);
                 const bridge_cy = Math.floor((bridge_crack.p1.y + bridge_crack.p2.y) / 2);
                 const bridge_y_list = [{y: bridge_cy, direction: -1}, {y: bridge_cy, direction: 1}].map(function(param){

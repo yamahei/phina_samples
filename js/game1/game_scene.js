@@ -209,7 +209,7 @@
 						const now_not_fall = (!hit || hit.event_name != "fall");
 						if(end_by_wall || (--counter <= 0 && now_not_fall)){//終わる条件
 							all_enemy_on();///
-							ctrl.speed = hero_state.speed;
+							item_setter.shoe();//set speed
 							ctrl.is_flyng = false;
 							gull_leave();
 						}else{
