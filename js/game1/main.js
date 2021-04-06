@@ -6,6 +6,9 @@
         //TODO: 各クラスからASSETに追加する
         font:　{'PressStart2P': 'fonts/PressStart2P-Regular.ttf'},
         image: {
+
+            title: "ASSETS/image/other/Logo1_digitize_240.png",
+
             map_castle_1: "ASSETS/image/maps/bg_castle_1.png",
             map_castle_2: "ASSETS/image/maps/bg_castle_2.png",
             map_cave_1: "ASSETS/image/maps/bg_cave_1.png",
