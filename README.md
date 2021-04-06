@@ -37,3 +37,11 @@ ruby -rsinatra -e 'set :bind, "0.0.0.0"; set :public_folder, "./", get("/"){"Hel
 
 * スプライトシート
 * マップ定義定義(map_sample.json)
+
+#### Credits
+
+* Character & Map : First seed material
+* Logo : cool text
+* Engine : Phina.js
+* Sound : NOT YET
+* Programming : yamahei
