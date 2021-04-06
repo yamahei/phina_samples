@@ -2,7 +2,7 @@
 
 	const CTRL_DEFAULT_SPEED = 2;
 	const CTRL_DEFAULT_SWORDS = 0;
-	const DEFAULT_TIMER = 45;//sec
+	const DEFAULT_TIMER = 30;//sec
 
 	const HeroController = function(sprite){
 		this.sprite = sprite;
@@ -404,7 +404,7 @@
 				.call(function(){
 					const goal_texts = [
 						"Clear", "",
-						`Score +${score.toString()}`
+						(score > 0) ? `Score +${score.toString()}` : "No score"
 					];
 					const goal_label = TextBox(goal_texts).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
 					setTimeout(function(){
