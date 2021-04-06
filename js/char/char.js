@@ -474,8 +474,6 @@
                     param.action = 'stand';
                     param._counter = 0;
                 }
-                self.setAnimationDirection(param.direction);
-                self.setAnimationAction(param.action);
             };
             param._counter += 1;
             if(param.counter <= param._counter){ turn(); }
@@ -483,7 +481,9 @@
             this.x += accel.v;
             this.y += accel.w;
             if(this.outerLimit()){ turn(); }
-        },
+            self.setAnimationDirection(param.direction);
+            self.setAnimationAction(param.action);
+    },
 
     });
     phina.define('CharBat', {

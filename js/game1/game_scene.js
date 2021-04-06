@@ -2,7 +2,7 @@
 
 	const CTRL_DEFAULT_SPEED = 2;
 	const CTRL_DEFAULT_SWORDS = 0;
-	const DEFAULT_TIMER = 60;//sec
+	const DEFAULT_TIMER = 45;//sec
 
 	const HeroController = function(sprite){
 		this.sprite = sprite;
@@ -226,13 +226,19 @@
 			const hero = ctrl.sprite;
 			const hero_damage_count = 10;
 			const items2 = Items2(options.items, options.width, options.height).addChildTo(scene);
+			const item_shoe = function(){ return items2.get_item_state("shoe")};
+			const item_sword = function(){ return items2.get_item_state("sword")};
 			const item_setter = {
-				shoe: function(){ ctrl.speed = CTRL_DEFAULT_SPEED + Math.log10(items2.get_item_state("shoe") || 1) * 3; },
-				sword: function(){ ctrl.swords = CTRL_DEFAULT_SWORDS + (items2.get_item_state("sword") || 0); },
+				shoe: function(){
+					ctrl.speed = CTRL_DEFAULT_SPEED + (item_shoe() ? Math.log10(item_shoe() + 1) * 2 : 0);
+				},
+				sword: function(){
+					ctrl.swords = CTRL_DEFAULT_SWORDS + (item_sword() ? Math.log10(item_sword() + 1) * 2 : 0);
+				},
 				time: null,//動的に設定しない
 				wing: null,//動的に設定しない
 			};
-			const timer_sec = DEFAULT_TIMER + (options.items.time || 0) * 5;
+			const timer_sec = DEFAULT_TIMER + (options.items.time || 0) * 3;
 			const timer = Timer().addChildTo(this).initialize(this, timer_sec);
 			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items2.top - timer.bottom);
 			tappable.onpointstart = function(e){

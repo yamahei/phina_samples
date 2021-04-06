@@ -128,9 +128,9 @@
             const rand = Random(seed || 99);
             rand.random();//init?
             const types = [
-                ..."B".repeat(1),//wing
-                ..."C".repeat(2),//sword
-                ..."D".repeat(3),//shoe
+                ..."B".repeat(2),//wing
+                ..."C".repeat(1),//sword
+                ..."D".repeat(2),//shoe
                 ..."E".repeat(3),//time
             ].shuffle();//敢えてレベルに連動しない
             this.type = types[0];
