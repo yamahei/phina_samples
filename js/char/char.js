@@ -223,8 +223,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "butterfly";
-            this.collision_setting_width = 8;
-            this.collision_setting_height = 8;
+            this.collision_setting_width = 10;
+            this.collision_setting_height = 10;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
@@ -259,8 +259,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "bee";
-            this.collision_setting_width = 12;
-            this.collision_setting_height = 12;
+            this.collision_setting_width = 14;
+            this.collision_setting_height = 14;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
@@ -301,8 +301,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "snake";
-            this.collision_setting_width = 12;
-            this.collision_setting_height = 12;
+            this.collision_setting_width = 14;
+            this.collision_setting_height = 14;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = 8;
             this.superInit(image);
@@ -345,8 +345,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "rooster";
-            this.collision_setting_width = 12;
-            this.collision_setting_height = 12;
+            this.collision_setting_width = 14;
+            this.collision_setting_height = 14;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
@@ -399,9 +399,9 @@
         init: function() {
             const image = "slime";
             this.collision_setting_width = 20;
-            this.collision_setting_height = 14;
+            this.collision_setting_height = 16;
             this.collision_setting_offset_x = null;
-            this.collision_setting_offset_y = null;
+            this.collision_setting_offset_y = 11;
             this.superInit(image);
         },
         getDefaultAutoParam: function(){
@@ -442,8 +442,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "hawk";
-            this.collision_setting_width = 12;
-            this.collision_setting_height = 12;
+            this.collision_setting_width = 14;
+            this.collision_setting_height = 14;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
@@ -490,8 +490,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "bat";
-            this.collision_setting_width = 8;
-            this.collision_setting_height = 8;
+            this.collision_setting_width = 12;
+            this.collision_setting_height = 12;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
@@ -539,8 +539,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "wolf";
-            this.collision_setting_width = 12;
-            this.collision_setting_height = 12;
+            this.collision_setting_width = 14;
+            this.collision_setting_height = 14;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = null;
             this.superInit(image);
@@ -617,8 +617,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "org";
-            this.collision_setting_width = 16;
-            this.collision_setting_height = 16;
+            this.collision_setting_width = 18;
+            this.collision_setting_height = 18;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = 10;
             this.superInit(image);
@@ -707,8 +707,8 @@
         superClass: 'CharEnemyBase',
         init: function() {
             const image = "dragon";
-            this.collision_setting_width = 16;
-            this.collision_setting_height = 16;
+            this.collision_setting_width = 18;
+            this.collision_setting_height = 18;
             this.collision_setting_offset_x = null;
             this.collision_setting_offset_y = 10;
             this.superInit(image);

@@ -121,11 +121,11 @@
 
         debug_enemies: function(map_data, chars){
             const enemies = [
-                // CharButterfly, CharBee, CharRooster,
-                // CharSnake, CharSlime, CharHawk, CharWolf,
-                // CharBat, CharOrg, CharDragon,
-                // CharSpirit3, CharSpirit2, CharSpirit5, CharSpirit4, CharSpirit6
-                CharSpirit6
+                CharButterfly, CharBee, CharRooster,
+                CharSnake, CharSlime, CharHawk, CharWolf,
+                CharBat, CharOrg, CharDragon,
+                CharSpirit3, CharSpirit2, CharSpirit5, CharSpirit4, CharSpirit6
+                // CharSpirit6
             ];
 
             for(let i=0; i<enemies.length; i++){
