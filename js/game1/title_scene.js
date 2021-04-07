@@ -30,9 +30,10 @@
 			});
 
 			const title = Sprite("title", 240, 85).addChildTo(this).setPosition(this.gridX.center(), -100);
+			const ease = "easeInOutElastic";//"linear";
 			title.tweener
-			.to({x: this.gridX.center(), y: this.gridY.center(-2)}, 1500, "linear")
-			.wait(500)
+			.to({x: this.gridX.center(), y: this.gridY.center(-2)}, 2000, ease)
+			.wait(100)
 			.call(function(){
 				select.visible = true;
 			});

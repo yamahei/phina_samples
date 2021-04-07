@@ -130,7 +130,7 @@
             const types = [
                 ..."B".repeat(2),//wing
                 ..."C".repeat(1),//sword
-                ..."D".repeat(2),//shoe
+                ..."D".repeat(3),//shoe
                 ..."E".repeat(3),//time
             ].shuffle();//敢えてレベルに連動しない
             this.type = types[0];

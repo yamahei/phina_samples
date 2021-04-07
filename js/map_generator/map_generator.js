@@ -192,7 +192,7 @@
             const rough_tiles = this.get_maplines(rough_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
             //side blank
-            const times = Math.floor(level / 8) * rnd.randint(0, level);
+            const times = Math.min(Math.floor(level / 8) * rnd.randint(0, level), 20);
             const under = rough_tiles.under;
             for(let i=0; i<times; i++){
                 const y = rnd.randint(1, under.length - 1);
@@ -650,8 +650,7 @@
 
         set_enemy: function(map_data, chars, scene, lap, stage, top_y, bottom_y){
             const rnd = this.random;
-            const num = Math.floor(Math.log10(lap || 1) * 7) + 1 + scene;
-            // const num = Math.max(3, Math.floor(lap / 2)) + 1;
+            const num = Math.floor(Math.log10(lap || 1) * 4 + scene / 1.5) + 1;
             let counter = 0;
             for(let i=0; i<num; i++){
                 while(true){

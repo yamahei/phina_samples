@@ -1,6 +1,7 @@
 (function(g){
     "use strict;";
 	const LABEL_FONTSIZE = 8;
+	const CLEAR_BONUS = 100;
 
 	phina.define('BonusScene', {
 		superClass: 'DisplayScene',
@@ -16,9 +17,9 @@
 			hero.setAnimationAction("walk");
 
 			const self = this;
-			this.step = 7;
-			this.bonus = 500;
-			this._bonus = 500;
+			this.step = 3;
+			this.bonus = CLEAR_BONUS;
+			this._bonus = CLEAR_BONUS;
 			this.score = options.score + this.bonus;
 			this._score = options.score;
 			const get_bonus_text = function(){
