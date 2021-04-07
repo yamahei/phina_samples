@@ -54,6 +54,10 @@
                 layer.obj.delChar = function(char){
                     return self.delChar(char);
                 }
+                //キャラクタリストの取得
+                layer.obj.getChars = function(){
+                    return self.getChars();
+                }
                 //y座標の小さい順位ソート（上から順に描画）
                 if(layer.sort){
                     layer.obj.onenterframe = function(e){
@@ -95,6 +99,11 @@
         delChar: function(char){
             this.fire({type: "delchar", char: char});
             return this.layer_field.removeChild(char);
+        },
+        getChars: function(){
+            return this.layer_field.children.filter(function(c){
+                return c.sprite_type && (["char", "event"].indexOf(c.sprite_type) >= 0);
+            });
         },
         switchCharLayer: function(char, from, _to){
             const current_layer = char.parent;

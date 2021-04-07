@@ -18,27 +18,8 @@ gem install sinatra
 ruby -rsinatra -e 'set :bind, "0.0.0.0"; set :public_folder, "./", get("/"){"Hello world"}'
 ```
 
-各ページの説明
---------------
-
-### [スプライト制御のサンプル](char_sample.html)
-
-スプライトシートとアニメーション、当たり判定の制御のサンプルです。
-
-* 基底クラス: SpriteCharBase
-* 基本設定: SpriteCharSetting
-
-### [マップ当たり判定のサンプル](map_sample.html)
-
-* トップビューのマップ管理クラス: MapTopView
-* マップチップ管理クラス: SpriteMapChip
-
-#### マップの構成要素
-
-* スプライトシート
-* マップ定義定義(map_sample.json)
-
-#### Credits
+Credits(覚書)
+--------
 
 * Character & Map : First seed material
 * Logo : cool text

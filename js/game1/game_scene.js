@@ -1,5 +1,6 @@
 (function(g){
 
+	const GEMA_DEBUG = true;
 	const CTRL_DEFAULT_SPEED = 2;
 	const CTRL_DEFAULT_SWORDS = 0;
 	const DEFAULT_TIMER = 30;//sec
@@ -254,10 +255,12 @@
 					return enemy.autonomous && hero.hitTestElement(enemy);
 				});
 				if(!ctrl.is_hide && !ctrl.damage && hit_enemy){
-					const attack = hero.char_isin_my_direction(hit_enemy);
-					if(ctrl.is_sword && attack){
+					const sword = items2.get_item_state("sword") * 1;
+					const attack = hero.char_isin_my_direction(hit_enemy, sword);
+					const can_attack = !!(["CharFire"].indexOf(hit_enemy.className) < 0);//剣が通じない
+					if(ctrl.is_sword && attack && can_attack){
 						const fps_of_6 = options.fps / 6;
-						const damage = (2 + items2.get_item_state("sword")) * fps_of_6;
+						const damage = (2 + sword) * fps_of_6;
 						hit_enemy.damageOn(damage);
 					}
 					else{
@@ -273,6 +276,17 @@
 					item_setter[type] && item_setter[type]();//セットする
 				}
 			};
+			if(GEMA_DEBUG){
+				const item_names = { "wing": "B", "sword":"C", "shoe": "D", "time": "E" };
+				const debug_item = function(name){
+					const type = items2.get_item(item_names[name]);
+					item_setter[name] && item_setter[name]();//セットする
+				}
+				Object.keys(item_names).forEach(function(n){
+					const func_name = `debug_${n}`;
+					g[func_name] = function(){ return debug_item(n); };
+				});
+			}
 
 			//ready action - 1.label-on 2.scroll 3.label-off
 			const level_text = `Level ${level + 1}`;

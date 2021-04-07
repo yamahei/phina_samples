@@ -94,14 +94,32 @@
         getCollisionRect: function(){
             return this.collision_rect || this;
         },
-        char_isin_my_direction: function(char){
+        get_char_distance: function(char){
+            const v = this.x - char.x;
+            const w = this.y - char.y;
+            return Math.abs(v) + Math.abs(w);
+        },
+        get_direction_for_char: function(char){
+            const v = char.x - this.x;
+            const w = char.y - this.y;
+            const is_joge = Math.abs(v) < Math.abs(w);//上下方向（左右ではなく）に向くべきか
+            const candy = is_joge ? ["up", "down"] : ["left", "right"];
+            const expression = is_joge ? w : v;
+            return expression < 0 ? candy[0] : candy[1];
+        },
+        char_isin_my_direction: function(char, range){
             const direction = this.direction;
             const accel = this.getAcceleration(direction, 1);
             const dv = char.x - this.x;
             const dw = char.y - this.y;
             const sv = Math.sign(dv);
             const sw = Math.sign(dw);
-            const v = (accel.v != 0 && accel.w == 0) ? {accel: accel.v, axis: dv, angle: dw / dv} : {accel: accel.w, axis: dw, angle: dv / dw};
+            const v = (accel.v != 0 && accel.w == 0) ?
+            {//左右方向を向いている
+                accel: accel.v, axis: dv, angle: dw / dv, diff: this.y - char.y
+            } : {//前後方向を向いている
+                accel: accel.w, axis: dw, angle: dv / dw, diff: this.x - char.x
+            };
             if(Math.sign(v.accel) * Math.sign(v.axis) < 0){
                 //向きの符号と座標差の向きが異なる
                 // console.log({isin:false, riyu: "dir", ...v});
@@ -114,7 +132,9 @@
             //     return false;
             // }
             // console.log({isin:true, ...v});
-            return true;
+
+            //range幅以内なら進行方向に対して衝突したとみなす
+            return !!(Math.abs(v.diff) <= range + 1);
         },
         getAcceleration: function(direction, speed){
             const accel_per_dir = {
@@ -230,19 +250,34 @@
             this.superInit(image);
         },
         getDefaultAutoParam: function(){
+            const target = this.parent.getScrollTarget();
             return {
                 speed: 1, counter: 4, _counter: this.random.randint(0, 4),
                 direction: "down", action: "walk",
+                chars: [...this.parent.getChars().filter(function(c){
+                    return c.sprite_type == "event";
+                }), target],
+                min_distance_to_closer: 3 * 16,//タイル（16）
             };
         },
         autonomousAction: function(e){
             const param = this.autoparam;
             const rnd = this.random;
             const self = this;
+            const get_nearest = function(){
+                //ドア、宝箱、主人公の一番近いもの
+                return param.chars.sort(function(a, b){
+                    return self.get_char_distance(a) - self.get_char_distance(b);
+                })[0];
+            };
             const turn = function(){
+                const nearest = get_nearest();
+                const distance = self.get_char_distance(nearest);
+                const is_closer = !!(param.min_distance_to_closer <= distance);
+                const is_rnd = !!(rnd.randint(0, 999) % 2 != 0);//1/2
                 const directions = g.SpriteCharSetting.directions;
                 const index = rnd.randint(1, directions.length) - 1;
-                param.direction = directions[index];
+                param.direction = (is_rnd && is_closer) ? self.get_direction_for_char(nearest) : directions[index];
                 param._counter = 0;
                 self.setAnimationDirection(param.direction);
                 self.setAnimationAction(param.action);
@@ -269,9 +304,12 @@
             return {
                 speed: 2, counter: 8, _counter: this.random.randint(0, 8),
                 waiting: true, direction: "down", action: "run",
+                min_distance_to_closer: 3 * 16,//タイル（16）
+                max_distance_to_closer: 7 * 16,//タイル（16）
             };
         },
         autonomousAction: function(e){
+            const target = this.parent.getScrollTarget();
             const param = this.autoparam;
             const rnd = this.random;
             const self = this;
@@ -281,10 +319,14 @@
                 if(!param.waiting){//動き出す
                     param.speed = 2;
                 }else{//方向転換して待つ
+                    const distance = self.get_char_distance(target);
+                    const is_closer = !!(param.min_distance_to_closer <= distance && distance <= param.max_distance_to_closer);
+                    // const is_rnd = !!(rnd.randint(0, 999) % 4 != 0);//3/4
                     const directions = g.SpriteCharSetting.directions;
                     const index = rnd.randint(1, directions.length) - 1;
-                    param.direction = directions[index];
+                    param.direction = is_closer ? self.get_direction_for_char(target) : directions[index];
                     param.speed = 0;
+                    // param._counter = (is_rnd && is_closer) ? param.counter : param._counter;
                     self.setAnimationDirection(param.direction);
                     self.setAnimationAction(param.action);
                 }
