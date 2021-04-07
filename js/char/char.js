@@ -304,7 +304,7 @@
             return {
                 speed: 2, counter: 8, _counter: this.random.randint(0, 8),
                 waiting: true, direction: "down", action: "run",
-                min_distance_to_closer: 3 * 16,//タイル（16）
+                min_distance_to_closer: 2 * 16,//タイル（16）
                 max_distance_to_closer: 7 * 16,//タイル（16）
             };
         },
@@ -321,12 +321,11 @@
                 }else{//方向転換して待つ
                     const distance = self.get_char_distance(target);
                     const is_closer = !!(param.min_distance_to_closer <= distance && distance <= param.max_distance_to_closer);
-                    // const is_rnd = !!(rnd.randint(0, 999) % 4 != 0);//3/4
                     const directions = g.SpriteCharSetting.directions;
                     const index = rnd.randint(1, directions.length) - 1;
                     param.direction = is_closer ? self.get_direction_for_char(target) : directions[index];
                     param.speed = 0;
-                    // param._counter = (is_rnd && is_closer) ? param.counter : param._counter;
+                    param._counter = is_closer ? param.counter : param._counter;
                     self.setAnimationDirection(param.direction);
                     self.setAnimationAction(param.action);
                 }

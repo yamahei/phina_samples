@@ -66,14 +66,14 @@
             const rand = this.random
             const stage_AorB = function(stageA, stageB, switchLevel, currentLevel){
                 const per = (currentLevel / switchLevel) * 100;
-                const random = rand.randint(0, 100);
+                const random = rand.randint(0, 9999) % 100;
                 return (per < random) ? stageA : stageB;
             };
             const ForC = function(currentLevel){
-                return stage_AorB("field", "criff", 20, currentLevel);
+                return stage_AorB("field", "criff", 40, currentLevel);
             };
             const ForR = function(currentLevel){
-                return stage_AorB("field", "crack", 15, currentLevel);
+                return stage_AorB("field", "crack", 20, currentLevel);
             };
 
             const lv = level;
