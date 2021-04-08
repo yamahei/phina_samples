@@ -128,10 +128,10 @@
             const rand = Random(seed || 99);
             rand.random();//init?
             const types = [
-                ..."B".repeat(2),//wing
-                ..."C".repeat(1),//sword
-                ..."D".repeat(3),//shoe
-                ..."E".repeat(3),//time
+                ..."B".repeat(11),//wing
+                ..."C".repeat( 9),//sword
+                ..."D".repeat(15),//shoe
+                ..."E".repeat(13),//time
             ].shuffle();//敢えてレベルに連動しない
             this.type = types[0];
             this.setEventAnimation();
