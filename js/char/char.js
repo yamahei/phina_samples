@@ -395,10 +395,11 @@
         getDefaultAutoParam: function(){
             return {
                 speed: 2, counter: 24, _counter: this.random.randint(0, 24),
-                waiting: true, direction: "down", action: "walk",
+                waiting: true, direction: "down", action: "walk", distance: 12 * 16,
             };
         },
         autonomousAction: function(e){
+            const target = this.parent.getScrollTarget();
             const param = this.autoparam;
             const rnd = this.random;
             const self = this;
@@ -429,6 +430,16 @@
             }
             param._counter += 1;
             if(param.counter <= param._counter){ turn(); }
+            else{//主人公を向いている場合は走り出す
+                const isin_distance = self.get_char_distance(target);
+                const isin_direction = self.char_isin_my_direction(target, 32);
+                if(isin_distance < param.distance && isin_direction){
+                    param.waiting = false;
+                    param.action = "walk";
+                    param.speed = 2;
+                    self.setAnimationAction(param.action);
+                }
+            }
             const accel = this.getAcceleration(param.direction, param.speed);
             const hit = this.moveBy(accel.v, accel.w);
             if(hit){ stop(); }
