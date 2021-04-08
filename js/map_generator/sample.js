@@ -12,6 +12,8 @@ const ASSETS = {
 		map_rockey_2: "ASSETS/image/maps/bg_rockey_2.png",
 
 		hero: "ASSETS/image/chars/hero.png",
+		hero_ken: "ASSETS/image/chars/hero_ken.png",
+		hero_kentate: "ASSETS/image/chars/hero_kentate.png",
 		door: "ASSETS/image/chars/doors.png",
 		treasure: "ASSETS/image/chars/treasure_chest.png",
 

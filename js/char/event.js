@@ -116,7 +116,7 @@
         init: function() {
             const image = "treasure";
             this.collision_setting_height = 24;
-            this.collision_setting_offset_y = 4;
+            this.collision_setting_offset_y = 7;
             this.superInit(image);
             this.event = "treasure";
             this.animation = FrameAnimation("treasure").attachTo(this);

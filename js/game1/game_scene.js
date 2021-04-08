@@ -226,9 +226,9 @@
 
 			const hero = ctrl.sprite;
 			const hero_damage_count = 10;
-			const items2 = Items2(options.items, options.width, options.height).addChildTo(scene);
-			const item_shoe = function(){ return items2.get_item_state("shoe")};
-			const item_sword = function(){ return items2.get_item_state("sword")};
+			const items = Items(options.items, options.width, options.height).addChildTo(scene);
+			const item_shoe = function(){ return items.get_item_state("shoe")};
+			const item_sword = function(){ return items.get_item_state("sword")};
 			const item_setter = {
 				shoe: function(){
 					ctrl.speed = CTRL_DEFAULT_SPEED + (item_shoe() ? Math.log10(item_shoe() + 1) * 2 : 0);
@@ -241,7 +241,7 @@
 			};
 			const timer_sec = DEFAULT_TIMER + (options.items.time || 0) * 3;
 			const timer = Timer().addChildTo(this).initialize(this, timer_sec);
-			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items2.top - timer.bottom);
+			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items.top - timer.bottom);
 			tappable.onpointstart = function(e){
 				ctrl.switch_direction();
 			};
@@ -255,7 +255,7 @@
 					return enemy.autonomous && hero.hitTestElement(enemy);
 				});
 				if(!ctrl.is_hide && !ctrl.damage && hit_enemy){
-					const sword = items2.get_item_state("sword") * 1;
+					const sword = items.get_item_state("sword") * 1;
 					const attack = hero.char_isin_my_direction(hit_enemy, sword);
 					const can_attack = !!(["CharFire"].indexOf(hit_enemy.className) < 0);//剣が通じない
 					if(ctrl.is_sword && attack && can_attack){
@@ -272,14 +272,14 @@
 				//treasure?
 				if(treasure && !treasure.is_open && hero.hitTestElement(treasure)){
 					treasure.do_open();
-					const type = items2.get_item(treasure.type);
+					const type = items.get_item(treasure.type);
 					item_setter[type] && item_setter[type]();//セットする
 				}
 			};
 			if(GEMA_DEBUG){
 				const item_names = { "wing": "B", "sword":"C", "shoe": "D", "time": "E" };
 				const debug_item = function(name){
-					const type = items2.get_item(item_names[name]);
+					const type = items.get_item(item_names[name]);
 					item_setter[name] && item_setter[name]();//セットする
 				}
 				Object.keys(item_names).forEach(function(n){
@@ -372,8 +372,8 @@
 			});
 			//fall action
 			hero.on("fall", function(e){
-				if(items2.get_item_state("wing")){
-					items2.use_item("wing");
+				if(items.get_item_state("wing")){
+					items.use_item("wing");
 					on_wing_use();
 					return;
 				}
@@ -424,7 +424,7 @@
 					setTimeout(function(){
 						options.level += 1;
 						options.score += score;
-						options.items = items2.get_item_properties();
+						options.items = items.get_item_properties();
 						const is_bonus = (options.level > 0) && (options.level % 4 == 0);
 						const next_scene = is_bonus ? "bonus" : "game";
 						scene.exit(next_scene, options);

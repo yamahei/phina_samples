@@ -26,20 +26,20 @@ phina.define('MainScene', {
       console.log(item);
       return item;
     };
-    const items2 = Items({}, size.width, size.height).addChildTo(this);
+    const items = Items({}, size.width, size.height).addChildTo(this);
     const addButton = this.addButton = Button({ text: '+'}).addChildTo(this);
     addButton.x = this.gridX.center(-4);
     addButton.y = this.gridY.center(-6);
     addButton.onclick = function(){
       const item = get_random_chest();
-      items2.get_item(item.chest);
+      items.get_item(item.chest);
     };
     const subButton = this.subButton = Button({ text: '-'}).addChildTo(this);
     subButton.x = this.gridX.center(+4);
     subButton.y = this.gridY.center(-6);
     subButton.onclick = function(){
       const item = get_random_chest();
-      items2.use_item(item.name);
+      items.use_item(item.name);
     };
 
   },
