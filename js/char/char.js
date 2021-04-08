@@ -122,16 +122,13 @@
             };
             if(Math.sign(v.accel) * Math.sign(v.axis) < 0){
                 //向きの符号と座標差の向きが異なる
-                // console.log({isin:false, riyu: "dir", ...v});
                 return false;
             }
-            //距離が近いと変になる
+            //距離が近いと変になるので角度はやめる
             // if(Math.abs(v.angle) > 0.5 ){/* 0.5 */
             //     //向きに対して45度を超えた範囲
-            //     // console.log({isin:false, riyu: "ang", ...v});
             //     return false;
             // }
-            // console.log({isin:true, ...v});
 
             //range幅以内なら進行方向に対して衝突したとみなす
             return !!(Math.abs(v.diff) <= range + 1);
@@ -251,6 +248,7 @@
         },
         getDefaultAutoParam: function(){
             const target = this.parent.getScrollTarget();
+            if(!target){ return; }
             return {
                 speed: 1, counter: 4, _counter: this.random.randint(0, 4),
                 direction: "down", action: "walk",
@@ -310,6 +308,7 @@
         },
         autonomousAction: function(e){
             const target = this.parent.getScrollTarget();
+            if(!target){ return; }
             const param = this.autoparam;
             const rnd = this.random;
             const self = this;
@@ -400,6 +399,7 @@
         },
         autonomousAction: function(e){
             const target = this.parent.getScrollTarget();
+            if(!target){ return; }
             const param = this.autoparam;
             const rnd = this.random;
             const self = this;

@@ -401,6 +401,7 @@
 				const hero = e.hero;
 				const goal = e.goal;
 				const distance = Math.floor(Math.abs(hero.x - goal.x));
+				const speed_per_fps = 1000 / (options.fps * 1);
 				action_stop("goal");
 				const score = Math.floor(timer.remain * (1 + Math.log10(options.level + 1)));
 				ctrl.set_goal();
@@ -411,7 +412,7 @@
 					if(hero.x < goal.x){ ctrl.direction = "right"; }
 					if(hero.x > goal.x){ ctrl.direction = "left"; }
 				}).wait(500)
-				.to({x: goal.x, y: hero.y}, distance * 80, "linear").wait(200)
+				.to({x: goal.x, y: hero.y}, distance * speed_per_fps, "linear").wait(200)
 				.call(function(){ ctrl.direction = "up"; }).wait(500)
 				.call(function(){ ctrl._visible = false; }).wait(100)
 				.call(function(){ goal.do_close(); }).wait(500)

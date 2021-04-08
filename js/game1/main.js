@@ -73,6 +73,7 @@
     phina.main(function() {
         // アプリケーション生成
         const app = GameApp({
+            // startLabel: 'game',
             startLabel: 'title',
             fps: 24,
             scenes: SCENES,

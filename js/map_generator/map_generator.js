@@ -82,7 +82,7 @@
             const scene_cave = 2;
             const scene_castle = 3;
             const map_stage_list = [
-                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", ForC(lv), "wall"], enemies: [0, 3, 1, 4, 2] },
+                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", ForC(lv), "wall"], enemies: [0, 3, 1, 1, 2] },
                 { scene: scene_rock, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 1, 3, 1] },
                 { scene: scene_cave, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 1, 2, 1, 3] },
                 { scene: scene_castle, name: "城",   stages: ["start", "criff", ForR(lv), "criff", "wall"], enemies: [0, 3, 1, 2, 1] },
@@ -107,6 +107,44 @@
             }
             //treasure
             const put_treasure = true;//(scene != scene_field);
+            // const treasure = this.get_treasure_point1(level, map_data);
+            const treasure = this.get_treasure_point2(level, map_data);
+            if(put_treasure && treasure){
+                chars.events.push(treasure);
+            }
+
+            // this.debug_enemies(map_data, chars);
+            return map_data.tiles;
+        },
+
+        get_treasure_point2: function(level, map_data){
+            const rnd = this.random;
+            const stage_length = map_data.tiles.under.length;
+            const map_under = map_data.tiles.under;
+            const map_over = map_data.tiles.over;
+            const candi_points = [];
+            let counter = 0;
+            while(candi_points.length < 12){
+                const x = rnd.randint(2, map_data.map_width - 1 - 2);
+                const y = rnd.randint(12, stage_length - 1 - 12);
+                const under_is_flat = this.is_in(map_under, {x: x-1, y: y-1}, {x: x+1, y: y+1}, MAPSYM_HOLE);
+                const over_is_empty = this.is_all(map_over, {x: x-1, y: y-1}, {x: x+1, y: y+1}, MAPSYM_EMPTY);
+                if(under_is_flat && over_is_empty){
+                    candi_points.push({x: x, y: y, canter: Math.abs((stage_length/2) - y)});
+                }
+                if(counter++ > 31){ break; }//無限ループ防止
+            }
+            candi_points.sort(function(a, b){ return a.center - b.center; });
+            if(candi_points.length > 0){
+                const p = candi_points[0];
+                const treasure = EventTreasure();
+                treasure.autostyle(level);
+                this.set_position_from_map_point(treasure, map_data, p.x, p.y);
+                return treasure;
+            }
+        },
+
+        get_treasure_point1: function(level, map_data){
             const stage_length = map_data.tiles.under.length;
             const map_under = map_data.tiles.under;
             const map_over = map_data.tiles.over;
@@ -114,7 +152,7 @@
             for(let y=0; y<stage_length; y++){
                 const under_is_flat = map_under[y].every(function(col){ return col != MAPSYM_HOLE && col != MAPSYM_BRIDGE;});
                 const over_is_empty = map_over[y].every(function(col){ return col == MAPSYM_EMPTY; });
-                if(put_treasure && under_is_flat && over_is_empty){
+                if(under_is_flat && over_is_empty){
                     candi_lines.push ({ y: y + 0.5, center: Math.abs((stage_length/2) - y) });
                 }
             }
@@ -127,11 +165,8 @@
                 const treasure = EventTreasure();
                 treasure.autostyle(level);
                 this.set_position_from_map_point(treasure, map_data, x, y);
-                chars.events.push(treasure);
+                return treasure;
             }
-
-            // this.debug_enemies(map_data, chars);
-            return map_data.tiles;
         },
 
         debug_enemies: function(map_data, chars){
@@ -213,8 +248,7 @@
                 fill: MAPSYM_FLOOR1, lay: null, exclude: MAPSYM_HOLE,
             });
             //hole
-            const maxarea = 20 + (Math.log10(level || 1) * 8);//40?
-            console.log(`maxarea to hole: ${maxarea}`);
+            const maxarea = 20 + (Math.log10(level || 1) * 8);
             const hole_times = Math.floor(8/15) * level + 8;
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
@@ -387,7 +421,7 @@
             const field_height = 6;
             const field_tiles = this.get_maplines(field_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
-            //rough
+            //hole
             field_tiles.under = this.spread_rects({
                 layer: field_tiles.under,
                 times: rnd.randint(5, 10),
@@ -544,6 +578,7 @@
             }
             return layer;
         },
+        //すべてが指定したシンボルかどうか
         is_all: function(layer, p1, p2, symbol){
             for(let y=p1.y; y<=p2.y; y++){
                 for(let x=p1.x; x<=p2.x; x++){
@@ -554,7 +589,8 @@
             }
             return true;
         },
-        is_in: function(layer, p1, p2, symbol){
+        //指定したシンボルが1つでも含まれているか
+        is_in: function(layer, p1, p2, symbol){//戻り値逆じゃないのか？
             for(let y=p1.y; y<p2.y; y++){
                 for(let x=p1.x; x<p2.x; x++){
                     if(layer[y] && layer[y][x]){
@@ -650,29 +686,75 @@
 
         set_enemy: function(map_data, chars, scene, lap, stage, top_y, bottom_y){
             const rnd = this.random;
-            const num = Math.floor(Math.log10(lap || 1) * 4 + scene / 1.5) + 1;
+            const num = Math.floor(Math.log10((lap || 1) / 3) + scene) + 2;
             let counter = 0;
             for(let i=0; i<num; i++){
-                while(true){
-                    const x = rnd.randint(0, this.map_width - 1 - 1);
-                    const y = rnd.randint(top_y, bottom_y - 1);
-                    const p1 = {x: x, y: y};
-                    const p2 = {x: x + 1, y: y + 1};
-                    const is_in = this.is_in(map_data.tiles.under, p1, p2, MAPSYM_HOLE);
-                    const is_all = is_in && this.is_all(map_data.tiles.over, p1, p2, MAPSYM_EMPTY);
-                    if(!is_all){
-                        if(counter++ > 99){ break; }//無限ループ防止
-                        else{ continue; }
+                const enemies = this.get_enemies_in_scene(lap, scene, stage);
+                const max_index = Math.min(lap, enemies.length-1) + 1;
+                const _index = rnd.randint(1, 65536);
+                const type = enemies[_index % max_index];
+                const mure = this.get_enemy_mure(type);
+                let bx = null, by = null;
+                for(let j=0; j<mure; j++){
+                    const char = type();
+                    while(true){
+                        const x = (bx === null) ? rnd.randint(2, this.map_width - 1 - 2) : bx + rnd.randint(-2, 2);
+                        const y = (by === null) ? rnd.randint(top_y + 2, bottom_y - 2) : by + rnd.randint(-2, 2);
+                        if(bx === null || by === null){
+                            bx = x;
+                            by = y;
+                        }
+                        const p1 = {x: x, y: y};
+                        const p2 = {x: x + 1, y: y + 1};
+                        const is_in = this.is_in(map_data.tiles.under, p1, p2, MAPSYM_HOLE);//あったらfalse
+                        const is_all = !is_in && this.is_all(map_data.tiles.over, p1, p2, MAPSYM_EMPTY);
+                        if(is_all){
+                            if(counter++ > 99){ break; }//無限ループ防止
+                            else{ continue; }
+                        }
+                        this.set_position_from_map_point(char, map_data, x + 0.5, y + 1);
+                        chars.enemies.push(char);
+                        break;
                     }
-                    const enemies = this.get_enemies_in_scene(lap, scene, stage);
-                    const max_index = Math.min(lap, enemies.length-1) + 1;
-                    const _index = rnd.randint(1, 65536);
-                    const char = enemies[_index % max_index]();
-                    this.set_position_from_map_point(char, map_data, x + 0.5, y + 1);
-                    chars.enemies.push(char);
-                    break;
                 }
             }
+        },
+        get_enemy_mure: function(enemy_type){
+            //aveを頂点にmin-max少なくとも1の山を作って確率テーブルにする（わかる？
+            const conf = [
+                { type: CharButterfly, min: 2, max: 5, ave: 3 },
+                { type: CharBee, min: 1, max: 4, ave: 2 },
+                { type: CharRooster, min: 1, max: 4, ave: 2 },
+                { type: CharSnake, min: 1, max: 3, ave: 1 },
+                { type: CharSlime, min: 1, max: 3, ave: 2 },
+                { type: CharBat, min: 1, max: 3, ave: 2 },
+                { type: CharWolf, min: 1, max: 3, ave: 1 },
+            ].find(function(m){ return m.type == enemy_type })
+            || { type: enemy_type, min: 1, max: 1, ave: 1};
+            const diff_min = conf.ave - conf.min;
+            const diff_max = conf.max - conf.ave;
+            const top = Math.max(diff_max, diff_min) + 1;//頂点
+            //美しくないけど。。
+            const table = [];
+            let x = conf.min;
+            let y = top - diff_min;
+            let gx = conf.ave;
+            let d = 1;
+            while(true){
+                table.push(...new Array(y).fill(x));
+                x += 1; y += d;
+                if(x >= gx){ break; }
+            }
+            gx = conf.max;
+            d = -1;
+            while(true){
+                table.push(...new Array(y).fill(x));
+                x += 1; y += d;
+                if(x > gx){ break; }
+            }
+
+            const rnd = this.random;
+            return table[rnd.randint(0, 9999) % table.length];
         },
 
     });
