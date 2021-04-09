@@ -225,7 +225,7 @@
 			};
 
 			const hero = ctrl.sprite;
-			const hero_damage_count = 10;
+			const hero_damage_count = 8;
 			const items = Items(options.items, options.width, options.height).addChildTo(scene);
 			const item_shoe = function(){ return items.get_item_state("shoe")};
 			const item_sword = function(){ return items.get_item_state("sword")};

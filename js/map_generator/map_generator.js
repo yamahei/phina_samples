@@ -127,7 +127,7 @@
             while(candi_points.length < 12){
                 const x = rnd.randint(2, map_data.map_width - 1 - 2);
                 const y = rnd.randint(12, stage_length - 1 - 12);
-                const under_is_flat = this.is_in(map_under, {x: x-1, y: y-1}, {x: x+1, y: y+1}, MAPSYM_HOLE);
+                const under_is_flat = !this.is_in(map_under, {x: x-1, y: y-1}, {x: x+1, y: y+1}, MAPSYM_HOLE);
                 const over_is_empty = this.is_all(map_over, {x: x-1, y: y-1}, {x: x+1, y: y+1}, MAPSYM_EMPTY);
                 if(under_is_flat && over_is_empty){
                     candi_points.push({x: x, y: y, canter: Math.abs((stage_length/2) - y)});
@@ -248,13 +248,13 @@
                 fill: MAPSYM_FLOOR1, lay: null, exclude: MAPSYM_HOLE,
             });
             //hole
-            const maxarea = 20 + (Math.log10(level || 1) * 8);
-            const hole_times = Math.floor(8/15) * level + 8;
+            const maxarea = 16;// + (Math.log10(level || 1) * 8);
+            const hole_times = (4 - scene) * 2 + 1;
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
-                times: (hole_times < 1) ? 1 : hole_times,
-                minarea: 6, maxarea: maxarea, minsize: 4, offset: 1,
-                fill: MAPSYM_HOLE, lay: null, exclude: MAPSYM_HOLE,
+                times: hole_times,
+                minarea: 4, maxarea: maxarea, minsize: 4, offset: 1,
+                fill: MAPSYM_HOLE, lay: null, //exclude: MAPSYM_HOLE,
             });
             //block
             this.put_blocks({
@@ -520,8 +520,9 @@
                     const p2 = {x: x2, y: y2};
                     const o1 = {x: x1 + conf.offset, y: y1 + conf.offset};
                     const o2 = {x: x2 - conf.offset, y: y2 - conf.offset};
-                    const lay_ok = conf.lay ? self.is_all(layer, p1, p2, conf.lay) : true;
-                    const exclude_ok = conf.exclude ? self.is_in(layer, p1, p2, conf.exclude) : true;
+                    if(o1.x >= o2.x || o1.y >= o2.y){ continue; }
+                    const lay_ok = conf.lay ? self.is_all(layer, p1, p2, conf.lay) : true;//未設定なら無条件にOK
+                    const exclude_ok = conf.exclude ? !self.is_in(layer, p1, p2, conf.exclude) : true;//同上
                     if(!lay_ok || !exclude_ok){ continue; }
                     layer = self.fill_rect(layer, o1, o2, conf.fill);
                     break;
@@ -590,15 +591,15 @@
             return true;
         },
         //指定したシンボルが1つでも含まれているか
-        is_in: function(layer, p1, p2, symbol){//戻り値逆じゃないのか？
-            for(let y=p1.y; y<p2.y; y++){
-                for(let x=p1.x; x<p2.x; x++){
+        is_in: function(layer, p1, p2, symbol){
+            for(let y=p1.y; y<=p2.y; y++){
+                for(let x=p1.x; x<=p2.x; x++){
                     if(layer[y] && layer[y][x]){
-                        if(layer[y][x] == symbol){ return false; }
+                        if(layer[y][x] == symbol){ return true; }
                     }
                 }
             }
-            return true;
+            return false;
         },
 
         draw_border: function(_layer, _symbols){
@@ -686,7 +687,7 @@
 
         set_enemy: function(map_data, chars, scene, lap, stage, top_y, bottom_y){
             const rnd = this.random;
-            const num = Math.floor(Math.log10((lap || 1) / 3) + scene) + 2;
+            const num = lap + Math.round(Math.log10(lap || 1) * (4 - scene) * 1.412) + 1;
             let counter = 0;
             for(let i=0; i<num; i++){
                 const enemies = this.get_enemies_in_scene(lap, scene, stage);
@@ -706,13 +707,13 @@
                         }
                         const p1 = {x: x, y: y};
                         const p2 = {x: x + 1, y: y + 1};
-                        const is_in = this.is_in(map_data.tiles.under, p1, p2, MAPSYM_HOLE);//あったらfalse
-                        const is_all = !is_in && this.is_all(map_data.tiles.over, p1, p2, MAPSYM_EMPTY);
-                        if(is_all){
+                        const is_flat = !this.is_in(map_data.tiles.under, p1, p2, MAPSYM_HOLE);
+                        const is_all = is_flat && this.is_all(map_data.tiles.over, p1, p2, MAPSYM_EMPTY);
+                        if(!is_all){
                             if(counter++ > 99){ break; }//無限ループ防止
                             else{ continue; }
                         }
-                        this.set_position_from_map_point(char, map_data, x + 0.5, y + 1);
+                        this.set_position_from_map_point(char, map_data, x + 1, y + 1);
                         chars.enemies.push(char);
                         break;
                     }
