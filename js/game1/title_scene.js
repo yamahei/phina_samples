@@ -8,6 +8,9 @@
 			this.backgroundColor = '#212';
 			this.canvas.imageSmoothingEnabled = false;
 
+			//音を鳴らす準備
+			g.Sounds.firstSoundForMobile(this.canvas);
+
 			const self = this;
             const selections = [
                 {label: "Game start", event: "game"},

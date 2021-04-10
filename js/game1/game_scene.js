@@ -323,14 +323,16 @@
 			};
 			const game_over = function(){
 				ctrl.speed = 0;
-				const score_text = (options.score).toString();
-				let level_text = (options.level+1).toString();
-				level_text = (" ").repeat(score_text.length) + level_text;
-				level_text = level_text.slice(-score_text.length);
+				let _score_text = (options.score).toString();
+				let _level_text = (options.level+1).toString();
+				let _retry_text = (options.retry).toString();
+				const text_width = Math.max(...[_score_text, _level_text, _retry_text].map(function(t){ return t.length; }));
+				const set_width = function(text, width){ return ((" ").repeat(width) + text).slice(-width); };
 				const fall_texts = [
 					`GAME OVER`, "",
-					`Level  ${level_text}`,
-					`Score  ${score_text}`,
+					`Score  ${set_width(_score_text, text_width)}`,
+					`Level  ${set_width(_level_text, text_width)}`,
+					`Retry  ${set_width(_retry_text, text_width)}`,
 				];
 				const fall_label = TextBox(fall_texts).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
 				const selections = [
@@ -344,6 +346,7 @@
 					switch(e.event){
 						case "continue":
 							options.score = 0;
+							options.retry += 1;
 							//アイテムクリアしない⇒開始時点のアイテム
 							scene.exit("game", options);
 							break;
@@ -356,6 +359,7 @@
 							break;
 						case "exit":
 							options.level = 0;
+							options.retry = 0;
 							options.items = {};
 							scene.exit("title", options);
 							break;

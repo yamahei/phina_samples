@@ -21,7 +21,7 @@
                 baseline: _label_options.baseline,
                 lineHeight: _label_options.lineHeight,
                 backgroundColor: "black",
-            }
+            };
             const objects = _selections.map(function(select){
                 // const label = (select.label + space).slice(0, max_length);
                 const options = Object.assign({text: select.label}, label_options);
@@ -57,7 +57,7 @@
                 event: target.event,
                 object: target.obj,
             });
-        }
+        },
     });
 
 

@@ -48,7 +48,7 @@
             map_data.tiles.under = this.draw_border(map_data.tiles.under, [MAPSYM_FLOOR1, MAPSYM_FLOOR2, MAPSYM_HOLE]);
             //生成
             const map_image = map_data.images[stage_scene];
-            const sprite_sheet = map_image.sheets[rand.randint(0, map_image.sheets.length-1)];
+            const sprite_sheet = map_image.sheets[rand.randint(0, map_image.sheets.length - 1)];
             const map = this.map.create(sprite_sheet, map_data);
             let _seed = level;
             if(chars.hero){ map.addChar(chars.hero); }
@@ -61,8 +61,6 @@
         },
 
         draw_map: function(level, scene, lap, flag, map_data, chars){
-
-
             const rand = this.random
             const stage_AorB = function(stageA, stageB, switchLevel, currentLevel){
                 const per = (currentLevel / switchLevel) * 100;
@@ -94,7 +92,7 @@
             while(map_stages.length){
                 const stage = map_stages.shift();
                 const _enemy = map_enemies.shift();
-                const enemy = !!_enemy && (lap >= _enemy-1);
+                const enemy = !!_enemy && (lap >= _enemy - 1);
                 switch(stage){
                     case "wall":  this.draw_map__wall(map_data, level, scene, lap, flag, stage, chars, enemy);  break;
                     case "rough": this.draw_map__rough(map_data, level, scene, lap, flag, stage, chars, enemy); break;
@@ -253,7 +251,7 @@
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
                 times: hole_times,
-                minarea: 4, maxarea: maxarea, minsize: 4, offset: 1,
+                minarea: 4, maxarea: maxarea, minsize: 4, offset: 1, marginx: 3,
                 fill: MAPSYM_HOLE, lay: null, //exclude: MAPSYM_HOLE,
             });
             //block
@@ -425,7 +423,7 @@
             field_tiles.under = this.spread_rects({
                 layer: field_tiles.under,
                 times: rnd.randint(5, 10),
-                minarea: 4, maxarea: 20, minsize: 2,
+                minarea: 4, maxarea: 20, minsize: 2, marginx: 3,
                 fill: MAPSYM_FLOOR1, lay: null, exclude: MAPSYM_HOLE,
             });
             //block
@@ -501,6 +499,7 @@
                 maxsize: param.maxsize || null,//矩形の最大幅・高さ
                 minsize: param.minsize || null,//矩形の最小幅・高さ
                 offset: param.offset || 0,//描画矩形の縮小幅（説明難しい
+                marginx: param.marginx || 0,//左右に余白
             };
             const self = this;
             const rnd = this.random;
@@ -512,7 +511,7 @@
                     const rect_height = rnd.randint(conf.minsize || 0, conf.maxsize || layer.length);
                     if(conf.maxarea !== null && (rect_width * rect_height > conf.maxarea)){ continue; }
                     if(conf.minarea !== null && (rect_width * rect_height < conf.minarea)){ continue; }
-                    const x1 = rnd.randint(0, self.map_width - rect_width - 1);
+                    const x1 = rnd.randint(conf.marginx, self.map_width - conf.marginx - rect_width - 1);
                     const x2 = x1 + rect_width;
                     const y1 = rnd.randint(0, layer.length - rect_height - 1);
                     const y2 = y1 + rect_height;

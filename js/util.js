@@ -33,5 +33,32 @@
         },
     };
 
+    const Sounds = g.Sounds = {
+        /**
+         * phina.jsで音ゲーを作ってみる【前編】
+         * https://qiita.com/pentamania/items/399d133e5440c9424bde
+         * > モバイル端末では最初のオーディオ再生はユーザーイベントによって行わないといけないという制約があるため、
+         * > タイトル画面（厳密に言うとアプリ本体のCanvas要素）タップ時に各音源毎に無音再生を行うよう仕込んでいます。
+         * > 以後は、こちらの好きなタイミングで音を鳴らせるようになります。
+         * @param {*} dom
+         * @param {*} event
+         */
+        firstSoundForMobile: function(app){
+            const event = "touchstart";
+            const dom = app.domElement;
+            dom.addEventListener(event, (function() {
+              return function f() {
+                const context = phina.asset.Sound.getAudioContext();
+                const buf = context.createBuffer(1, 1, 22050);
+                const src = context.createBufferSource();
+                src.buffer = buf;
+                src.connect(context.destination);
+                src.start(0);
+                dom.removeEventListener(event, f, false)
+              }
+            }()), false);
+        },
+    };
+
 
 })(this);

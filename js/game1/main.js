@@ -80,11 +80,11 @@
             assets: ASSETS,
             ...size,
             //
+            usegl: USE_WebGL,
             level: GAME_LEVEL,
             items: {},
-            // items: [],
-            usegl: USE_WebGL,
             score: 0,
+            retry: 0,
             timeout: 60,//sec
         });
         // アプリケーション実行
