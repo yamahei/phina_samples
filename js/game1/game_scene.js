@@ -1,6 +1,6 @@
 (function(g){
 
-	const GEMA_DEBUG = true;
+	const GEMA_DEBUG = false;
 	const CTRL_DEFAULT_SPEED = 2;
 	const CTRL_DEFAULT_SWORDS = 0;
 	const DEFAULT_TIMER = 30;//sec
