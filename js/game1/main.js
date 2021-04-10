@@ -57,6 +57,38 @@
             door: "ASSETS/tmss/door.tmss",
             treasure: "ASSETS/tmss/treasure.tmss",
         },
+        sound: {
+            //maoh damashi
+            turn: "ASSETS/sound_md/md_se_sys22.mp3",
+            damage: "ASSETS/sound_md/md_battle14.mp3",
+            attack: "ASSETS/sound_md/md_battle17.mp3",
+            treasure: "ASSETS/sound_md/md_se_door03.mp3",
+            open: "ASSETS/sound_md/md_se_door06.mp3",
+            close: "ASSETS/sound_md/md_se_door02.mp3",
+            wing: "ASSETS/sound_md/md_bird04.mp3",
+            fall: "ASSETS/sound_md/md_magical04.mp3",
+            timeup: "ASSETS/sound_md/md_se_onepoint06.mp3",
+            // //https://taira-komori.jpn.org/index.html
+            // turn: "ASSETS/sound_tk/defense1.mp3",
+            // damage: "ASSETS/sound_tk/powerdown07.mp3",
+            // attack: "ASSETS/sound_tk/damage7.mp3",
+            // treasure: "ASSETS/sound_tk/jump13.mp3",
+            // open: "ASSETS/sound_tk/locker_O.mp3",
+            // close: "ASSETS/sound_tk/locker_C.mp3",
+            // wing: "ASSETS/sound_tk/strange_wave.mp3",
+            // fall: "ASSETS/sound_tk/falling2.mp3",
+            // timeup: "ASSETS/sound_tk/powerdown01.mp3",
+            // //the match makers
+            // turn: "ASSETS/sound_mm/step10_a.wav", //cursor16.wav", //bosu39.wav",
+            // damage: "ASSETS/sound_mm/puu77_b.wav", //voice009.wav",
+            // attack: "ASSETS/sound_mm/hit48.wav",
+            // treasure: "ASSETS/sound_mm/voice023_a.wav",//bell00.wav", //voice026.wav",
+            // open: "ASSETS/sound_mm/door03.wav",
+            // close: "ASSETS/sound_mm/close12_r.wav",
+            // wing: "ASSETS/sound_mm/voice023_b.wav/",//animal00.wav",
+            // fall: "ASSETS/sound_mm/voice006.wav",
+            // timeup: "ASSETS/sound_mm/whistle02.wav",
+        },
     };
 
     const USE_WebGL = false;//WebGLだと当たり判定枠が表示できない

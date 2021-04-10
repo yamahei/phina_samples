@@ -179,6 +179,7 @@
 				ctrl.is_flyng = true;
 				ctrl.speed = 0;
 				all_enemy_off();
+				SoundManager.play('wing');
 				gull.tweener
 				.call(function(){
 					gull.setPosition(hero.x, hero.y + (16*8));
@@ -244,6 +245,7 @@
 			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items.top - timer.bottom);
 			tappable.onpointstart = function(e){
 				ctrl.switch_direction();
+				SoundManager.play('turn');
 			};
 
 			world.update = function(e){
@@ -262,10 +264,12 @@
 						const fps_of_6 = options.fps / 6;
 						const damage = (2 + sword) * fps_of_6;
 						hit_enemy.damageOn(damage);
+						SoundManager.play('attack');
 					}
 					else{
 						//TODO: shield?
 						ctrl.damage = hero_damage_count;
+						SoundManager.play('damage');
 					}
 				}
 				if(ctrl.damage > 0){ timer.minus(); }
@@ -274,6 +278,7 @@
 					treasure.do_open();
 					const type = items.get_item(treasure.type);
 					item_setter[type] && item_setter[type]();//セットする
+					SoundManager.play('treasure');
 				}
 			};
 			if(GEMA_DEBUG){
@@ -372,6 +377,7 @@
 				action_stop(null);
 				ctrl.timeup = true;
 				ctrl.speed = 0;
+				SoundManager.play('timeup');
 				game_over();
 			});
 			//fall action
@@ -394,6 +400,7 @@
 					}, 800);
 				}
 				ctrl.set_fall();
+				SoundManager.play('fall');
 				hero.on("falled", function(_){
 					action_stop("falled");
 					game_over();
@@ -411,7 +418,10 @@
 				ctrl.set_goal();
 				ctrl.speed = 0;
 				hero.tweener
-				.call(function(){ goal.do_open(); }).wait(500)
+				.call(function(){
+					goal.do_open();
+					SoundManager.play('open');
+				}).wait(500)
 				.call(function(){
 					if(hero.x < goal.x){ ctrl.direction = "right"; }
 					if(hero.x > goal.x){ ctrl.direction = "left"; }
@@ -421,6 +431,7 @@
 				.call(function(){ ctrl._visible = false; }).wait(100)
 				.call(function(){ goal.do_close(); }).wait(500)
 				.call(function(){
+					SoundManager.play('close');
 					const goal_texts = [
 						"Clear", "",
 						(score > 0) ? `Score +${score.toString()}` : "No score"
