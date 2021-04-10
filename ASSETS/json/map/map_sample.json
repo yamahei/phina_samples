@@ -6,9 +6,9 @@
     "chips": [
 
         { "name": "//標準の障害物(*)",
-          "index": 0, "symbol": "*0", "layer": "over", "collision": 1, "event": "wall"},
-        { "index": 1, "symbol": "*1", "layer": "over", "collision": 1, "event": "wall"},
-        { "index": 2, "symbol": "*2", "layer": "over", "collision": 1, "event": "wall"},
+          "index": 0, "symbol": "*0", "layer": "over", "collision": 1, "event": "wall" },
+        { "index": 1, "symbol": "*1", "layer": "over", "collision": 1, "event": "wall" },
+        { "index": 2, "symbol": "*2", "layer": "over", "collision": 1, "event": "wall" },
 
         { "name": "//橋(#)",
           "index":  3, "symbol": "#7", "layer": "over", "collision": 1, "proportion": -0.75, "offset_x": -6, "event": "wall" },

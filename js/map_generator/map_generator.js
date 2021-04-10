@@ -82,7 +82,7 @@
             const scene_cave = 2;
             const scene_castle = 3;
             const map_stage_list = [
-                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", ForC(lv), "wall"], enemies: [0, 3, 1, 1, 2] },
+                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", ForC(lv), "wall"], enemies: [0, 3, 1, 2, 2] },
                 { scene: scene_rock, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 1, 3, 1] },
                 { scene: scene_cave, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 1, 2, 1, 3] },
                 { scene: scene_castle, name: "城",   stages: ["start", "criff", ForR(lv), "criff", "wall"], enemies: [0, 3, 1, 2, 1] },
@@ -542,7 +542,7 @@
             (new Array(conf.times)).fill(null).map(function(_){
                 let counter = 0;
                 while(true){
-                    if(counter++ > 9){ break; }//無限ループ防止
+                    if(counter++ > 6){ break; }//無限ループ防止
                     const x = rnd.randint(1, self.map_width - 1) - 1;
                     const y = rnd.randint(1, conf.under.length - 1) - 1;
 
@@ -687,7 +687,12 @@
 
         set_enemy: function(map_data, chars, scene, lap, stage, top_y, bottom_y){
             const rnd = this.random;
-            const num = lap + Math.round(Math.log10(lap || 1) * (4 - scene) * 1.412) + 1;
+            // const num = lap + Math.round(Math.log10(lap || 1) * (4 - scene) * 1.412) + 1;
+            const num1 = Math.abs(scene - 1) + 1;
+            const num2 = Math.log10(lap || 1) * 1.414;
+            const num3 = (10 + lap) / 3.14;
+            const num = Math.round((num1 + num2 + num3) / 2);
+            const max_counter = 99;
             let counter = 0;
             for(let i=0; i<num; i++){
                 const enemies = this.get_enemies_in_scene(lap, scene, stage);
@@ -710,7 +715,7 @@
                         const is_flat = !this.is_in(map_data.tiles.under, p1, p2, MAPSYM_HOLE);
                         const is_all = is_flat && this.is_all(map_data.tiles.over, p1, p2, MAPSYM_EMPTY);
                         if(!is_all){
-                            if(counter++ > 99){ break; }//無限ループ防止
+                            if(counter++ > max_counter){ break; }//無限ループ防止
                             else{ continue; }
                         }
                         this.set_position_from_map_point(char, map_data, x + 1, y + 1);
