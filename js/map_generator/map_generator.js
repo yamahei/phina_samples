@@ -80,10 +80,10 @@
             const scene_cave = 2;
             const scene_castle = 3;
             const map_stage_list = [
-                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", ForC(lv), "wall"], enemies: [0, 3, 1, 2, 2] },
-                { scene: scene_rock, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [0, 2, 1, 3, 1] },
-                { scene: scene_cave, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [0, 1, 2, 1, 3] },
-                { scene: scene_castle, name: "城",   stages: ["start", "criff", ForR(lv), "criff", "wall"], enemies: [0, 3, 1, 2, 1] },
+                { scene: scene_field, name: "平原", stages: ["start", "field", "rough", ForC(lv), "wall"], enemies: [16, 3, 1, 2, 2] },
+                { scene: scene_rock, name: "岩場", stages: ["start", "rough", "crack", "rough", "wall"], enemies: [12, 2, 1, 3, 1] },
+                { scene: scene_cave, name: "洞窟", stages: ["start", "crack", "rough", "crack", "wall"], enemies: [8, 1, 2, 1, 3] },
+                { scene: scene_castle, name: "城",   stages: ["start", "criff", ForR(lv), "criff", "wall"], enemies: [4, 3, 1, 2, 1] },
             ];
             const map_stages = map_stage_list[scene].stages.reverse();
             const map_enemies = map_stage_list[scene].enemies.reverse();
@@ -225,7 +225,7 @@
             const rough_tiles = this.get_maplines(rough_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
             //side blank
-            const times = Math.min(Math.floor(level / 8) * rnd.randint(0, level), 20);
+            const times = Math.min(Math.floor(level / 3) * rnd.randint(1, level), 20);
             const under = rough_tiles.under;
             for(let i=0; i<times; i++){
                 const y = rnd.randint(1, under.length - 1);
@@ -247,12 +247,12 @@
             });
             //hole
             const maxarea = 16;// + (Math.log10(level || 1) * 8);
-            const hole_times = (4 - scene) * 2 + 1;
-            const marginx = Math.max(3 - Math.floor(lap / 20), 0);
+            const hole_times = (4 - scene) * 3 + 1;
+            const marginx = 0;//Math.max(3 - Math.floor(lap / 20), 0);
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
                 times: hole_times,
-                minarea: 4, maxarea: maxarea, minsize: 4, offset: 1, marginx: marginx,
+                minarea: 4, maxarea: maxarea, minsize: 3, offset: 1, marginx: marginx,
                 fill: MAPSYM_HOLE, lay: null, //exclude: MAPSYM_HOLE,
             });
             //block
@@ -421,11 +421,11 @@
             const field_tiles = this.get_maplines(field_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
             //hole
-            const marginx = Math.max(3 - Math.floor(lap / 20), 0);
+            const marginx = 0;//Math.max(3 - Math.floor(lap / 20), 0);
             field_tiles.under = this.spread_rects({
                 layer: field_tiles.under,
-                times: rnd.randint(5, 10),
-                minarea: 4, maxarea: 20, minsize: 2, marginx: marginx,
+                times: rnd.randint(5, 12),
+                minarea: 4, maxarea: 16, minsize: 2, marginx: marginx,
                 fill: MAPSYM_FLOOR1, lay: null, exclude: MAPSYM_HOLE,
             });
             //block
@@ -691,8 +691,8 @@
             // const num = lap + Math.round(Math.log10(lap || 1) * (4 - scene) * 1.412) + 1;
             const num1 = Math.abs(scene - 1) + 1;
             const num2 = Math.log10(lap || 1) * 1.732;
-            const num3 = (10 + lap) / 3.14;
-            const num4 = Math.floor(lap / 10);
+            const num3 = (10 + lap) / 2.56;
+            const num4 = Math.floor(lap / 6.45);
             const num = Math.round((num1 + num2 + num3) / 2) + num4;
             const max_counter = 99;
             let counter = 0;
@@ -730,7 +730,7 @@
         get_enemy_mure: function(enemy_type){
             //aveを頂点にmin-max少なくとも1の山を作って確率テーブルにする（わかる？
             const conf = [
-                { type: CharButterfly, min: 2, max: 5, ave: 3 },
+                { type: CharButterfly, min: 1, max: 5, ave: 2 },
                 { type: CharBee, min: 1, max: 4, ave: 2 },
                 { type: CharRooster, min: 1, max: 4, ave: 2 },
                 { type: CharSnake, min: 1, max: 3, ave: 1 },
