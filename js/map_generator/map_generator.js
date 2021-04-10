@@ -248,10 +248,11 @@
             //hole
             const maxarea = 16;// + (Math.log10(level || 1) * 8);
             const hole_times = (4 - scene) * 2 + 1;
+            const marginx = Math.max(3 - Math.floor(lap / 20), 0);
             rough_tiles.under = this.spread_rects({
                 layer: rough_tiles.under,
                 times: hole_times,
-                minarea: 4, maxarea: maxarea, minsize: 4, offset: 1, marginx: 3,
+                minarea: 4, maxarea: maxarea, minsize: 4, offset: 1, marginx: marginx,
                 fill: MAPSYM_HOLE, lay: null, //exclude: MAPSYM_HOLE,
             });
             //block
@@ -420,10 +421,11 @@
             const field_tiles = this.get_maplines(field_height, MAPSYM_BASE, MAPSYM_EMPTY);
             const rnd = this.random;
             //hole
+            const marginx = Math.max(3 - Math.floor(lap / 20), 0);
             field_tiles.under = this.spread_rects({
                 layer: field_tiles.under,
                 times: rnd.randint(5, 10),
-                minarea: 4, maxarea: 20, minsize: 2, marginx: 3,
+                minarea: 4, maxarea: 20, minsize: 2, marginx: marginx,
                 fill: MAPSYM_FLOOR1, lay: null, exclude: MAPSYM_HOLE,
             });
             //block
@@ -690,7 +692,8 @@
             const num1 = Math.abs(scene - 1) + 1;
             const num2 = Math.log10(lap || 1) * 1.414;
             const num3 = (10 + lap) / 3.14;
-            const num = Math.round((num1 + num2 + num3) / 2);
+            const num4 = Math.floor(lap / 20);
+            const num = Math.round((num1 + num2 + num3) / 2) + num4;
             const max_counter = 99;
             let counter = 0;
             for(let i=0; i<num; i++){
