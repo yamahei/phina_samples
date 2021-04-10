@@ -690,9 +690,9 @@
             const rnd = this.random;
             // const num = lap + Math.round(Math.log10(lap || 1) * (4 - scene) * 1.412) + 1;
             const num1 = Math.abs(scene - 1) + 1;
-            const num2 = Math.log10(lap || 1) * 1.414;
+            const num2 = Math.log10(lap || 1) * 1.732;
             const num3 = (10 + lap) / 3.14;
-            const num4 = Math.floor(lap / 20);
+            const num4 = Math.floor(lap / 10);
             const num = Math.round((num1 + num2 + num3) / 2) + num4;
             const max_counter = 99;
             let counter = 0;

@@ -60,13 +60,13 @@
         sound: {
             //maoh damashi
             turn: "ASSETS/sound/md_se_sys22.mp3",
-            damage: "ASSETS/sound/md_battle14.mp3",
-            attack: "ASSETS/sound/md_battle17.mp3",
-            treasure: "ASSETS/sound/md_se_door03.mp3",
-            open: "ASSETS/sound/md_se_door06.mp3",
-            close: "ASSETS/sound/md_se_door02.mp3",
+            damage: "ASSETS/sound/voice009.mp3",//md_battle14.mp3",
+            attack: "ASSETS/sound/hit48.mp3",//md_battle17.mp3",
+            treasure: "ASSETS/sound/voice023_a.mp3",//md_se_door03.mp3",
+            open: "ASSETS/sound/door03.mp3",//md_se_door06.mp3",
+            close: "ASSETS/sound/close12_r.mp3",//md_se_door02.mp3",
             wing: "ASSETS/sound/md_bird04.mp3",
-            fall: "ASSETS/sound/md_magical04.mp3",
+            fall: "ASSETS/sound/voice006.mp3",//md_magical04.mp3",
             timeup: "ASSETS/sound/md_se_onepoint06.mp3",
             // //https://taira-komori.jpn.org/index.html
             // turn: "ASSETS/sound_tk/defense1.mp3",
