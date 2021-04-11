@@ -105,8 +105,8 @@
             }
             //treasure
             const put_treasure = true;//(scene != scene_field);
-            // const treasure = this.get_treasure_point1(level, map_data);
-            const treasure = this.get_treasure_point2(level, map_data);
+            const treasure = this.get_treasure_point1(level, map_data);
+            // const treasure = this.get_treasure_point2(level, map_data);
             if(put_treasure && treasure){
                 chars.events.push(treasure);
             }
