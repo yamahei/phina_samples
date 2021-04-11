@@ -355,12 +355,13 @@
 							//アイテムクリアしない⇒開始時点のアイテム
 							scene.exit("game", options);
 							break;
-						case "tweet": alert("not yet");
-							//twitterに画像付きで登校する
-							//$x("//canvas")[0].toDataURL("image/jpeg");
-							//Javascriptで画像付きツイートを行う
-							//https://qiita.com/miura/items/036ef6da8f93bb65caac
-							//https://github.com/oauth-io/oauth-js
+						case "tweet":
+							const url = [
+								"http://twitter.com/share",
+								"?url=", escape(document.location.href),
+								"&text=", `I got ${options.score} pts for "Tap Runner"`
+							].join("");
+							window.open(url, "_blank");
 							break;
 						case "exit":
 							options.level = 0;

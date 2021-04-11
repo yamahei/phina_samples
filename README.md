@@ -24,5 +24,5 @@ Credits(覚書)
 * Character & Map : First seed material
 * Logo : cool text
 * Engine : Phina.js
-* Sound : NOT YET
+* Sound : maoh-damashii, The match makers
 * Programming : yamahei
