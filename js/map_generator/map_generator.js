@@ -688,12 +688,13 @@
 
         set_enemy: function(map_data, chars, scene, lap, stage, top_y, bottom_y){
             const rnd = this.random;
+            const level = lap * 4 + scene;
             // const num = lap + Math.round(Math.log10(lap || 1) * (4 - scene) * 1.412) + 1;
-            const num1 = Math.abs(scene - 1) + 1;
-            const num2 = Math.log10(lap || 1) * 1.732;
-            const num3 = (10 + lap) / 2.56;
-            const num4 = Math.floor(lap / 6.45);
-            const num = Math.round((num1 + num2 + num3) / 2) + num4;
+            const num1 = [2,6,7,4][scene] / 2 ;//Math.abs(scene - 1) + 1;
+            const num2 = 1 + Math.log10(level || 1) * 1.414;
+            const num3 = (10 + lap) / 2;
+            const num4 = Math.floor(level / 1.732);
+            const num = Math.round(((num2 + num3) + (num1 * num4)) / 3.14);
             const max_counter = 99;
             let counter = 0;
             for(let i=0; i<num; i++){
