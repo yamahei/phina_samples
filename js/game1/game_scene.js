@@ -442,7 +442,7 @@
 						options.score += score;
 						options.items = items.get_item_properties();
 						const is_bonus = (options.level > 0) && (options.level % 4 == 0);
-						const next_scene = is_bonus ? "bonus" : "role";//"game";
+						const next_scene = is_bonus ? "bonus" : "game";
 						scene.exit(next_scene, options);
 					}, 1500);
 				})

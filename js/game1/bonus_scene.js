@@ -63,7 +63,7 @@
 			this.on("counted", function(e){
 				setTimeout(function(){
 					options.score += self.bonus;
-					self.exit("game", options);
+					self.exit("role", options);
 				}, 1000);
 			});
 
