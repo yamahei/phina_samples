@@ -98,6 +98,7 @@
         {label: "title", className: "TitleScene"},
         {label: "bonus", className: "BonusScene"},
         {label: "game", className: "GameScene"},
+        {label: "role", className: "RoleScene"},
     ];
 
 
@@ -107,6 +108,7 @@
         const app = GameApp({
             // startLabel: 'game',
             startLabel: 'title',
+            // startLabel: 'role',
             fps: 24,
             scenes: SCENES,
             assets: ASSETS,
