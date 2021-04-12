@@ -393,7 +393,7 @@
         },
         getDefaultAutoParam: function(){
             return {
-                speed: 2, counter: 24, _counter: this.random.randint(0, 24),
+                speed: 2, counter: 12, _counter: this.random.randint(0, 12),
                 waiting: true, direction: "down", action: "walk", distance: 12 * 16,
             };
         },
