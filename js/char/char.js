@@ -703,8 +703,6 @@
                     param.action = "stand";
                     param.speed = 0;
                 }
-                self.setAnimationDirection(param.direction);
-                self.setAnimationAction(param.action);
             };
             param._counter += 1;
             if(param.counter <= param._counter){ turn(); }
@@ -712,7 +710,9 @@
             const hit = this.moveBy(accel.v, accel.w);
             if(hit){ param._counter = param.counter; }
             if(this.outerLimit()){ turn(); }
-        },
+            self.setAnimationDirection(param.direction);
+            self.setAnimationAction(param.action);
+    },
     });
     phina.define('CharFire', {
         superClass: 'CharEnemyBase',
@@ -805,8 +805,6 @@
                         fire.autonomousOn();
                     }
                 }
-                self.setAnimationDirection(param.direction);
-                self.setAnimationAction(param.action);
             };
             const stop = function(){
                 param.waiting = false;
@@ -819,6 +817,8 @@
             const hit = this.moveBy(accel.v, accel.w);
             if(hit){ stop(); }
             if(this.outerLimit()){ stop(); }
+            self.setAnimationDirection(param.direction);
+            self.setAnimationAction(param.action);
         },
 
     });
