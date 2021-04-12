@@ -279,6 +279,9 @@
 					const type = items.get_item(treasure.type);
 					item_setter[type] && item_setter[type]();//セットする
 					SoundManager.play('treasure');
+					setTimeout(function(){
+						SoundManager.play('item');
+					}, 500);
 				}
 			};
 			if(GEMA_DEBUG){
@@ -299,21 +302,24 @@
 			const scroll_time = Math.abs(world.getBottomY()) * 5;
 			const bottom_y = world.getBottomY();
 			world.setPosition(0, bottom_y);
-			world.tweener
-			.wait(1000)
-			.to({x: 0, y: 0}, scroll_time, "linear")
-			.wait(800)
-			.to({x: 0, y: bottom_y}, scroll_time, "linear")
-			.call(function(){
-				//start action
+			const start_acion = function(){
 				level_label.remove();
 				world.setScrollTracker(hero, {x: 0, y: options.height / 4});
 				item_setter.shoe();//set speed
 				item_setter.sword();
 				all_enemy_on();
 				timer.count_start();
-				// items.usable = true;
-			});
+			};
+			setTimeout(function(){
+				world.tweener
+				.wait(1000)
+				.to({x: 0, y: 0}, scroll_time, "linear")
+				.wait(800)
+				.to({x: 0, y: bottom_y}, scroll_time, "linear")
+				.call(function(){
+					setTimeout(start_acion, 0);
+				});
+			}, 0);
 
 			const action_stop = function(stop_hero_event){
 				if(stop_hero_event){
@@ -352,7 +358,13 @@
 						case "continue":
 							options.score = 0;
 							options.retry += 1;
-							//アイテムクリアしない⇒開始時点のアイテム
+							//アイテムは開始時点＋取ったやつ（甘くした
+							const game_items = items.get_item_properties();
+							Object.keys(game_items).forEach(function(key){
+								if(options.items[key] || 0 < game_items[key] || 0){
+									options.items[key] = game_items[key] || 0;
+								}
+							});
 							scene.exit("game", options);
 							break;
 						case "tweet":
@@ -390,16 +402,7 @@
 				}
 				const hero = e.hero;
 				action_stop("fall");
-				const map_pos = world.translatePositionToMapXY(hero.x, hero.y);
-				const upper_chip1 = world.getHitMap(map_pos.mapX, map_pos.mapY - 1);
-				const upper_chip2 = world.getHitMap(map_pos.mapX, map_pos.mapY - 2);
-				if(upper_chip1.collision_rect && upper_chip2.collision_rect){//TODO: 地面にめり込むのが解消していない
-					world.switchCharLayer(hero, "field", "bottom");
-				}else{
-					setTimeout(function(){
-						world.switchCharLayer(hero, "field", "bottom");
-					}, 800);
-				}
+				world.switchCharLayer(hero, "field", "bottom");
 				ctrl.set_fall();
 				SoundManager.play('fall');
 				hero.on("falled", function(_){

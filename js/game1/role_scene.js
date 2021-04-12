@@ -26,7 +26,7 @@
             };
             const lap = options.level % 4;
             const cycle = options.level % 20;
-            const is_fin = !!(options.level >= 100);
+            const is_fin = !!(options.level >= 40);
             const texts = [
                 "Congrats!", "",
                 "You've finally run through",
