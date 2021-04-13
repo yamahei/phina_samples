@@ -347,7 +347,7 @@
 				];
 				const fall_label = TextBox(fall_texts).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(-1));
 				const selections = [
-					{label: "Continue", event: "continue"},
+					{label: "Retry", event: "continue"},
 					{label: "Tweet", event: "tweet"},
 					{},
 					{label: "Exit", event: "exit"},

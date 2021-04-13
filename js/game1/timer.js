@@ -13,6 +13,7 @@
                 margin: 0,
                 padding: 0,
                 height: METER_HEIGHT,
+                fill: "blue",
             });
             this.x = this.y = METER_MARGIN;
         },
@@ -64,14 +65,18 @@
         },
         set_width: function(_per){
             let per = _per;
+            let is_hurry = false;
             if(per < 0){ per = 0; }
             if(per > 1){ per = 1; }
             if(per > 0){
                 this.width = Math.ceil(this.full_width * per);
-                this.visible = (METER_MINPER > per) ? !this.visible : true;
+                is_hurry = (METER_MINPER > per);
+                this.visible = is_hurry ? !this.visible : true;
             }else{
                 this.visible = false;
             }
+            this.fill = is_hurry ? "red" : "blue";
+
             if(per <= 0 && !this.init && !this.timeup){
                 this.timeup = true;
                 this.fire({type: "timeup"});
