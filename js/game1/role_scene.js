@@ -47,7 +47,7 @@
                 options.score = 0;
                 options.retry = 0;
                 options.items = {};
-                self.exit("title", options);
+                self.exit("credit", options);
             }
             : function(){
                 self.exit("game", options);
@@ -61,7 +61,7 @@
             const set_label = function(){
                 const text = texts[index++];
                 if(text === undefined){
-                    setTimeout(next_scene, 2000);
+                    setTimeout(next_scene, 3000);
                 }else{
                     if(!text){
                     }else{
@@ -70,7 +70,7 @@
                         label.addChildTo(self);
                         label.setPosition(x, y);
                     }
-                    y += label_options.fontSize;
+                    y += label_options.fontSize * 1.5;
                     setTimeout(set_label, 1000);
                 }
             };

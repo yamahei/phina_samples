@@ -100,6 +100,7 @@
         {label: "bonus", className: "BonusScene"},
         {label: "game", className: "GameScene"},
         {label: "role", className: "RoleScene"},
+        {label: "credit", className: "CreditScene"},
     ];
 
 
@@ -110,6 +111,7 @@
             // startLabel: 'game',
             startLabel: 'title',
             // startLabel: 'role',
+            // startLabel: 'credit',
             fps: 24,
             scenes: SCENES,
             assets: ASSETS,

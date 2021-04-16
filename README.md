@@ -6,7 +6,7 @@ phina_samples
 GithubPages
 --------
 
-* [https://yamahei.github.io/phina_samples/](https://yamahei.github.io/phina_samples/)
+* [https://yamahei.github.io/phina_samples/samples.html](https://yamahei.github.io/phina_samples/samples.html)
 
 ローカルでの動かし方
 --------
@@ -18,11 +18,3 @@ gem install sinatra
 ruby -rsinatra -e 'set :bind, "0.0.0.0"; set :public_folder, "./", get("/"){"Hello world"}'
 ```
 
-Credits(覚書)
---------
-
-* Character & Map : First seed material
-* Logo : cool text
-* Engine : Phina.js
-* Sound : maoh-damashii, The match makers
-* Programming : yamahei

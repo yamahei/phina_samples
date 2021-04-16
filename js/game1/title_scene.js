@@ -14,8 +14,6 @@
 			const self = this;
             const selections = [
                 {label: "Game start", event: "game"},
-				{},
-                {label: "Credits", event: "credit"},
             ];
             const select = Selector(selections, {}).addChildTo(this).setPosition(this.gridX.center(), this.gridY.center(0.5));
 			select.visible = false;
@@ -26,7 +24,7 @@
 						//options.level = 0;
 						self.exit("game", options);
 						break;
-					case "credit": alert("not yet"); break;
+					// case "credit": alert("not yet"); break;
 				}
 			});
 

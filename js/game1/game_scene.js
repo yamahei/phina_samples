@@ -30,7 +30,7 @@
 					dv = (rand.randint(0, 99) % 2) * 2 - 1;
 					dw = (rand.randint(0, 99) % 2) * 2 - 1;
 				}
-				if(!ctrl.is_flyng){
+				if(!ctrl.timeup && !ctrl.is_flyng){
 					const accel = this.getAcceleration(ctrl.direction, ctrl.speed);
 					const hit = this.moveBy(accel.v + dv, accel.w + dw, {repell_events:{wall: true, fall: false}});
 					if(hit && hit.event_name == "fall"){
@@ -210,10 +210,12 @@
 						const end_by_wall = (hit && hit.event_name == "wall");
 						const now_not_fall = (!hit || hit.event_name != "fall");
 						if(end_by_wall || (--counter <= 0 && now_not_fall)){//終わる条件
-							all_enemy_on();///
-							item_setter.shoe();//set speed
-							ctrl.is_flyng = false;
-							gull_leave();
+							setTimeout(function(){
+								all_enemy_on();///
+								item_setter.shoe();//set speed
+								ctrl.is_flyng = false;
+								gull_leave();
+							}, 500);
 						}else{
 							gull.y -= 1;
 							hero.y = gull.y - 1;
@@ -242,7 +244,7 @@
 			};
 			const timer_sec = DEFAULT_TIMER + (options.items.time || 0) * 3;
 			const timer = Timer().addChildTo(this).initialize(this, timer_sec);
-			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(items.top - timer.bottom);
+			const tappable = DisplayElement().setInteractive(true).addChildTo(scene).setOrigin(0, 0).setPosition(0, timer.bottom).setWidth(scene.width).setHeight(scene.height - timer.bottom);
 			tappable.onpointstart = function(e){
 				ctrl.switch_direction();
 				SoundManager.play('turn');
@@ -362,7 +364,7 @@
 							const game_items = items.get_item_properties();
 							Object.keys(game_items).forEach(function(key){
 								if(options.items[key] || 0 < game_items[key] || 0){
-									options.items[key] = game_items[key] || 0;
+									options.items[key] = Math.max(options.items[key] || 0, game_items[key] || 0);
 								}
 							});
 							scene.exit("game", options);
