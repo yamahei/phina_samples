@@ -39,31 +39,41 @@
     <script src='js/game1/credit_scene.js'></script>
     <script src='js/game1/main.js'></script>
 
+    <!-- PWA -->
+    <!-- <script src='pwa/taprunner/sw.js'></script> -->
+    <script>
+      window.addEventListener('load', function() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register("/phina_samples/pwa/taprunner/sw.js")
+            .then(function(registration) {
+              console.log("serviceWorker registed.");
+            }).catch(function(error) {
+              console.warn("serviceWorker error.", error);
+            });
+        }
+      });
+    </script>
 
     <!--
       Meta Tags Generated via http://heymeta.com
     -->
     <!-- HTML Meta Tags -->
     <title>Tap Runner</title>
-    <meta name="description" content="8bit風ワンキーゲーム タップしてゴールを目指します
-    宝箱を開いてアイテムをゲット">
+    <meta name="description" content="8bit風ワンキーゲーム。タップしてゴールを目指します。宝箱を開いてアイテムをゲット">
     <!-- Google / Search Engine Tags -->
     <meta itemprop="name" content="Tap Runner">
-    <meta itemprop="description" content="8bit風ワンキーゲーム タップしてゴールを目指します
-    宝箱を開いてアイテムをゲット">
+    <meta itemprop="description" content="8bit風ワンキーゲーム。タップしてゴールを目指します。宝箱を開いてアイテムをゲット">
     <meta itemprop="image" content="/phina_samples/ASSETS/ogp/image.png">
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="/phina_samples/taprunner.pwa.html">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Tap Runner">
-    <meta property="og:description" content="8bit風ワンキーゲーム タップしてゴールを目指します
-    宝箱を開いてアイテムをゲット">
+    <meta property="og:description" content="8bit風ワンキーゲーム。タップしてゴールを目指します。宝箱を開いてアイテムをゲット">
     <meta property="og:image" content="/phina_samples/ASSETS/ogp/image.png">
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Tap Runner">
-    <meta name="twitter:description" content="8bit風ワンキーゲーム タップしてゴールを目指します
-    宝箱を開いてアイテムをゲット">
+    <meta name="twitter:description" content="8bit風ワンキーゲーム。タップしてゴールを目指します。宝箱を開いてアイテムをゲット">
     <meta name="twitter:image" content="/phina_samples/ASSETS/ogp/image.png">
 
 
