@@ -56,12 +56,12 @@
                 {sprite: CharDragon},
                 {text: "Special thanks"},
                 {margin: min_margin},
-                {text: "takakun"},
+                {text: "Takakun"},
                 {margin: default_margin},
                 {margin: default_margin},
                 {margin: default_margin},
 
-                {text: "powered by yamahei"},
+                {text: "Powered by Yamahei"},
             ];
             const layer = this.layer = DisplayElement(options).addChildTo(this).setOrigin(0, 0).setPosition(0, this.height);
             const x = this.gridX.center();
