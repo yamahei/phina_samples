@@ -50,7 +50,7 @@
                 {sprite: CharOrg},
                 {text: "Game engine"},
                 {margin: min_margin},
-                {text: "Phina.js"},
+                {text: "phina.js"},
                 {margin: default_margin},
 
                 {sprite: CharDragon},
