@@ -1,5 +1,5 @@
 
-const CACHE_STORAGE_NAME = 'v1';
+const CACHE_STORAGE_NAME = 'v2';
 self.addEventListener('fetch', function(event) {
   //キャッシュ対象
   const is_assets = event.request.url.includes('ASSETS/');

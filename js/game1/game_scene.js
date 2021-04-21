@@ -207,9 +207,10 @@
 					}
 					const carry_action = function(){
 						const hit = world.hitTestElement(gull);
-						const end_by_wall = (hit && hit.event_name == "wall");
-						const now_not_fall = (!hit || hit.event_name != "fall");
-						if(end_by_wall || (--counter <= 0 && now_not_fall)){//終わる条件
+						const end_by_wall = (hit && hit.event_name == "wall" && !hit.symbol.match(/^#/));//衝突したら終わる→ただし橋は無視
+						const now_not_fall = (!hit || hit.event_name != "fall");//落ちる状況ではない
+						const count_is_up = (--counter <= 0 );//最低限の距離飛んだ
+						if((count_is_up && now_not_fall) || end_by_wall){//終わる条件
 							setTimeout(function(){
 								all_enemy_on();///
 								item_setter.shoe();//set speed
