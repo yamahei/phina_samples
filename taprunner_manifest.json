@@ -1,0 +1,81 @@
+{
+  "dir": "ltr",
+  "lang": "no",
+  "name": "Tap Runner",
+  "short_name": "TR",
+  "scope": "./",
+  "display": "standalone",
+  "start_url": "./taprunner.pwa.html",
+  "background_color": "#000000",
+  "theme_color": "#221122",
+  "description": "8bit風ワンキーゲーム タップしてゴールを目指します\n    宝箱を開いてアイテムをゲット",
+  "orientation": "portrait",
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/phina_samples/pwa/taprunner/icons/msteams/msteams-192-192.png",
+      "sizes": "192x192"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/msteams/msteams-silhouette-32-32.png",
+      "sizes": "32x32"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/android/android-launchericon-512-512.png",
+      "sizes": "512x512"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/android/android-launchericon-192-192.png",
+      "sizes": "192x192"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/android/android-launchericon-144-144.png",
+      "sizes": "144x144"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/android/android-launchericon-96-96.png",
+      "sizes": "96x96"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/android/android-launchericon-72-72.png",
+      "sizes": "72x72"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/android/android-launchericon-48-48.png",
+      "sizes": "48x48"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/chrome/chrome-extensionmanagementpage-48-48.png",
+      "sizes": "48x48"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/chrome/chrome-favicon-16-16.png",
+      "sizes": "16x16"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/chrome/chrome-installprocess-128-128.png",
+      "sizes": "128x128"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-marketplace-512-512.png",
+      "sizes": "512x512"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-marketplace-128-128.png",
+      "sizes": "128x128"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-general-256-256.png",
+      "sizes": "256x256"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-general-128-128.png",
+      "sizes": "128x128"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-general-90-90.png",
+      "sizes": "90x90"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-general-64-64.png",
+      "sizes": "64x64"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-general-48-48.png",
+      "sizes": "48x48"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-general-32-32.png",
+      "sizes": "32x32"
+    }, {
+      "src": "/phina_samples/pwa/taprunner/icons/firefox/firefox-general-16-16.png",
+      "sizes": "16x16"
+    }
+  ],
+  "url": "/phina_samples/taprunner.pwa.html",
+  "generated": true,
+  "screenshots": []
+}
