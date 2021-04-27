@@ -9,7 +9,7 @@
  *     以下のコマンドを実行する
  *     $ find . -type f | grep "phina_samples" | grep -v ".git" | sed 's/^\.//'
  */
-const CACHE_STORAGE_NAME = 'v2';
+const CACHE_STORAGE_NAME = 'v3';
 const files_to_cache = `
 /phina_samples/ASSETS/image/chars/armor.png
 /phina_samples/ASSETS/image/chars/bat.png

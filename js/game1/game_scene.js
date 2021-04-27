@@ -450,7 +450,12 @@
 						options.items = items.get_item_properties();
 						const is_bonus = (options.level > 0) && (options.level % 4 == 0);
 						const next_scene = is_bonus ? "bonus" : "game";
-						scene.exit(next_scene, options);
+
+						const selections = [{label: "Next", event: "next"}];
+						const select = Selector(selections, {}).addChildTo(scene).setPosition(scene.gridX.center(), scene.gridY.center(+1));
+						select.on("select", function(e){
+							scene.exit(next_scene, options);
+						});
 					}, 1500);
 				})
 			});
