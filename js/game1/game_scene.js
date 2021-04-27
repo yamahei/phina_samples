@@ -436,7 +436,7 @@
 				.to({x: goal.x, y: hero.y}, distance * speed_per_fps, "linear").wait(200)
 				.call(function(){ ctrl.direction = "up"; }).wait(500)
 				.call(function(){ ctrl._visible = false; }).wait(100)
-				.call(function(){ goal.do_close(); }).wait(500)
+				.call(function(){ goal.do_close(); }).wait(200)
 				.call(function(){
 					SoundManager.play('close');
 					const goal_texts = [

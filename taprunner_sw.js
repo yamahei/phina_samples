@@ -225,7 +225,8 @@ self.addEventListener('fetch', function(event) {
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
-    caches.open(CACHE_STORAGE_NAME).then(function(cache) {
+    caches.open(CACHE_STORAGE_NAME)
+    .then(function(cache) {
       return cache.addAll(files_to_cache);
     })
   );
