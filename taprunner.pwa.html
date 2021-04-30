@@ -47,7 +47,7 @@
         if ('serviceWorker' in navigator) {
           const path_to_service_worke = "./taprunner_sw.js";
           // const path_to_service_worke = "/phina_samples/pwa/taprunner/sw.js";
-          const register_option = {cope: "."};
+          const register_option = {scope: "."};
           navigator.serviceWorker.register(path_to_service_worke, register_option)
             .then(function(registration) {
               console.log("serviceWorker registed.");
